@@ -40,8 +40,8 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 3: למידת מכונה בפרק אחד | `03-machine-learning-in-one-chapter.md` | ⏳ |
-| פרק 4: המתמטיקה המינימלית | `04-minimal-math.md` | ⏳ |
+| פרק 3: למידת מכונה בפרק אחד | [`03-machine-learning-in-one-chapter.md`](03-machine-learning-in-one-chapter.md) | ✅ |
+| פרק 4: המתמטיקה המינימלית | [`04-minimal-math.md`](04-minimal-math.md) | ✅ |
 | פרק 5: בתוך מודל שפה | `05-inside-a-language-model.md` | ⏳ |
 | פרק 6: יצירת טקסט והכפתורים שלה | `06-generation-and-its-knobs.md` | ⏳ |
 
