@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 23: זמן תגובה, עלות ואמינות</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="22-observability.html">← פרק 22: תצפיתיות (Observability)</a> · <a href="24-security-and-privacy.html">פרק 24: אבטחה ופרטיות →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#231">23.1 למדוד זמן תגובה נכון</a></li>
+<li><a href="#232">23.2 מודל העלות</a></li>
+<li><a href="#233">23.3 הידיות, לפי סדר</a></li>
+<li><a href="#234">23.4 שומר תקציב</a></li>
+<li><a href="#235">23.5 אמינות: מה כל דפוס עושה</a></li>
+<li><a href="#236-resilient_call">23.6 resilient_call</a></li>
+<li><a href="#237">23.7 הבדיקות עם תקלות מוזרקות</a></li>
+<li><a href="#238">23.8 הזמן</a></li>
+<li><a href="#239">23.9 בפרויקט</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="23">פרק 23: זמן תגובה, עלות ואמינות</h1>
+<p>שלוש התכונות שהופכות הדגמה למוצר: היא מהירה מספיק, זולה מספיק, ולא נופלת. הפרק מודד את
+הראשונה נכון (p50, p95, זמן לטוקן ראשון), מסביר את מודל העלות ואת הידיות לפי סדר התועלת (חינמיות
+קודם), בונה שומר תקציב, ומרכיב את הדפוסים של אמינות, זמן קצוב לבקשה שלמה, ניסיונות חוזרים, מפסק
+זרם, מודל גיבוי והידרדרות מכובדת, לפונקציה אחת שאפשר לבדוק עם תקלות מוזרקות. בסופו תהיה לך
+טבלה שמראה חצי מהעלות עם אותו ציון הערכה, ו־<code>resilient_call</code> שמחזיר תמיד משהו שאפשר לחיות איתו.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>p50, p95 וזמן לטוקן ראשון, ומה עשר הרצות יכולות ולא יכולות להגיד.</li>
+<li>מודל העלות: קלט, פלט, מטמון, אצווה.</li>
+<li>הידיות לפי סדר: מודל, מטמון, פלט קצר, אצווה, מקבול, חשיבה.</li>
+<li>שומר תקציב.</li>
+<li>אמינות: זמן קצוב לבקשה שלמה, ניסיונות, מפסק זרם, גיבוי, הידרדרות, שליחה אידמפוטנטית.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרק 11 (ניסיונות, זמן קצוב, <code>LLMError</code>), פרק 22 (עלות ב־span). התרגיל קורא ל־API.</p>
+<h2 id="231">23.1 למדוד זמן תגובה נכון</h2>
+<p>ממוצע משקר פעמיים: הוא מסתיר את הזנב, והוא לא קיים לאף משתמשת. שלושה מספרים במקום:</p>
+<table>
+<thead>
+<tr>
+<th>מספר</th>
+<th>משמעות</th>
+<th>למי חשוב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>p50 (חציון)</td>
+<td>חצי מהקריאות מהירות מזה</td>
+<td>החוויה הטיפוסית</td>
+</tr>
+<tr>
+<td>p95</td>
+<td>אחת מעשרים איטית מזה</td>
+<td>מי שסובלת, והיא תספר לאחרים</td>
+</tr>
+<tr>
+<td>זמן לטוקן ראשון (TTFT)</td>
+<td>מתי משהו מופיע, בהזרמה</td>
+<td>מי שמחכה מול מסך</td>
+</tr>
+</tbody>
+</table>
+<p><strong>אחוזון לפי דרגה</strong> (nearest-rank) הוא חישוב של שלוש שורות: ממיינים, מחשבים <code>ceil(p/100 × n)</code>,
+לוקחים את האיבר במקום הזה. <code>percentile</code> בתרגיל נבדק ביד על עשרה ערכים.</p>
+<p>מה עשר הרצות אומרות: את <em>הצורה</em> של ההתפלגות (האם יש זנב ארוך), ואת סדר הגודל. מה הן לא אומרות:
+את p95 האמיתי (צריך מאות), ואת ההתנהגות בשעה אחרת ביום (העומס אצל הספק משתנה). לכן המסקנה
+של הניסוי היא שלוש שורות, והשלישית תמיד „לחזור בשעה אחרת”.</p>
+<h2 id="232">23.2 מודל העלות</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">cost = input_tokens × price_in + output_tokens × price_out + cached_tokens × price_cached
+</code></pre>
+
+
+</div>
+
+<p>ארבע עובדות שמכתיבות את כל הידיות:</p>
+<ul>
+<li><strong>פלט יקר פי שמונה מקלט</strong> (0.30 מול 2.50 דולר למיליון ב־Flash-Lite). לקצר פלט שווה יותר מלקצר
+  קלט.</li>
+<li><strong>קלט מהמטמון זול ברבע</strong> מקלט רגיל, ודורש קידומת זהה (פרק 15).</li>
+<li><strong>אצווה</strong> (Batch API): חצי מחיר, שעות של השהיה, ממשק אחר (<code>contents</code>, לא Interactions).</li>
+<li><strong>מודל חכם יותר</strong> יקר פי שניים וחצי לקלט (0.75) ופי אחד וחצי לפלט (3.75). ההבדל באיכות נמדד,
+  לא מונח.</li>
+</ul>
+<p>בשכבה החינמית הכול אפס, אבל המגבלות היומיות הן המטבע: כל ידית שחוסכת טוקנים חוסכת גם מכסה.</p>
+<h2 id="233">23.3 הידיות, לפי סדר</h2>
+<table>
+<thead>
+<tr>
+<th>סדר</th>
+<th>ידית</th>
+<th>מה דורש</th>
+<th>חיסכון טיפוסי</th>
+<th>מתי לא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>מודל זול יותר למשימות הפשוטות (tiering)</td>
+<td>הערכה שמראה שהציון מחזיק</td>
+<td>פי 2 עד 3</td>
+<td>הציון יורד</td>
+</tr>
+<tr>
+<td>2</td>
+<td>מטמון הנחיות</td>
+<td>קידומת יציבה: הוראות, דוגמאות, מסמכים קודם; השאלה בסוף</td>
+<td>עד 75 אחוז מהקלט החוזר</td>
+<td>הקידומת קצרה מהמינימום של המודל</td>
+</tr>
+<tr>
+<td>3</td>
+<td>פלט קצר יותר</td>
+<td>הוראה מפורשת, <code>max_output_tokens</code> הדוק, סכמה שטוחה</td>
+<td>30 עד 50 אחוז מהפלט</td>
+<td>התוכן באמת צריך אורך</td>
+</tr>
+<tr>
+<td>4</td>
+<td>אצווה למה שיכול לחכות</td>
+<td>הפרדה בין דחוף ללא דחוף</td>
+<td>50 אחוז על החלק הזה</td>
+<td>הכול דחוף</td>
+</tr>
+<tr>
+<td>5</td>
+<td>מקבול</td>
+<td>סמפור (פרק 19)</td>
+<td>זמן, לא כסף</td>
+<td>מגבלות קצב</td>
+</tr>
+<tr>
+<td>6</td>
+<td>פחות חשיבה (<code>thinking_level</code>)</td>
+<td>הערכה</td>
+<td>פי 2 עד 5 בטוקני פלט על מודלים חושבים</td>
+<td>הערכה דורשת היסק</td>
+</tr>
+</tbody>
+</table>
+<p>הסדר הוא לפי „חינמי קודם”: הראשונות לא דורשות שינוי בקוד שמעבד את התשובה. הניסוי בתרגיל
+מפעיל את 1 עד 3 על 50 פריטים ומדפיס לכל גרסה עלות, זמן, ו<strong>שיעור תקינות</strong> לפי המאמת של פרק 9.
+ציון שיורד הוא קו אדום: חיסכון שמוריד איכות אינו חיסכון; הוא העברה של העלות למשתמשת.</p>
+<h2 id="234">23.4 שומר תקציב</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">guard = BudgetGuard(max_usd=0.25)
+completion = client.complete(...)
+guard.charge(model, completion)      # raises BudgetExceeded when the running total passes the limit
+</code></pre>
+
+
+</div>
+
+<p>השומר סוכם את העלות של כל קריאה (לפי <code>estimate_cost</code> של פרק 22, עם המטמון בנפרד) ועוצר את
+הריצה כשהסכום עובר את התקרה. שתי החלטות: <strong>הוא עוצר באמצע</strong>, ולא אחרי; הריצה שנעצרה מדווחת
+<code>budget_exceeded</code> וכותבת מה הספיקה. ו<strong>התקרה היא קונפיגורציה</strong>, לא קבוע: בפרויקט, 0.25 דולר
+לגיליון עם יעד של 0.10. בשכבה החינמית התקרה שומרת על המכסה, לא על הארנק, אבל ההרגל זהה.</p>
+<h2 id="235">23.5 אמינות: מה כל דפוס עושה</h2>
+<table>
+<thead>
+<tr>
+<th>דפוס</th>
+<th>מגן מפני</th>
+<th>איך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>זמן קצוב לבקשה שלמה (deadline)</td>
+<td>המתנה אינסופית, כולל ניסיונות וגיבוי</td>
+<td>מודדים את הזמן שנותר ומגבילים כל שלב בו</td>
+</tr>
+<tr>
+<td>ניסיונות חוזרים (פרק 11)</td>
+<td>כשל זמני</td>
+<td>רק על 429, 5xx וזמן קצוב; מעריכי עם אקראיות</td>
+</tr>
+<tr>
+<td>מפסק זרם (circuit breaker)</td>
+<td>הצפה של שירות שכבר נופל</td>
+<td>אחרי N כשלים רצופים, פתוח: לא מנסים; אחרי קירור, חצי פתוח: ניסיון אחד</td>
+</tr>
+<tr>
+<td>מודל גיבוי (fallback)</td>
+<td>הספק או המודל לא זמינים</td>
+<td>אותה בקשה למודל אחר; נרשם במפורש</td>
+</tr>
+<tr>
+<td>הידרדרות מכובדת (graceful degradation)</td>
+<td>הכול נכשל</td>
+<td>תוצאה שמקיימת את החוזה ואומרת שהיא לא תשובה של מודל</td>
+</tr>
+<tr>
+<td>שליחה אידמפוטנטית (פרק 20)</td>
+<td>כפילות בניסיון חוזר</td>
+<td>מפתח לפעולה</td>
+</tr>
+</tbody>
+</table>
+<p><strong>מפסק הזרם</strong> בשלוש מילים: סגור, פתוח, חצי פתוח. סגור הוא הרגיל. אחרי שלושה כשלים רצופים הוא
+נפתח, וכל קריאה נדחית מיד בלי לפנות לספק (זה חוסך זמן לנו ועומס לו). אחרי זמן קירור הוא עובר
+לחצי פתוח: קריאה אחת מנסה; הצלחה סוגרת, כישלון פותח שוב. בלי מפסק, מאה ריצות מקבילות היו
+מנסות שלוש פעמים כל אחת מול שירות שנפל, ומאריכות את הנפילה שלו.</p>
+<h2 id="236-resilient_call">23.6 <code>resilient_call</code></h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">outcome = resilient_call(
+    GeminiClient(fast), prompt,
+    fallback=GeminiClient(smart),            # a different model, recorded as &quot;fallback&quot;
+    breaker=breaker,                         # shared across calls in the run
+    deadline_s=30,                           # the whole thing: retries + fallback
+    policy=RetryPolicy(max_attempts=3),
+    degrade=degraded_summary,                # keeps the contract when everything fails
+)
+outcome.source        # &quot;primary&quot; | &quot;fallback&quot; | &quot;degraded&quot;
+outcome.errors        # what happened on the way; empty on the happy path
+</code></pre>
+
+
+</div>
+
+<p>הסדר בתוך הפונקציה: אם המפסק מרשה, המודל הראשי עם ניסיונות חוזרים שתחומים בזמן שנותר;
+הצלחה סוגרת את המפסק. כישלון נרשם במפסק ועוברים לגיבוי, גם הוא תחום בזמן שנותר. כישלון שני,
+ו־<code>degrade</code> מייצר תוצאה: <code>Completion</code> עם סטטוס <code>degraded</code> וטקסט שאומר „הסיכום לא זמין כרגע,
+הכתבה מקושרת למטה”. הקוד שקורא מקבל תמיד <code>Outcome</code>, ויודע מהשדה <code>source</code> מה הוא מחזיק.</p>
+<p>מה <strong>גיבוי</strong> משנה, וצריך לדעת: איכות (מודל אחר, אולי טוב יותר או פחות; ההערכה רצה גם עליו),
+עלות (אולי יקר יותר), ופרטיות (אם הגיבוי הוא ספק אחר, הנתונים נוסעים למקום אחר; בפרויקט שני
+המודלים אצל אותו ספק).</p>
+<p>מה <strong>הידרדרות</strong> צריכה לשמור: את החוזה. מי שמצפה ל־<code>Completion</code> מקבל <code>Completion</code>; העיתון מקבל
+פריט עם כותרת וקישור במקום סיכום, לא שורה ריקה ולא קריסה. ו<strong>היא נספרת</strong>: <code>source: degraded</code>
+במעקב הוא מדד.</p>
+<h2 id="237">23.7 הבדיקות עם תקלות מוזרקות</h2>
+<p>ה־<code>FakeClient</code> של פרק 11 מקבל חריגות בתסריט, ולכן כל נתיב נבדק:</p>
+<table>
+<thead>
+<tr>
+<th>תסריט</th>
+<th>תוצאה צפויה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ראשי מצליח</td>
+<td><code>primary</code>, ניסיון אחד, בלי שגיאות</td>
+</tr>
+<tr>
+<td>429 ואז הצלחה</td>
+<td><code>primary</code>, שני ניסיונות</td>
+</tr>
+<tr>
+<td>503 פעמיים, גיבוי מצליח</td>
+<td><code>fallback</code>, שגיאות עם 503</td>
+</tr>
+<tr>
+<td>400 בשניהם, עם <code>degrade</code></td>
+<td><code>degraded</code>, שתי שגיאות, סטטוס <code>degraded</code></td>
+</tr>
+<tr>
+<td>ניסיונות איטיים מול deadline של 12 שניות</td>
+<td><code>fallback</code>, השעון לא עבר 12</td>
+</tr>
+<tr>
+<td>מפסק פתוח</td>
+<td><code>fallback</code>, הראשי לא נקרא כלל, „circuit open” בשגיאות</td>
+</tr>
+</tbody>
+</table>
+<p>השעון וההמתנה מוזרקים (כמו בפרק 11), ולכן גם בדיקת ה־deadline רצה באלפית שנייה.</p>
+<h2 id="238">23.8 הזמן</h2>
+<table>
+<thead>
+<tr>
+<th>מקור זמן</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פלט ארוך</td>
+<td>לקצר (ידית 3); הזרמה כשאדם מחכה</td>
+</tr>
+<tr>
+<td>קריאות סדרתיות</td>
+<td>מקבול עם סמפור</td>
+</tr>
+<tr>
+<td>ניסיונות חוזרים</td>
+<td>תקרה ו־deadline; לא עשרים ניסיונות</td>
+</tr>
+<tr>
+<td>מודל חכם</td>
+<td>רק איפה שההערכה דורשת</td>
+</tr>
+<tr>
+<td>חשיבה</td>
+<td>הרמה הנמוכה ביותר שעוברת הערכה</td>
+</tr>
+<tr>
+<td>אחזור</td>
+<td>k קטן, אינדקס מקומי</td>
+</tr>
+</tbody>
+</table>
+<p>בפרויקט הלילי זמן אינו הבעיה; עלות ואמינות כן. בכלי אינטראקטיבי זה הפוך. שתי ההגדרות, deadline
+ותקציב, נמצאות בקונפיגורציה ומשתנות לפי המקרה.</p>
+<h2 id="239">23.9 בפרויקט</h2>
+<ul>
+<li><strong>אבן דרך 7:</strong> מודל מהיר לסיכומים ולדירוג, חכם למחקר ולהרכבה; הערכה של אבן דרך 6 מאשרת.
+  הקידומת (פרופיל והוראות) יציבה ובהתחלה; <code>cached_tokens</code> בדוח. פלט קצר בסכמה.</li>
+<li><strong>שומר תקציב</strong> ברמת הריצה: 0.25 דולר, יעד 0.10; <code>budget_exceeded</code> בדוח ובמייל.</li>
+<li><strong><code>resilient_call</code></strong> סביב כל קריאה בצינור, עם הידרדרות לפריט „כותרת וקישור בלבד”.</li>
+<li><strong>מפסק זרם</strong> אחד לכל מודל, משותף לריצה.</li>
+</ul>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>מודדים p50, p95 וזמן לטוקן ראשון; עשר הרצות מראות צורה, לא אמת.</li>
+<li>עלות: קלט, פלט (פי שמונה), מטמון (רבע), אצווה (חצי). הידיות לפי סדר: מודל, מטמון, פלט קצר,
+  אצווה, מקבול, חשיבה. ציון שיורד הוא קו אדום.</li>
+<li>שומר תקציב עוצר באמצע, עם דיווח.</li>
+<li>אמינות: deadline לבקשה שלמה, ניסיונות רק לכשל זמני, מפסק זרם, גיבוי מפורש, הידרדרות ששומרת
+  חוזה ונספרת, שליחה אידמפוטנטית.</li>
+<li>כל נתיב נבדק עם תקלות מוזרקות ושעון מזויף.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>אחוזון</td>
+<td>percentile</td>
+<td>הערך שאחוז נתון מהמדידות קטן ממנו</td>
+</tr>
+<tr>
+<td>זמן לטוקן ראשון</td>
+<td>time to first token (TTFT)</td>
+<td>מתי מופיע הפלט הראשון בהזרמה</td>
+</tr>
+<tr>
+<td>מדרוג מודלים</td>
+<td>model tiering</td>
+<td>מודל זול למשימות פשוטות, יקר למורכבות</td>
+</tr>
+<tr>
+<td>מטמון הנחיות</td>
+<td>prompt caching</td>
+<td>קידומת זהה מחויבת פחות</td>
+</tr>
+<tr>
+<td>אצווה</td>
+<td>batch API</td>
+<td>עיבוד מאוחר בחצי מחיר</td>
+</tr>
+<tr>
+<td>שומר תקציב</td>
+<td>budget guard</td>
+<td>עצירה כשהעלות המצטברת עוברת תקרה</td>
+</tr>
+<tr>
+<td>זמן קצוב לבקשה שלמה</td>
+<td>request deadline</td>
+<td>גבול לכל הניסיונות והגיבוי יחד</td>
+</tr>
+<tr>
+<td>מפסק זרם</td>
+<td>circuit breaker</td>
+<td>סגור, פתוח, חצי פתוח; מפסיק לנסות מול שירות שנופל</td>
+</tr>
+<tr>
+<td>מודל גיבוי</td>
+<td>fallback model</td>
+<td>מודל שני כשהראשון לא זמין</td>
+</tr>
+<tr>
+<td>הידרדרות מכובדת</td>
+<td>graceful degradation</td>
+<td>תוצאה שמקיימת את החוזה כשהכול נכשל</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>ממוצע זמן תגובה.</strong> p50 ו־p95, או כלום.</li>
+<li><strong>לחסוך בלי הערכה.</strong> המודל הזול „נראה בסדר” עד שהעיתון מלא שגיאות.</li>
+<li><strong>מטמון עם חותמת זמן בתחילת ההנחיה.</strong> הקידומת משתנה בכל קריאה; אפס פגיעות.</li>
+<li><strong>ניסיונות בלי deadline כולל.</strong> ארבעה ניסיונות כפול שישים שניות כפול גיבוי.</li>
+<li><strong>גיבוי שקט.</strong> אם לא נרשם <code>source: fallback</code>, לא תדעי שהאיכות השתנתה.</li>
+<li><strong>הידרדרות ששוברת את החוזה.</strong> <code>None</code> במקום <code>Completion</code> מפיל את השלב הבא.</li>
+<li><strong>מפסק זרם לכל קריאה בנפרד.</strong> הוא חייב להיות משותף, אחרת הוא לא לומד כלום.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>איך את מודדת ומדווחת זמן תגובה?</strong> p50 ו־p95 (לא ממוצע), וזמן לטוקן ראשון כשיש הזרמה;
+   אחוזון לפי דרגה; וסייג על מספר הדגימות והשעה. בפרויקט שלי: טבלה של שני מודלים על עשר הרצות,
+   עם מסקנה של שלוש שורות.</li>
+<li><strong>איך מורידים עלות של מערכת מודל בלי לפגוע באיכות?</strong> לפי סדר: מודל זול יותר איפה שההערכה
+   מחזיקה, מטמון הנחיות עם קידומת יציבה, פלט קצר יותר, אצווה למה שיכול לחכות, ופחות חשיבה.
+   כל ידית נמדדת מול ההערכה, ושומר תקציב עוצר את הריצה כשחורגים.</li>
+<li><strong>מה ההבדל בין ניסיון חוזר, גיבוי והידרדרות?</strong> ניסיון חוזר: אותה בקשה שוב אחרי כשל זמני. גיבוי:
+   אותה בקשה למודל אחר, נרשם במפורש כי האיכות והפרטיות משתנות. הידרדרות: תוצאה שמקיימת את
+   החוזה ואומרת שהיא לא תשובה של מודל, כשהכול נכשל. ו־deadline אחד מעל כולם.</li>
+<li><strong>למה צריך מפסק זרם אם יש ניסיונות חוזרים?</strong> ניסיונות חוזרים מטפלים בכשל של קריאה אחת; מפסק
+   זרם מטפל בכשל של שירות: אחרי כמה כשלים רצופים מפסיקים לנסות, חוסכים זמן לנו ועומס לספק,
+   ובודקים שוב אחרי קירור עם קריאה אחת.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/23-latency-cost-reliability.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>מדידה:</strong> p50, p95, TTFT; אחוזון לפי דרגה; עשר הרצות = צורה, לא אמת.</li>
+<li><strong>עלות:</strong> in × 0.30 + out × 2.50 + cached × 0.075 (Flash-Lite, למיליון). פלט יקר פי 8. אצווה חצי.</li>
+<li><strong>ידיות לפי סדר:</strong> מודל, מטמון (קידומת יציבה), פלט קצר, אצווה, מקבול, חשיבה. ציון יורד = קו אדום.</li>
+<li><strong>BudgetGuard(max_usd).charge(model, completion)</strong> עוצר באמצע.</li>
+<li><strong>resilient_call:</strong> deadline כולל, ניסיונות תחומים, מפסק (סגור/פתוח/חצי), גיבוי מפורש, הידרדרות
+  ששומרת חוזה. <code>Outcome.source</code>.</li>
+<li><strong>בדיקות:</strong> FakeClient עם חריגות בתסריט, שעון מזויף.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">bench     python -m ch23.bench --runs 10        percentile(values, 95) = sorted[ceil(0.95*n)-1]
+levers    python -m ch23.cost_levers --items 50 [--batch]   variants: smart/long -&gt; fast -&gt; fast/short; validity column
+budget    BudgetGuard(max_usd=0.25).charge(model, completion) -&gt; BudgetExceeded
+breaker   CircuitBreaker(failure_threshold=3, cooldown_s=30): allow() / record_success() / record_failure()
+call      resilient_call(primary, prompt, fallback=, breaker=, deadline_s=, policy=, degrade=degraded_summary) -&gt; Outcome(source, errors, attempts)
+batch     client.batches.create(model=, src=[InlinedRequest(contents=, config=)], config=CreateBatchJobConfig(display_name=)) -&gt; job.name; poll batches.get
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> למדוד זמן תגובה של שני מודלים, לחתוך את עלות הסיכום של 50 פריטים בחצי עם ציון ההערכה
+לצד כל גרסה, לבנות שומר תקציב, ולכתוב <code>resilient_call</code> עם מפסק זרם, גיבוי והידרדרות, נבדק עם תקלות
+מוזרקות. <strong>זמן:</strong> שלושה ימי לימוד (ימים 44 עד 46), כ־60, 70 ו־60 דקות. <strong>ידע מקדים:</strong> הפרק, פרקים
+11 ו־22, ומפתח API.</p>
+<p>הצעדים, קוד ההתחלה, הרמזים והפתרון נמצאים ב־
+<a href="../exercises/ch23-latency-cost-reliability/README.md"><code>exercises/ch23-latency-cost-reliability/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li>טבלת p50, p95, TTFT ועלות לקריאה לשני מודלים, ומסקנה של שלוש שורות.</li>
+<li>טבלת לפני ואחרי: שלוש גרסאות, עלות, זמן, שיעור תקינות; הגרסה האחרונה זולה בחצי לפחות בלי ירידה.</li>
+<li>שש הבדיקות עוברות בלי רשת, כולל טבלת תקלה ותוצאה.</li>
+<li>בפתק: מה הגיבוי משנה (איכות, עלות, פרטיות) במערכת שלך.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>„Release It!” (Michael Nygard): המקור של מפסק הזרם ושל רוב דפוסי היציבות.</li>
+<li>התיעוד של Gemini על Batch API ועל context caching: מינימום טוקנים, זמן חיים, מחירים.</li>
+<li>„Latency Numbers Every Programmer Should Know”, בשביל פרופורציות.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="22-observability.html">← פרק 22: תצפיתיות (Observability)</a> · <a href="24-security-and-privacy.html">פרק 24: אבטחה ופרטיות →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

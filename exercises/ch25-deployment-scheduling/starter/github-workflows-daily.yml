@@ -1,0 +1,47 @@
+# Chapter 25 starter: the daily job on GitHub Actions. Copy to .github/workflows/daily.yml.
+# 07:00 Asia/Jerusalem = 04:00 UTC in summer (IDT) and 05:00 UTC in winter (IST). Cron has no timezone,
+# so both lines are scheduled and the job exits early (code 2) when it is not 07:00 locally.
+name: daily-brief
+
+on:
+  schedule:
+    - cron: "0 4 * * *"     # summer
+    - cron: "0 5 * * *"     # winter
+  workflow_dispatch:        # the "run it now" button, with an optional item count
+    inputs:
+      items:
+        description: "how many items"
+        default: "5"
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      MODEL_FAST: gemini-3.5-flash-lite
+      MODEL_SMART: gemini-3.8-flash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - name: offline tests first (never run the paid job on a broken tree)
+        run: uv run pytest -q -m "not judge"
+      - name: run the job
+        id: job
+        run: |
+          set +e
+          uv run python -m ch25.daily_job --out out --items "${{ github.event.inputs.items || '5' }}" ${{ github.event_name == 'schedule' && '--local-hour 7' || '' }}
+          code=$?
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" = "2" ]; then echo "skipped: not 07:00 in Jerusalem"; exit 0; fi
+          exit $code
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.job.outputs.exit != '2'
+        with:
+          name: brief-${{ github.run_id }}
+          path: |
+            out/brief-*.md
+            out/run-report.json
+            out/traces.jsonl
+          retention-days: 14

@@ -84,11 +84,11 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 22: תצפיתיות (Observability) | `22-observability.md` | ⏳ |
-| פרק 23: זמן תגובה, עלות ואמינות | `23-latency-cost-reliability.md` | ⏳ |
-| פרק 24: אבטחה ופרטיות | `24-security-and-privacy.md` | ⏳ |
-| פרק 25: פריסה ותזמון | `25-deployment-and-scheduling.md` | ⏳ |
-| פרק 26: בחירת מודלים ושיטות | `26-choosing-models-and-methods.md` | ⏳ |
+| פרק 22: תצפיתיות (Observability) | [`22-observability.md`](22-observability.md) | ✅ |
+| פרק 23: זמן תגובה, עלות ואמינות | [`23-latency-cost-reliability.md`](23-latency-cost-reliability.md) | ✅ |
+| פרק 24: אבטחה ופרטיות | [`24-security-and-privacy.md`](24-security-and-privacy.md) | ✅ |
+| פרק 25: פריסה ותזמון | [`25-deployment-and-scheduling.md`](25-deployment-and-scheduling.md) | ✅ |
+| פרק 26: בחירת מודלים ושיטות | [`26-choosing-models-and-methods.md`](26-choosing-models-and-methods.md) | ✅ |
 
 ## חלק ח: קריירה
 

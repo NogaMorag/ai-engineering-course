@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 25: פריסה ותזמון</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="24-security-and-privacy.html">← פרק 24: אבטחה ופרטיות</a> · <a href="26-choosing-models-and-methods.html">פרק 26: בחירת מודלים ושיטות →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#251">25.1 קונפיגורציה וסביבות</a></li>
+<li><a href="#252-github-actions">25.2 GitHub Actions: המשימה שרצה בלי אדם</a></li>
+<li><a href="#253-ci">25.3 CI לפני ריצה בתשלום</a></li>
+<li><a href="#254">25.4 גרסאות יחד</a></li>
+<li><a href="#255">25.5 הקנרית</a></li>
+<li><a href="#256">25.6 המשימה עצמה</a></li>
+<li><a href="#257-windows-task-scheduler">25.7 Windows Task Scheduler</a></li>
+<li><a href="#258-docker">25.8 תיבה אופציונלית: Docker</a></li>
+<li><a href="#259">25.9 בפרויקט</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="25">פרק 25: פריסה ותזמון</h1>
+<p>עיתון בוקר שצריך להריץ ביד הוא לא עיתון בוקר. הפרק הופך את הקוד למשימה שרצה בלי אדם: קונפיגורציה
+לפי סביבה, GitHub Actions עם תזמון (ועם המלכודת של שעון קיץ), סודות, תוצרים (artifacts) והפעלה ידנית;
+CI שמריץ את הבדיקות הלא־מקוונות ואת ההערכות המהירות לפני כל ריצה בתשלום; גרסאות של הנחיה, מודל
+ואינדקס יחד, ומה זה „חזרה לאחור” כשאחד מהם הוא מודל אצל ספק; וחלופה מקומית ב־Windows Task
+Scheduler. בסופו ריצה מתוזמנת תייצר קובץ Markdown ודוח ריצה ב־GitHub בלי שתגעי במקלדת.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>קונפיגורציה וסביבות: מה בקובץ, מה במשתנה סביבה, מה בסוד.</li>
+<li>GitHub Actions: cron ב־UTC, שעון קיץ, סודות, תוצרים, הפעלה ידנית.</li>
+<li>CI לפני ריצה: בדיקות לא־מקוונות והערכות מהירות.</li>
+<li>גרסאות יחד: הנחיה, מודל, אינדקס, סכמה.</li>
+<li>חזרה לאחור ורעיון הקנרית.</li>
+<li>Windows Task Scheduler כחלופה; Docker כתיבה אופציונלית.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרק 18 (המדרגות וה־CI), פרק 22 (המעקב), פרק 23 (שומר התקציב). התרגיל דורש מאגר GitHub.</p>
+<h2 id="251">25.1 קונפיגורציה וסביבות</h2>
+<table>
+<thead>
+<tr>
+<th>סוג</th>
+<th>דוגמה</th>
+<th>איפה</th>
+<th>למה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>קוד</td>
+<td>הלוגיקה</td>
+<td>Git</td>
+<td>משתנה בגרסאות</td>
+</tr>
+<tr>
+<td>הגדרה</td>
+<td>מספר פריטים, שפה, נושאים</td>
+<td>קובץ בגיט (<code>profile.yaml</code>)</td>
+<td>שונה בין משתמשות, לא סודי, מגורסן</td>
+</tr>
+<tr>
+<td>סביבה</td>
+<td>שמות מודלים, נתיבים</td>
+<td>משתני סביבה, או קובץ <code>.env</code> מקומי</td>
+<td>שונה בין מכונה ל־CI</td>
+</tr>
+<tr>
+<td>סוד</td>
+<td>מפתח API, סיסמת מייל</td>
+<td><code>.env</code> מקומי (לא בגיט); GitHub Secrets ב־CI</td>
+<td>אסור שיהיה בקוד או בלוג</td>
+</tr>
+<tr>
+<td>גרסאות</td>
+<td>הנחיה, מודל, אינדקס</td>
+<td><code>versions.json</code> בגיט</td>
+<td>סעיף 25.4</td>
+</tr>
+</tbody>
+</table>
+<p>הכלל: קוד אחד, קונפיגורציה לכל סביבה, סודות מחוץ לגיט. אותו <code>daily_job.py</code> רץ על המחשב שלך
+(<code>.env</code>), ב־CI (secrets), ובמכולה (משתני סביבה).</p>
+<h2 id="252-github-actions">25.2 GitHub Actions: המשימה שרצה בלי אדם</h2>
+<p>ה־workflow בתרגיל (<code>daily.yml</code>) מכיל כל מה שמשימה מתוזמנת צריכה:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-yaml">on:
+  schedule:
+    - cron: &quot;0 4 * * *&quot;     # summer: 07:00 Asia/Jerusalem is 04:00 UTC
+    - cron: &quot;0 5 * * *&quot;     # winter: 05:00 UTC
+  workflow_dispatch:        # the &quot;run it now&quot; button
+    inputs: { items: { default: &quot;5&quot; } }
+</code></pre>
+
+
+</div>
+
+<p><strong>המלכודת של שעון הקיץ.</strong> cron ב־GitHub Actions רץ ב־UTC ולא יודע מה זה שעון קיץ. 07:00
+בירושלים הוא 04:00 UTC בקיץ (UTC+3) ו־05:00 UTC בחורף (UTC+2). פתרון של שורה אחת ייתן עיתון ב־06:00
+או ב־08:00 במחצית השנה. הפתרון בתרגיל: <strong>שתי שורות cron, והמשימה בודקת בעצמה</strong> (<code>--local-hour 7</code>)
+אם עכשיו שבע בירושלים; אם לא, היא יוצאת עם קוד 2 בלי לעשות כלום, וה־workflow מתייחס לזה כהצלחה
+שקטה. <code>cron_for_local_time</code> מחשב את שתי השורות מתוך <code>zoneinfo</code>, לכל אזור זמן.</p>
+<p><strong>סודות.</strong> <code>GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}</code> נכנס כמשתנה סביבה; GitHub ממסך אותו
+בלוגים. בלי הסוד, המדרגה המהירה עדיין רצה (היא לא צריכה מפתח), והמשימה נכשלת מוקדם וברור.</p>
+<p><strong>תוצרים.</strong> <code>upload-artifact</code> שומר את <code>brief-&lt;date&gt;.md</code>, <code>run-report.json</code> ו־<code>traces.jsonl</code> ל־14 יום.
+זה המקום שבו רואים את העיתון של הבוקר בלי מחשב דולק. <code>if: always()</code> מעלה את התוצרים גם כשהריצה
+נכשלה: הדוח של ריצה שנכשלה הוא החשוב מכולם.</p>
+<p><strong>הפעלה ידנית.</strong> <code>workflow_dispatch</code> עם קלט (<code>items</code>) הוא כפתור „הרץ עכשיו” לבדיקה אחרי שינוי.</p>
+<h2 id="253-ci">25.3 CI לפני ריצה בתשלום</h2>
+<p>הצעד הראשון ב־workflow הוא <code>uv run pytest -q -m "not judge"</code>: המדרגה המהירה של פרק 18, בלי
+מפתח. אם היא אדומה, המשימה לא רצה, ולא משלמים על ריצה של קוד שבור. ההערכות עם השופט לא רצות
+כאן (איטיות ובתשלום); הן רצות בלילה אחר, ב־workflow של פרק 18. <strong>סדר העבודה:</strong> בדיקות, ואז ריצה,
+ואז תוצרים. ואם הריצה נכשלה, הדוח עולה בכל זאת.</p>
+<h2 id="254">25.4 גרסאות יחד</h2>
+<p>במערכת רגילה, גרסה היא commit. במערכת מודל, ההתנהגות תלויה בארבעה דברים שמשתנים בנפרד:</p>
+<table>
+<thead>
+<tr>
+<th>רכיב</th>
+<th>משתנה כש…</th>
+<th>מי שולט</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>הנחיה (<code>summarize.v3</code>)</td>
+<td>עורכים קובץ</td>
+<td>את</td>
+</tr>
+<tr>
+<td>מודל (<code>gemini-3.5-flash-lite</code>)</td>
+<td>הספק מעדכן, או את מחליפה</td>
+<td>שניכם</td>
+</tr>
+<tr>
+<td>אינדקס (<code>notes-2026-10</code>)</td>
+<td>מאנדקסים מחדש, או משנים מודל שיכון</td>
+<td>את</td>
+</tr>
+<tr>
+<td>סכמה (<code>schema_version: 1</code>)</td>
+<td>משנים את <code>ArticleSummary</code></td>
+<td>את</td>
+</tr>
+</tbody>
+</table>
+<p><code>versions.json</code> מצהיר על ארבעתם במקום אחד, ו־<code>check_versions</code> משווה אותם למציאות לפני הריצה:
+קובץ ההנחיה קיים? משתני הסביבה של המודלים תואמים? האינדקס נבנה עם מודל השיכון המוצהר? אי־התאמה
+היא כישלון מוקדם, לא עיתון מוזר. ואז <strong>חזרה לאחור</strong> (rollback) היא פעולה מוגדרת: לשחזר את
+<code>versions.json</code> הקודם (ואת האינדקס שהוא מצביע עליו), לא „לבטל את העריכה של ההנחיה” בלבד, כי
+ההנחיה החדשה אולי נמדדה מול המודל החדש.</p>
+<p>מה שלא נשלט: הספק יכול לשנות את התנהגות המודל מתחת לאותו שם. ההגנה היא ההערכה שרצה בלילה
+(פרק 18): ציון שיורד בלי שינוי אצלך פירושו שהמודל זז.</p>
+<h2 id="255">25.5 הקנרית</h2>
+<p>כשמשנים הנחיה או מודל, לא מחליפים את כל העיתון בבת אחת. <strong>קנרית</strong> (canary) היא ריצה אחת של
+הגרסה החדשה לצד הישנה: אותם פריטים, שני סיכומים, ההערכה והקוראת משוות, ורק אז מחליפים. בפרויקט
+זה <code>--versions versions-next.json</code> לריצה ידנית, והשוואת שני הדוחות (פרק 16). עבור מערכת של אדם
+אחד, זה מספיק; במערכת גדולה, אחוז מהתעבורה.</p>
+<h2 id="256">25.6 המשימה עצמה</h2>
+<p><code>daily_job.py</code> הוא מה שה־workflow מריץ, והוא נבנה לרוץ בלי אדם:</p>
+<table>
+<thead>
+<tr>
+<th>תכונה</th>
+<th>איך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>קודי יציאה ברורים</td>
+<td>0 הצלחה, 2 דילוג (לא השעה), 3 המודל נכשל על הכול, 4 התקציב נגמר</td>
+</tr>
+<tr>
+<td>תוצרים תמיד</td>
+<td><code>brief-&lt;date&gt;.md</code> ו־<code>run-report.json</code>; הדוח נכתב גם בכישלון</td>
+</tr>
+<tr>
+<td>מעקב</td>
+<td><code>TracingClient</code> של פרק 22 לכל קריאה; <code>traces.jsonl</code> עולה כתוצר</td>
+</tr>
+<tr>
+<td>תקציב</td>
+<td><code>BudgetGuard</code> של פרק 23; חריגה כותבת דוח ויוצאת 4</td>
+</tr>
+<tr>
+<td>כשל חלקי</td>
+<td>פריט שנכשל נספר ונרשם; הריצה ממשיכה</td>
+</tr>
+<tr>
+<td>הרצה יבשה</td>
+<td><code>--dry-run</code> עם <code>FakeClient</code>: אותו קוד, בלי מפתח, ל־CI ולבדיקות</td>
+</tr>
+<tr>
+<td>גרסאות</td>
+<td>קורא <code>versions.json</code> אם קיים; המודל משם</td>
+</tr>
+</tbody>
+</table>
+<p><code>--dry-run</code> הוא מה שמאפשר לבדוק את <em>כל</em> המשימה בלי רשת: הבדיקה מריצה אותה על שלושה פריטים
+מזויפים ובודקת את הקובץ, את הדוח ואת המעקב. ההרצה האמיתית שונה רק בלקוח.</p>
+<h2 id="257-windows-task-scheduler">25.7 Windows Task Scheduler</h2>
+<p>GitHub Actions דורש מאגר ורשת. על המחשב עצמו, Task Scheduler עושה את אותו דבר, בזמן מקומי
+(בלי המלכודת של UTC):</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">schtasks /Create /TN &quot;MorningBrief&quot; /SC DAILY /ST 07:00 /TR &quot;pwsh -File C:\path\to\ai-course\run_daily.ps1&quot; /F
+schtasks /Run /TN &quot;MorningBrief&quot;
+schtasks /Query /TN &quot;MorningBrief&quot; /V /FO LIST
+</code></pre>
+
+
+</div>
+
+<p><code>run_daily.ps1</code> עובר לתיקיית הפרויקט, מריץ את המשימה עם <code>--env-file .env</code>, ומנתב את הפלט לקובץ
+לוג יומי. ההבדל מ־CI: המחשב צריך להיות דלוק, והסודות הם <code>.env</code> המקומי. בשביל עיתון אישי זה
+לגיטימי לגמרי, וזה מה שתעשי אם אין לך מאגר ציבורי.</p>
+<h2 id="258-docker">25.8 תיבה אופציונלית: Docker</h2>
+<p>מכולה היא „אותה סביבה בכל מקום”: Python, התלויות והקוד בתמונה אחת, המפתח כמשתנה סביבה בזמן
+ריצה. ה־<code>Dockerfile</code> בתרגיל הוא עשר שורות עם <code>uv sync --frozen</code>. מתי זה שווה: כשהמשימה רצה על
+שרת שאינו שלך, או כשצריך גרסת Python מסוימת. מתי לא: לעיתון אישי על המחשב או ב־Actions, <code>uv</code>
+לבד מספיק.</p>
+<h2 id="259">25.9 בפרויקט</h2>
+<ul>
+<li><strong>אבן דרך 9:</strong> <code>daily.yml</code> עם שתי שורות cron, <code>--local-hour</code>, סודות, תוצרים, הפעלה ידנית;
+  <code>versions.json</code> ו־<code>check_versions</code> בתחילת הריצה; קנרית ידנית לפני כל החלפת הנחיה או מודל.</li>
+<li><strong>ה־README</strong> של הפרויקט מסביר את שלוש הדרכים להריץ: ביד, Task Scheduler, Actions.</li>
+<li><strong>הדוח של ריצה שנכשלה</strong> הוא תוצר ראשון במעלה.</li>
+</ul>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>קוד אחד, קונפיגורציה לכל סביבה, סודות מחוץ לגיט, גרסאות בקובץ אחד.</li>
+<li>cron ב־UTC בלי שעון קיץ: שתי שורות, והמשימה בודקת את השעה המקומית.</li>
+<li>סודות של המאגר, תוצרים גם בכישלון, כפתור הפעלה ידנית.</li>
+<li>בדיקות לא־מקוונות לפני כל ריצה בתשלום; השופט בלילה אחר.</li>
+<li>הנחיה, מודל, אינדקס וסכמה מגורסנים יחד; חזרה לאחור משחזרת את הקובץ; קנרית לפני החלפה.</li>
+<li>קודי יציאה, דוח תמיד, הרצה יבשה; Task Scheduler בזמן מקומי; Docker כשצריך.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>משימה מתוזמנת</td>
+<td>scheduled job</td>
+<td>קוד שרץ בזמן קבוע בלי אדם</td>
+</tr>
+<tr>
+<td>cron</td>
+<td>cron</td>
+<td>תחביר של תזמון: דקה שעה יום חודש יום־בשבוע, ב־UTC ב־Actions</td>
+</tr>
+<tr>
+<td>שעון קיץ</td>
+<td>daylight saving time (DST)</td>
+<td>הסיבה שלשעה מקומית יש שני זמני UTC בשנה</td>
+</tr>
+<tr>
+<td>סוד</td>
+<td>secret</td>
+<td>ערך שמוזרק כמשתנה סביבה ולא מופיע בקוד או בלוג</td>
+</tr>
+<tr>
+<td>תוצר</td>
+<td>artifact</td>
+<td>קובץ שנשמר מריצה: העיתון, הדוח, המעקב</td>
+</tr>
+<tr>
+<td>הפעלה ידנית</td>
+<td>workflow_dispatch</td>
+<td>כפתור „הרץ עכשיו” עם קלטים</td>
+</tr>
+<tr>
+<td>קובץ גרסאות</td>
+<td>versions file</td>
+<td>הנחיה, מודל, אינדקס וסכמה במקום אחד</td>
+</tr>
+<tr>
+<td>חזרה לאחור</td>
+<td>rollback</td>
+<td>שחזור של קובץ הגרסאות והאינדקס שהוא מצביע עליו</td>
+</tr>
+<tr>
+<td>קנרית</td>
+<td>canary</td>
+<td>ריצה אחת של גרסה חדשה לצד הישנה, לפני החלפה</td>
+</tr>
+<tr>
+<td>הרצה יבשה</td>
+<td>dry run</td>
+<td>אותו קוד עם לקוח מזויף; בלי רשת ובלי מפתח</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>שורת cron אחת.</strong> העיתון זז בשעה פעמיים בשנה.</li>
+<li><strong>המפתח בקובץ ה־workflow.</strong> סוד של המאגר, או כלום.</li>
+<li><strong>תוצרים רק בהצלחה.</strong> הדוח של הכישלון הוא זה שצריך.</li>
+<li><strong>ריצה בתשלום בלי בדיקות לפניה.</strong> משלמים על קוד שבור.</li>
+<li><strong>לגרסן רק את ההנחיה.</strong> ההנחיה נמדדה מול מודל ואינדקס מסוימים.</li>
+<li><strong>להחליף מודל בלי קנרית.</strong> עיתון שלם ברמה לא ידועה.</li>
+<li><strong>קוד יציאה אפס תמיד.</strong> אף אחד לא יודע שהמשימה דילגה או נכשלה.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>איך את פורסת משימת מודל שרצה כל בוקר?</strong> GitHub Actions עם cron, שתי שורות בגלל שעון הקיץ
+   והמשימה בודקת את השעה המקומית; המפתח כסוד; בדיקות לא־מקוונות לפני הריצה; תוצרים (העיתון, דוח
+   ריצה, מעקב) גם בכישלון; קודי יציאה ברורים ותקציב. ואותו קוד רץ מקומית עם Task Scheduler.</li>
+<li><strong>מה הגרסה של מערכת מודל?</strong> לא commit בלבד: הנחיה, מודל, אינדקס וסכמה יחד, בקובץ אחד שנבדק מול
+   המציאות בתחילת הריצה. חזרה לאחור משחזרת את הקובץ ואת האינדקס. ומה שהספק משנה מתחת לשם
+   המודל נתפס רק בהערכה שרצה בקביעות.</li>
+<li><strong>מה המלכודת של cron ב־Actions?</strong> הוא ב־UTC ובלי שעון קיץ; שעה מקומית קבועה היא שני זמני UTC
+   בשנה. פתרון: שתי שורות ובדיקה בתוך המשימה, או קבלת סחף של שעה.</li>
+<li><strong>איך משנים הנחיה בייצור בלי לשבור את העיתון?</strong> גרסה חדשה בקובץ נפרד, ריצת קנרית לצד הישנה
+   על אותם פריטים, השוואה בהערכה ובעין, ואז החלפה של קובץ הגרסאות עם דרך חזרה.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/25-deployment-and-scheduling.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>קוד / הגדרה / סביבה / סוד / גרסאות:</strong> Git / קובץ בגיט / env / <code>.env</code> ו־Secrets / <code>versions.json</code>.</li>
+<li><strong>cron = UTC בלי DST.</strong> 07:00 ירושלים = 04:00 UTC קיץ, 05:00 חורף. שתי שורות + <code>--local-hour 7</code>.</li>
+<li><strong>workflow:</strong> secrets, <code>upload-artifact</code> עם <code>if: always()</code>, <code>workflow_dispatch</code>; בדיקות לפני הריצה.</li>
+<li><strong>versions.json:</strong> הנחיה, מודל, אינדקס, סכמה; <code>check_versions</code> לפני הריצה; rollback = שחזור הקובץ.</li>
+<li><strong>קנרית</strong> לפני החלפה. <strong>קודי יציאה:</strong> 0 / 2 דילוג / 3 כשל / 4 תקציב. <strong>דוח תמיד.</strong> <code>--dry-run</code>.</li>
+<li><strong>Task Scheduler:</strong> זמן מקומי, <code>.env</code>, מחשב דלוק. <strong>Docker:</strong> כשהשרת לא שלך.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">cron      cron_for_local_time(7, 0) -&gt; summer &quot;0 4 * * *&quot;, winter &quot;0 5 * * *&quot;;  is_local_hour(now_utc, 7)
+job       python -m ch25.daily_job --out out --items 5 [--dry-run] [--local-hour 7] [--versions versions.json]   exit 0/2/3/4
+versions  load_versions(path) -&gt; Versions; check_versions(v, prompts_dir=, env=, index_metadata=) -&gt; [problems]
+actions   .github/workflows/daily.yml: schedule x2 + workflow_dispatch; secrets.GEMINI_API_KEY; pytest first; upload-artifact if: always()
+windows   schtasks /Create /TN &quot;MorningBrief&quot; /SC DAILY /ST 07:00 /TR &quot;pwsh -File ...\run_daily.ps1&quot; /F
+docker    docker build -t morning-brief . ; docker run --rm -e GEMINI_API_KEY -v &quot;$PWD/out:/app/out&quot; morning-brief
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> לבנות את המשימה היומית עם קודי יציאה, מעקב ותקציב; לפרוס אותה ב־GitHub Actions עם שתי
+שורות cron, סודות, תוצרים והפעלה ידנית; לגרסן הנחיה, מודל ואינדקס יחד; ולהריץ אותה גם מ־Task
+Scheduler. <strong>זמן:</strong> יום לימוד אחד (יום 49), כ־70 דקות בנייה, ועוד המתנה לריצה המתוזמנת. <strong>ידע
+מקדים:</strong> הפרק, פרקים 18, 22 ו־23, מאגר GitHub ומפתח API.</p>
+<p>הצעדים, קוד ההתחלה, הרמזים והפתרון נמצאים ב־
+<a href="../exercises/ch25-deployment-scheduling/README.md"><code>exercises/ch25-deployment-scheduling/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li>ריצה ידנית (<code>workflow_dispatch</code>) ירוקה ב־GitHub עם תוצר שמכיל את העיתון, הדוח והמעקב.</li>
+<li>הריצה המתוזמנת הבאה ייצרה תוצר בעצמה (או דילגה עם קוד 2 בשעה הלא נכונה, ורואים את זה בלוג).</li>
+<li><code>versions.json</code> במאגר, ו־<code>check_versions</code> נכשל כשמשנים משתנה סביבה בכוונה.</li>
+<li>ארבע הבדיקות עוברות בלי רשת; המשימה רשומה גם ב־Task Scheduler ורצה פעם אחת.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>התיעוד של GitHub Actions על <code>schedule</code> (כולל האזהרה שריצות מתוזמנות עלולות להתעכב בעומס) ועל
+  <code>workflow_dispatch</code>.</li>
+<li>„The Twelve-Factor App”: קונפיגורציה בסביבה, תהליכים חסרי מצב, לוגים כזרמים.</li>
+<li><code>uv</code> ו־Docker: <code>uv sync --frozen</code> בתמונה, והסבר על <code>--no-sync</code> בזמן ריצה.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="24-security-and-privacy.html">← פרק 24: אבטחה ופרטיות</a> · <a href="26-choosing-models-and-methods.html">פרק 26: בחירת מודלים ושיטות →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 22: תצפיתיות (Observability)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="21-frameworks-and-protocols.html">← פרק 21: ספריות ופרוטוקולים: LangGraph ו־MCP</a> · <a href="23-latency-cost-reliability.html">פרק 23: זמן תגובה, עלות ואמינות →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#221">22.1 שלושה כלים לשלוש שאלות</a></li>
+<li><a href="#222-span">22.2 מה נמצא ב־span</a></li>
+<li><a href="#223">22.3 המעקב בשלושים שורות</a></li>
+<li><a href="#224">22.4 הדוח</a></li>
+<li><a href="#225">22.5 הסתרה כהחלטת תכנון</a></li>
+<li><a href="#226">22.6 על מה מתריעים</a></li>
+<li><a href="#227">22.7 כלים מתארחים</a></li>
+<li><a href="#228">22.8 בפרויקט</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="22-observability">פרק 22: תצפיתיות (Observability)</h1>
+<p>מערכת שרצה בלילה בלי משתמשת לידה חייבת לספר לך בבוקר מה היא עשתה: כמה קריאות, לאיזה מודל, כמה
+טוקנים, כמה זה עלה, כמה זמן לקח, ואיפה נכשל. „תצפיתיות” (observability) היא היכולת לענות על
+השאלות האלה מתוך מה שהמערכת רשמה, בלי להריץ אותה שוב. הפרק מבחין בין לוגים, מדדים ומעקבים, בונה
+מעקב (tracer) בשלושים שורות שכותב JSONL, עוטף איתו את המסכם ואת הסוכן, ומפיק דוח ריצה. והוא
+מתעקש על החלטה אחת שרוב המערכות דוחות: מה <em>לא</em> רושמים. בסופו תהיה לך רשומה לכל קריאה למודל
+ולכל כלי, ודוח שאומר כמה עלה כל שלב, בלי שום טקסט של כתבה בפנים.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>לוג, מדד, מעקב: שלושה כלים לשלוש שאלות.</li>
+<li>מה נמצא ב־span של קריאה למודל, ולמה.</li>
+<li>מזהה מעקב לריצה שלמה, וקינון של שלבים.</li>
+<li>דוח ריצה: לכל שלב, קריאות, טוקנים, עלות, זמן.</li>
+<li>הסתרה (redaction) כהחלטת תכנון: גיבוב במקום טקסט.</li>
+<li>על מה מתריעים.</li>
+<li>מה כלים מתארחים מוסיפים, ומתי.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרק 11 (הלקוח, <code>Completion</code>), פרק 19 (הלולאה). התרגיל קורא ל־API.</p>
+<h2 id="221">22.1 שלושה כלים לשלוש שאלות</h2>
+<table>
+<thead>
+<tr>
+<th>כלי</th>
+<th>עונה על</th>
+<th>צורה</th>
+<th>דוגמה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>לוג (log)</td>
+<td>מה קרה, ברגע מסוים</td>
+<td>שורת טקסט עם זמן</td>
+<td>„fetched 20 items from 3 feeds”</td>
+</tr>
+<tr>
+<td>מדד (metric)</td>
+<td>כמה, לאורך זמן</td>
+<td>מספר עם תווית, מצטבר</td>
+<td>עלות ליום; p95 של זמן תגובה; שיעור הימנעות</td>
+</tr>
+<tr>
+<td>מעקב (trace)</td>
+<td>מה קרה בריצה <em>אחת</em>, שלב אחרי שלב</td>
+<td>עץ של spans עם זמנים ותכונות</td>
+<td>הריצה של הבוקר: איסוף, 12 סיכומים, סוכן עם 4 קריאות, שליחה</td>
+</tr>
+</tbody>
+</table>
+<p>בפרויקט אחד, בלילה, מה שצריך הוא בעיקר מעקב: ריצה אחת, ומה היה בה. המדדים נגזרים ממנו (סכום
+העלות של כל הריצות); הלוגים הם תוצר לוואי שלו (אירועים). לכן הפרק בונה מעקב, והדוח הוא המדד.</p>
+<h2 id="222-span">22.2 מה נמצא ב־span</h2>
+<p><strong>span</strong> הוא קטע זמן עם שם, התחלה וסוף, ותכונות. span של קריאה למודל נושא:</p>
+<table>
+<thead>
+<tr>
+<th>תכונה</th>
+<th>למה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trace_id</code></td>
+<td>כל ה־spans של ריצה אחת חולקים אותו; כך „הריצה של הבוקר” היא שאילתה אחת</td>
+</tr>
+<tr>
+<td><code>span_id</code>, <code>parent_id</code></td>
+<td>העץ: הסיכום של פריט 7 הוא בן של שלב הסיכום, שהוא בן של הריצה</td>
+</tr>
+<tr>
+<td><code>name</code>, <code>kind</code></td>
+<td><code>summarize</code> מסוג <code>llm</code>; <code>tool.search_feeds</code> מסוג <code>tool</code>; <code>research-agent</code> מסוג <code>stage</code></td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td>כי המחיר והתנהגות תלויים בו, והוא ישתנה</td>
+</tr>
+<tr>
+<td><code>input_tokens</code>, <code>output_tokens</code>, <code>cached_tokens</code></td>
+<td>היחידות שבהן משלמים, והמטמון שחוסך</td>
+</tr>
+<tr>
+<td><code>cost_usd</code></td>
+<td>הערכה לפי טבלת מחירים; אפס למודל לא ידוע, עם דגל בדוח</td>
+</tr>
+<tr>
+<td><code>duration_ms</code>, <code>ttft_ms</code></td>
+<td>זמן כולל; זמן לטוקן ראשון בהזרמה</td>
+</tr>
+<tr>
+<td><code>attempts</code>, <code>completion_status</code></td>
+<td>ניסיונות חוזרים (פרק 11) וסטטוס (<code>incomplete</code>?)</td>
+</tr>
+<tr>
+<td><code>status</code>, <code>error</code></td>
+<td>הצליח או נכשל, ואיזו חריגה</td>
+</tr>
+<tr>
+<td><code>prompt_chars</code>, <code>prompt_sha256</code></td>
+<td>במקום ההנחיה עצמה; סעיף 22.5</td>
+</tr>
+</tbody>
+</table>
+<p>הכלל: <strong>כל מה שתרצי לשאול בדיעבד צריך להיות תכונה.</strong> „למה הריצה של יום שלישי עלתה כפול?” נענית
+רק אם המודל והטוקנים נרשמו לכל קריאה.</p>
+<h2 id="223">22.3 המעקב בשלושים שורות</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">tracer = Tracer(&quot;out/traces.jsonl&quot;)                      # one trace_id for this run
+
+with tracer.span(&quot;summarize-items&quot;):                     # a stage
+    client = TracingClient(GeminiClient(model), tracer, model=model, stage=&quot;summarize&quot;)
+    for item in items:
+        client.complete(build_prompt(item[&quot;text&quot;]), system=SYSTEM, response_format=RESPONSE_FORMAT)
+
+with tracer.span(&quot;research-agent&quot;):
+    backend = TracingAgentBackend(GeminiAgentBackend(smart), tracer, model=smart)
+    state = run_agent(backend, traced_tools(make_tools(), tracer), AgentState(question))
+    tracer.event(&quot;agent_finished&quot;, f&quot;{state.stop_reason} after {state.steps} calls&quot;)
+</code></pre>
+
+
+</div>
+
+<p>שלושה חלקים:</p>
+<ul>
+<li><strong><code>Tracer.span</code></strong> הוא מנהל הקשר (context manager): פותח span, דוחף אותו למחסנית (וכך הבן יודע מי
+  האב), ובסיום כותב שורת JSON. חריגה בתוך הבלוק מסמנת <code>status: error</code> עם סוג ההודעה, ונזרקת
+  הלאה; המעקב לא בולע שגיאות.</li>
+<li><strong><code>TracingClient</code></strong> עוטף כל <code>LLMClient</code> (פרק 11): כל <code>complete</code> הוא span מסוג <code>llm</code> עם טוקנים,
+  עלות, ניסיונות וסטטוס. הקוד שקורא לא השתנה; רק הלקוח שהוא קיבל.</li>
+<li><strong><code>TracingAgentBackend</code> ו־<code>traced_tools</code></strong> עושים אותו דבר ללולאה של פרק 19: קריאת מודל היא span
+  עם רשימת הכלים שהוצעו; קריאת כלי היא span עם שם הכלי, מפתחות הארגומנטים וגודל התוצאה. בלי
+  לשנות שורה בלולאה.</li>
+</ul>
+<p><code>event</code> הוא span באורך אפס: „משהו קרה שראוי לשורה”. הוא מחליף את ה־<code>print</code> בלוגים.</p>
+<h2 id="224">22.4 הדוח</h2>
+<p><code>report.py</code> קורא את ה־JSONL ומקבץ לפי סוג ושם:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">| span              | calls | errors | in    | cached | out  | cost USD | p50 ms | p95 ms |
+| llm:summarize     | 12    | 0      | 14880 | 9600   | 1810 | 0.004512 | 1840.0 | 2910.0 |
+| llm:agent.model   | 4     | 0      | 6120  | 0      | 410  | 0.006128 | 2210.5 | 3005.1 |
+| tool:tool.read_item | 2   | 0      | 0     | 0      | 0    | 0.000000 | 1.2    | 1.9    |
+| stage:research-agent | 1  | 0      | 0     | 0      | 0    | 0.000000 | 9800.0 | 9800.0 |
+
+Estimated paid-tier cost of this run: 0.010640 USD.
+</code></pre>
+
+
+</div>
+
+<p>מה רואים: הסוכן עלה יותר מ־12 סיכומים יחד (מודל חכם, היסטוריה גדלה); המטמון עבד בסיכומים
+(<code>cached</code> גבוה, אותו prefix); p95 של הסוכן הוא שלוש שניות לקריאה. זה הבסיס להחלטות של פרק 23:
+קודם מודדים, אחר כך מחליפים מודל.</p>
+<p><strong>מודל בלי מחיר</strong> מופיע עם עלות אפס ובשורה מפורשת („No price known for…”). עדיף אפס גלוי מניחוש
+שקט; הטבלה <code>PRICES</code> מתעדכנת ביד, מתוך נספח ג.</p>
+<h2 id="225">22.5 הסתרה כהחלטת תכנון</h2>
+<p>ברירת המחדל של המעקב היא <strong>לא לרשום את הטקסט</strong>: לא את ההנחיה ולא את התשובה. במקומן, אורך
+בתווים וגיבוב (<code>sha256</code>, 16 תווים). למה:</p>
+<ul>
+<li><strong>הטקסט הוא הנתון הרגיש.</strong> כתבות הן ציבוריות, אבל השאלה של המשתמשת, ההעדפות שלה, והפתקים
+  האישיים שלה לא. קובץ מעקב שנשמר חודשים הוא עותק של כולם.</li>
+<li><strong>הגיבוב מספיק לרוב הדיבוג.</strong> „אותה הנחיה בדיוק נשלחה 40 פעמים” נראה מהגיבוב; „הקידומת לא
+  יציבה” נראה מהמטמון. כשצריך את הטקסט עצמו, מריצים שוב עם <code>record_text=True</code>, פעם אחת, ומוחקים.</li>
+<li><strong>הסתרה היא החלטה, לא תוצר לוואי.</strong> אם הטקסט נרשם „כי זה נוח”, הוא נרשם לנצח. אם לא, מישהי
+  צריכה להחליט לרשום אותו, ולומר למה ולכמה זמן.</li>
+</ul>
+<p>כלי המעקב רושם גם רק את <em>מפתחות</em> הארגומנטים של כלים, לא את הערכים: שאילתת חיפוש של משתמשת היא
+טקסט שלה. פרק 24 יוסיף הסתרה של כתובות מייל ומספרים גם למה שכן נרשם.</p>
+<h2 id="226">22.6 על מה מתריעים</h2>
+<p>דוח הוא לקריאה; התרעה (alert) היא למה שדורש פעולה גם כשאף אחד לא קורא. שלוש התרעות שמספיקות
+לפרויקט:</p>
+<table>
+<thead>
+<tr>
+<th>התרעה</th>
+<th>תנאי</th>
+<th>למה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>עלות</td>
+<td>עלות הריצה מעל פי שניים מהממוצע של השבוע</td>
+<td>לולאה, שינוי מודל בטעות, קלט מנופח</td>
+</tr>
+<tr>
+<td>כישלון</td>
+<td><code>status: error</code> בשלב שחייב להצליח (שליחה), או שיעור כשל של כלים מעל 20 אחוז</td>
+<td>מקור נפל, מפתח פג, ספק למטה</td>
+</tr>
+<tr>
+<td>איכות</td>
+<td>שיעור הימנעות או <code>incomplete</code> קופץ</td>
+<td>ההנחיה או המודל השתנו מתחתינו</td>
+</tr>
+</tbody>
+</table>
+<p>לא מתריעים על p95 בפרויקט לילי; מתריעים עליו במערכת שבה אדם מחכה. ההתרעה היא מייל אחד עם
+הדוח; חלק ח יחבר אותה לריצה היומית.</p>
+<h2 id="227">22.7 כלים מתארחים</h2>
+<p>יש כלי מעקב ייעודיים למודלים (Langfuse, למשל) ותקן כללי (OpenTelemetry) עם מציגים לכל ספק. מה הם
+מוסיפים על ה־JSONL שלך: ממשק גרפי לעץ, חיפוש בין ריצות, גרפים של עלות לאורך זמן, שיתוף עם
+צוות, ולעיתים הערכות וגרסאות הנחיות באותו מקום. מה הם עולים: תלות, חשבון, ושאלת הפרטיות מחדש
+(הטקסט נשלח לצד שלישי אלא אם מסתירים).</p>
+<p>ההמלצה של הקורס: <strong>קודם ה־JSONL שלך.</strong> הוא מלמד מה חשוב לרשום, הוא שלך, והוא הופך בקלות לפורמט
+של כל כלי. התיבה האופציונלית ביום 44 מחברת את אותו <code>Tracer</code> לכלי מתארח בשכבה חינמית, ומראה
+שההבדל הוא במציג, לא בנתונים.</p>
+<h2 id="228">22.8 בפרויקט</h2>
+<ul>
+<li><strong>אבן דרך 7:</strong> <code>tracing.py</code> של הפרויקט הוא <code>Tracer</code> של הפרק; כל שלב בצינור הוא span; כל קריאה
+  למודל ולכלי בתוכו. דוח הריצה (<code>report.py</code>) מצורף לכל גיליון.</li>
+<li><strong>תקציב:</strong> הדוח הוא מה שמזין את שומר התקציב של פרק 23.</li>
+<li><strong>הסתרה:</strong> ברירת המחדל נשארת; <code>record_text</code> רק בדיבוג מקומי, לעולם לא ב־CI.</li>
+</ul>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>לוג אומר מה קרה; מדד אומר כמה לאורך זמן; מעקב אומר מה קרה בריצה אחת, שלב אחרי שלב.</li>
+<li>span נושא את כל מה שתרצי לשאול בדיעבד: מודל, טוקנים, עלות, זמן, ניסיונות, סטטוס, שגיאה.</li>
+<li><code>trace_id</code> לריצה, מחסנית לקינון, שורת JSON לכל span. שלושים שורות.</li>
+<li>עוטפים את הלקוח ואת הלולאה במקום לשנות אותם.</li>
+<li>הדוח מקבץ לפי שלב: קריאות, טוקנים, עלות, p50 ו־p95. מודל בלי מחיר הוא אפס גלוי.</li>
+<li>לא רושמים טקסט כברירת מחדל; גיבוב ואורך. הסתרה היא החלטה.</li>
+<li>מתריעים על עלות, כישלון ואיכות; כלים מתארחים הם מציג, הנתונים שלך.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>תצפיתיות</td>
+<td>observability</td>
+<td>לענות „מה קרה” מתוך מה שנרשם, בלי להריץ שוב</td>
+</tr>
+<tr>
+<td>לוג</td>
+<td>log</td>
+<td>שורה עם זמן: מה קרה</td>
+</tr>
+<tr>
+<td>מדד</td>
+<td>metric</td>
+<td>מספר לאורך זמן</td>
+</tr>
+<tr>
+<td>מעקב</td>
+<td>trace</td>
+<td>עץ של spans לריצה אחת</td>
+</tr>
+<tr>
+<td>span</td>
+<td>span</td>
+<td>קטע זמן עם שם, אב, ותכונות</td>
+</tr>
+<tr>
+<td>מזהה מעקב</td>
+<td>trace_id</td>
+<td>המפתח של ריצה אחת</td>
+</tr>
+<tr>
+<td>תכונה</td>
+<td>attribute</td>
+<td>שדה ב־span: מודל, טוקנים, עלות</td>
+</tr>
+<tr>
+<td>הסתרה</td>
+<td>redaction</td>
+<td>לא לרשום, או למסך, מה שרגיש</td>
+</tr>
+<tr>
+<td>טביעת אצבע</td>
+<td>fingerprint</td>
+<td>אורך וגיבוב במקום הטקסט</td>
+</tr>
+<tr>
+<td>התרעה</td>
+<td>alert</td>
+<td>תנאי על המדדים שדורש פעולה</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong><code>print</code> בכל מקום.</strong> אין מבנה, אין עץ, אין סכום. span עם תכונות.</li>
+<li><strong>לרשום את ההנחיה „כי זה נוח”.</strong> עותק של כל הנתונים הרגישים, לנצח. גיבוב כברירת מחדל.</li>
+<li><strong>לשכוח את המודל ב־span.</strong> בעוד חודש לא תדעי למה העלות קפצה.</li>
+<li><strong>מחיר מנוחש למודל לא ידוע.</strong> אפס גלוי עם דגל, ועדכון של הטבלה.</li>
+<li><strong>מעקב שבולע חריגות.</strong> ה־span מסמן שגיאה וזורק הלאה.</li>
+<li><strong>להתחיל מכלי מתארח.</strong> קודם ה־JSONL שלך; אחר כך מציג.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>מה ההבדל בין לוג, מדד ומעקב, ומה הכי חשוב למערכת מודל?</strong> לוג: אירוע בזמן. מדד: מספר לאורך
+   זמן. מעקב: עץ של spans לריצה אחת. למערכת מודל המעקב הוא הבסיס, כי כל קריאה היא כסף וזמן והיא
+   חלק מריצה גדולה יותר; המדדים נגזרים ממנו.</li>
+<li><strong>מה נמצא ב־span של קריאה למודל?</strong> מזהה ריצה והורה, שם וסוג, מודל, טוקנים (קלט, פלט, מטמון),
+   עלות משוערת, זמן וזמן לטוקן ראשון, ניסיונות, סטטוס, שגיאה, וטביעת אצבע של ההנחיה במקום הטקסט.</li>
+<li><strong>איך את מטפלת בטקסט רגיש במעקבים?</strong> ברירת המחדל לא רושמת טקסט: אורך וגיבוב. ארגומנטים של
+   כלים נרשמים כמפתחות בלבד. הקלטה מלאה היא דגל מפורש לדיבוג מקומי, ומה שכן נרשם עובר הסתרה
+   של מיילים ומספרים. זו החלטת תכנון, לא ברירת מחדל של ספרייה.</li>
+<li><strong>על מה תתריעי?</strong> עלות ריצה חריגה (לולאה, מודל שגוי), כישלון בשלב קריטי או שיעור כשל גבוה של
+   כלים, וקפיצה בהימנעות או בפלט קטוע. לא על p95 במערכת לילית בלי משתמשת.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/22-observability.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>לוג = מה קרה. מדד = כמה לאורך זמן. מעקב = ריצה אחת, שלב אחרי שלב.</strong></li>
+<li><strong>span:</strong> trace_id, span_id, parent_id, name, kind, model, tokens (in/out/cached), cost_usd, duration,
+  ttft, attempts, status, error, prompt_chars + prompt_sha256.</li>
+<li><strong>Tracer:</strong> <code>with tracer.span(name, kind)</code>; מחסנית לקינון; שורת JSONL בסיום; חריגה = error ונזרקת.</li>
+<li><strong>עטיפות:</strong> <code>TracingClient(client, tracer, model=)</code>, <code>TracingAgentBackend</code>, <code>traced_tools</code>.</li>
+<li><strong>דוח:</strong> לפי <code>kind:name</code>: calls, errors, tokens, cost, p50, p95; מודל בלי מחיר = 0 גלוי.</li>
+<li><strong>הסתרה היא החלטה:</strong> <code>record_text=False</code> ברירת מחדל; מפתחות ארגומנטים בלבד.</li>
+<li><strong>התרעות:</strong> עלות ×2, כישלון בשלב קריטי, קפיצה בהימנעות.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">tracer    Tracer(&quot;out/traces.jsonl&quot;, record_text=False)   with tracer.span(&quot;stage&quot;): ...   tracer.event(&quot;name&quot;, &quot;detail&quot;)
+llm       TracingClient(inner, tracer, model=&quot;gemini-3.5-flash-lite&quot;, stage=&quot;summarize&quot;).complete(...)
+agent     TracingAgentBackend(backend, tracer, model=...);  traced_tools(tools, tracer)
+cost      estimate_cost(model, input_tokens_excl_cached, output_tokens, cached_tokens=...)  PRICES per 1M (in, out, cached)
+report    python -m ch22.report out/traces.jsonl   -&gt; per kind:name table + total + unpriced models + events + errors
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> לבנות את <code>Tracer</code>, לעטוף איתו את המסכם ואת הסוכן, ולהפיק דוח ריצה עם עלות וזמן לכל שלב,
+בלי טקסט של כתבות בקובץ. <strong>זמן:</strong> יום לימוד אחד (יום 43), כ־60 דקות בנייה, ועוד תיבה אופציונלית
+ביום 44. <strong>ידע מקדים:</strong> הפרק, פרקים 11 ו־19, ומפתח API.</p>
+<p>הצעדים, קוד ההתחלה, הרמזים והפתרון נמצאים ב־
+<a href="../exercises/ch22-observability/README.md"><code>exercises/ch22-observability/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li>קובץ מעקב של ריצה אחת עם spans מקוננים: שלב, קריאות מודל, קריאות כלים, אירוע.</li>
+<li>דוח ריצה עם עלות וזמן לכל שלב; <code>grep</code> אחרי טקסט של כתבה בקובץ המעקב מחזיר כלום.</li>
+<li>ארבע הבדיקות עוברות בלי רשת; בפתק: על מה היית מתריעה בפרויקט, ולמה.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>OpenTelemetry: מושגי היסוד (trace, span, attribute) זהים למה שבנית; הפורמט שונה.</li>
+<li>Langfuse בשכבה חינמית: לחבר את <code>Tracer</code> דרך ה־SDK שלהם, ולראות את אותו עץ בממשק.</li>
+<li>„Observability Engineering” (Majors, Fong-Jones, Miranda): הטיעון ל־events עם תכונות רבות.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="21-frameworks-and-protocols.html">← פרק 21: ספריות ופרוטוקולים: LangGraph ו־MCP</a> · <a href="23-latency-cost-reliability.html">פרק 23: זמן תגובה, עלות ואמינות →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>
