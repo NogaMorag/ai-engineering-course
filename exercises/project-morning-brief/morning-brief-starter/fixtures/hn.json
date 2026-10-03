@@ -1,0 +1,32 @@
+{
+ "hits": [
+  {
+   "objectID": "101",
+   "title": "Clusters on the legacy CNI plugin lose pod networking after upgrading to Kubernetes 1.36",
+   "url": "https://example.com/blog/k8s-136-cni-report",
+   "points": 312,
+   "created_at": "2026-10-02T08:10:00Z"
+  },
+  {
+   "objectID": "102",
+   "title": "CVE-2026-1234: OpenSSH agent forwarding RCE patched",
+   "url": "https://example.com/security/cve-2026-1234",
+   "points": 540,
+   "created_at": "2026-10-01T15:00:00Z"
+  },
+  {
+   "objectID": "103",
+   "title": "Show HN: a 3B model that matches last year's frontier on coding benchmarks",
+   "url": "https://example.com/research/small-coding-model",
+   "points": 420,
+   "created_at": "2026-09-30T18:00:00Z"
+  },
+  {
+   "objectID": "104",
+   "title": "Ask HN: how do you track LLM costs in production?",
+   "url": null,
+   "points": 95,
+   "created_at": "2026-10-02T05:00:00Z"
+  }
+ ]
+}

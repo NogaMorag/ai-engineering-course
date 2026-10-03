@@ -1,0 +1,21 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  fast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - run: uv run ruff check .
+      - run: uv run pytest -q -m "not judge"
+      - name: offline end-to-end run (fixture feeds, fake models)
+        run: uv run morning-brief run --offline --date 2026-10-03 --data-dir data --out out
+      - run: uv run python -m evals.run_eval --offline --out docs/eval-offline.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: offline-issue
+          path: |
+            out/
+            data/runs/
+            docs/eval-offline.md

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 32: הערכה, ראיון והצגה של הפרויקט</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="31-project-milestones.html">← פרק 31: תשע אבני הדרך</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#321">32.1 ההערכה בארבעה חלקים</a></li>
+<li><a href="#322">32.2 עשרים שאלות על הפרויקט</a></li>
+<li><a href="#323">32.3 קורות חיים: שלוש השורות הסופיות</a></li>
+<li><a href="#324">32.4 ההדגמה ומה לומר על המגבלות</a></li>
+<li><a href="#325-80">32.5 היום האחרון (יום 80)</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="32">פרק 32: הערכה, ראיון והצגה של הפרויקט</h1>
+<p>הפרויקט רץ. הפרק האחרון סוגר שלושה דברים: איך מעריכים אותו בכנות (הרתמה בארבעה חלקים, הספים, ומה
+כל מדד מוכיח), איך מדברים עליו בראיון (עשרים שאלות שישאלו אותך, עם תשובות־מודל שבנויות מהמספרים
+שלך), ואיך מציגים אותו (קורות חיים, ההדגמה, ומה לומר על המגבלות). ואז הקורס נגמר, והחיפוש מתחיל.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>ארבעת חלקי ההערכה של העיתון ומה כל אחד מוכיח.</li>
+<li>עשרים שאלות ראיון על הפרויקט, עם תשובות־מודל.</li>
+<li>שורות קורות החיים הסופיות, עם המספרים שלך.</li>
+<li>מה לומר על המגבלות, ולמה זה מחזק.</li>
+<li>היום האחרון: רשימות, חזרות, והבא.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרויקט שעובד (M1 עד M9), ופרקים 28 ו־29.</p>
+<h2 id="321">32.1 ההערכה בארבעה חלקים</h2>
+<table>
+<thead>
+<tr>
+<th>חלק</th>
+<th>מקרים</th>
+<th>מדד</th>
+<th>סף</th>
+<th>מה זה מוכיח</th>
+<th>מה זה לא מוכיח</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>רלוונטיות</td>
+<td>60 כתבות עם תווית 0/1/2 שלך</td>
+<td>precision@8; Spearman בין ציון לתווית</td>
+<td>0.75; 0.5</td>
+<td>הדירוג מסכים איתך על הכתבות האלה</td>
+<td>שהוא יסכים על נושא חדש</td>
+</tr>
+<tr>
+<td>נאמנות</td>
+<td>20 זוגות כתבה וסיכום עם תווית שלך</td>
+<td>הסכמת השופט עם התוויות; קאפה</td>
+<td>0.8</td>
+<td>השופט שמיש; ואז הסיכומים נאמנים</td>
+<td>שהשופט צודק במקרים שלא ראית</td>
+</tr>
+<tr>
+<td>קיבוץ</td>
+<td>30 זוגות: 15 כפולים, 15 כמעט</td>
+<td>precision ו־recall של הסף</td>
+<td>0.9; 0.75</td>
+<td>הסף נכון לכותרות האלה</td>
+<td>שהוא נכון לתחום אחר</td>
+</tr>
+<tr>
+<td>הזרקה</td>
+<td>5 כתבות מורעלות ומעלה</td>
+<td>שיעור מעבר: אף הוראה לא בוצעה, אף קישור זר</td>
+<td>1.0</td>
+<td>ההגנות מחזיקות על ההתקפות שידועות</td>
+<td>שאין התקפה אחרת</td>
+</tr>
+</tbody>
+</table>
+<p>הטור האחרון הוא מה שמבדיל הערכה כנה ממצגת. בראיון, אומרים את שניהם: „19 מתוך 20 נאמנים לפי שופט
+שמסכים איתי ב־9 מתוך 10, על 20 מקרים שתייגתי”.</p>
+<p><strong>מתי מריצים.</strong> <code>make eval</code> לפני כל שינוי של הנחיה, מודל או סף, ובסוף כל שבוע; <code>--offline</code> ב־CI (מבנה
+בלבד; ההזרקה שם לא אומרת כלום, כי המודל המזויף מעתיק טקסט). התוצאות עם תאריך ב־<code>docs/eval.md</code>, והטבלה
+האחרונה ב־README.</p>
+<p><strong>מה עוד נמדד, מהריצות עצמן.</strong> עלות לגיליון, משך, כשלים לפי שלב, שיעור <code>partial</code>. דוח הריצה הוא מדד
+תפעולי; שבוע של דוחות הוא גרף.</p>
+<h2 id="322">32.2 עשרים שאלות על הפרויקט</h2>
+<p>התשובות כאן הן תבניות עם מקומות למספרים <em>שלך</em>. בלי המספרים הן ריקות.</p>
+<p><strong>על המערכת</strong></p>
+<ol>
+<li><strong>ספרי לי על הפרויקט בדקה.</strong> (פרק 28, q40.) סוכן מתוזמן שהופך N כתבות מ־K פידים לעיתון אישי; תשעה
+   שלבים, רובם קוד; ארבעה עם מודל; אחד סוכן תחום; הערכה בארבעה חלקים; מעקב ועלות לכל ריצה; רץ ב־Actions
+   בשבע; X סנט לגיליון.</li>
+<li><strong>איפה המודל ואיפה קוד, ולמה?</strong> סיכום, ציון עם נימוק, מחקר, פתיח: הבנת שפה. הכול אחר קוד: נרמול,
+   כפילויות, חיזוקים, בריחה, משלוח, תקציב. „הקוד מחליט, המודל מציע.”</li>
+<li><strong>למה רק שלב אחד הוא סוכן?</strong> רק במחקר הצעד הבא תלוי במה שנמצא. ואפילו הוא תחום: שישה צעדים, תשעים
+   שניות, תקציב טוקנים, כלים לקריאה בלבד, סיבת עצירה בדוח.</li>
+<li><strong>למה לא RAG?</strong> אין קורפוס לשאול; אחזור מופיע כזיכרון סיפורים ובמחקר. „שאל את הארכיון” הוא הרחבה.</li>
+<li><strong>למה Chroma ולא רק SQLite?</strong> ליום numpy מספיק ואכן; לזיכרון בין ימים צריך התמדה ומסנן תאריך. ההערה
+   כתובה ב־<code>docs/decisions.md</code>, כולל שהסריקה הייתה עובדת עד 50 אלף.</li>
+<li><strong>מה קורה כשפיד מת?</strong> שורה ברשימת הכשלים, הריצה ממשיכה, הסטטוס <code>partial</code>, הגיליון יוצא עם הערה.
+   בדיקה: <code>test_collect_isolates_a_dead_feed</code>.</li>
+<li><strong>מה קורה כשהספק מחזיר 529?</strong> ניסיונות חוזרים עם המתנה וגבול זמן; גיבוי למודל השני בשלב ההרכבה;
+   כתבה שנכשלה בסיכום נספרת ולא מפילה; הכול בדוח.</li>
+<li><strong>מה קורה כשכתבה אומרת „התעלמי מההוראות”?</strong> הכתבה היא נתונים בתגיות; הפלט נבדק: אין קישורים
+   מהמודל, אין HTML, אין הדים; קישורים בגיליון רק ממקורות שנקראו; שליחה אינה כלי. ובהערכה חמישה מקרים
+   כאלה עם סף 1.0. מה לא מובטח: שהמודל לא ישתכנע לנסח כותרת מטעה; זה עניין לשופט הנאמנות.</li>
+<li><strong>איך את יודעת שהסיכומים נאמנים?</strong> שופט עם רובריקה, מכויל מול 20 תוויות שלי (הסכמה X, קאפה Y),
+   רץ על כל גיליון בהערכה השבועית; ועשרה סיכומים בעין כל שבוע.</li>
+<li><strong>כמה עולה גיליון ואיך את יודעת?</strong> X סנט, מ־<code>usage</code> של כל קריאה, מסוכם לפי שלב בדוח הריצה; שומר תקציב
+    עוצר ב־0.25. אחרי מעבר העלות ירד מ־A ל־B בלי ירידה בהערכה.</li>
+</ol>
+<p><strong>על ההחלטות</strong></p>
+<ol start="11">
+<li><strong>למה מודל מהיר כאן וחכם שם?</strong> ההערכה החזיקה עם המהיר בסיכומים ובציונים; המחקר והפתיח קיבלו את
+    החכם. נמדד, לא הונח.</li>
+<li><strong>למה GitHub Actions?</strong> המחשב כבוי בשבע; Actions נותן סודות, תוצרים ותזמון; Task Scheduler הוא
+    החלופה המתועדת. והמלכודת: cron ב־UTC בלי שעון קיץ, לכן שתי שורות ובדיקת שעה מקומית.</li>
+<li><strong>למה לא LangGraph?</strong> אין הסתעפות, יש הפרעה אחת לכל היותר, מחברת אחת; הלולאה שקופה. בניתי את
+    שער האישור כהרחבה ומדדתי שורות ובהירות.</li>
+<li><strong>למה לא כוונון עדין?</strong> אף כשל לא הצדיק: הכשלים היו מפרט (הנחיה) ואחזור. כוונון לומד צורה, לא
+    עובדות, ועולה בכל החלפת בסיס.</li>
+<li><strong>מה היית בונה אחרת היום?</strong> (מהפתקים שלך. דוגמה: לתייג 60 כתבות ביום הראשון במקום ב־M6, כי הדירוג
+    הוא מה שהקוראת מרגישה.)</li>
+</ol>
+<p><strong>על קנה המידה והעתיד</strong></p>
+<ol start="16">
+<li><strong>איך זה משתנה לאלף קוראות?</strong> סיכום פעם אחת לכתבה ודירוג לכל קוראת; אצווה לסיכומים; תור לפידים;
+    זיכרון משותף עם מסנן לכל קוראת שהקוד אוכף; תקציב לכל קוראת. השלב שנשבר ראשון הוא הסיכום.</li>
+<li><strong>מה הסיכון הגדול ביותר במערכת?</strong> עובדה שקרית עם ציטוט חוקי: עוברת את כל ההגנות בקוד, ורק
+    השופט והעין תופסים. לכן ההערכה השבועית וההימנעות כברירת מחדל.</li>
+<li><strong>מה המדד שהיית מתריעה עליו?</strong> עלות ריצה כפולה מהממוצע (לולאה או קלט מנופח); כישלון בשלב המשלוח;
+    קפיצה בשיעור <code>partial</code> או ב־<code>incomplete</code>.</li>
+<li><strong>מה היית בונה הבא?</strong> דירוג שלומד ממה שפתחתי; „שאל את הארכיון”; חיפוש ברשת למחקר, עם הערת עלות.</li>
+<li><strong>מה הדבר שהכי לא עובד?</strong> (פרק 28, q43.) מספר, סיבה, תוכנית. בלי זה התשובה לא אמינה.</li>
+</ol>
+<h2 id="323">32.3 קורות חיים: שלוש השורות הסופיות</h2>
+<p>הנוסחה מפרק 29, עם המספרים שלך במקום X:</p>
+<ul>
+<li>Built Morning Brief, a scheduled newsletter agent (Python, Gemini API, Chroma, SQLite) that turns ~N daily
+  articles from K feeds into a personalized brief; kept it a plain workflow with one bounded agent stage;
+  runs on GitHub Actions at $X per issue.</li>
+<li>Designed its evaluation: 60 relevance labels, a faithfulness judge calibrated against 20 of my labels
+  (agreement X, kappa Y), 30 duplicate pairs and 5 injection cases, with thresholds as a regression gate;
+  error analysis drove two fixes that moved faithfulness from A to B.</li>
+<li>Engineered for production: per-run traces with cost by stage, a budget guard, retries with a fallback
+  model, idempotent delivery, per-item failure isolation, injection defenses verified by eval, and a
+  DST-aware schedule with a versions file.</li>
+</ul>
+<h2 id="324">32.4 ההדגמה ומה לומר על המגבלות</h2>
+<p>התסריט של פרק 29 (<code>docs/demo.md</code>), עם שני כללים נוספים לפרויקט הזה:</p>
+<ul>
+<li><strong>מראים את דוח הריצה, לא רק את העיתון.</strong> העיתון הוא מה שכולם בונים; הדוח עם העלות לפי שלב הוא מה
+  שמבדיל.</li>
+<li><strong>המגבלות הן חלק מההדגמה</strong>, לא הערת שוליים: „קוראת אחת, פידים ציבוריים; השופט הוא מודל ולכן עשרה
+  סיכומים בעין כל שבוע; המחקר קורא רק קישורים מהכתבה”. מי שאומרת את זה נשמעת כמי שמדדה; מי שמסתירה
+  נתפסת בשאלה הראשונה.</li>
+</ul>
+<h2 id="325-80">32.5 היום האחרון (יום 80)</h2>
+<ol>
+<li><strong>רשימות</strong> (נספח ה): רשימת הלמידה ורשימת המוכנות לראיון. שלושה נושאים חלשים, ותאריך חזרה לכל אחד.</li>
+<li><strong>רטרוספקטיבה</strong> בעמוד: מה לקח יותר מהמתוכנן, איזו החלטה היית משנה, איזה פרק היה החשוב ביותר, ומה לא
+   היה צריך.</li>
+<li><strong>הבא.</strong> שתי שעות ביום לחיפוש, לוח אחד, פרק אחד לחזרה בשבוע. והעיתון ממשיך להגיע כל בוקר: הוא ההוכחה
+   שהמערכת רצה, ותזכורת יומית למה למדת.</li>
+</ol>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>ההערכה: רלוונטיות, נאמנות, קיבוץ, הזרקה; לכל אחת מקרים, מדד, סף, ומה היא לא מוכיחה.</li>
+<li>עשרים שאלות על המערכת, ההחלטות וקנה המידה; התשובות ריקות בלי המספרים שלך.</li>
+<li>שלוש שורות קורות חיים; הדגמה שמראה את הדוח; מגבלות בקול.</li>
+<li>היום האחרון: רשימות, רטרוספקטיבה, והחיפוש כפרויקט הבא.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>סף רגרסיה</td>
+<td>regression threshold</td>
+<td>המדד שמתחתיו שינוי לא נכנס</td>
+</tr>
+<tr>
+<td>הסכמת שופט</td>
+<td>judge agreement</td>
+<td>כמה פעמים השופט הסכים עם התוויות שלי</td>
+</tr>
+<tr>
+<td>שיעור ריצות חלקיות</td>
+<td>partial-run rate</td>
+<td>כמה ריצות יצאו עם הערת כשל</td>
+</tr>
+<tr>
+<td>רטרוספקטיבה</td>
+<td>retrospective</td>
+<td>עמוד על מה שלמדת מהתהליך עצמו</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>לדווח מדד בלי לומר מה הוא לא מוכיח.</strong> זו ההבחנה בין הערכה למצגת.</li>
+<li><strong>תשובות־מודל בלי מספרים.</strong> „חשוב למדוד” לא מרשים אף אחד.</li>
+<li><strong>להסתיר מגבלות בהדגמה.</strong> הן נמצאות בשאלה הראשונה בכל מקרה.</li>
+<li><strong>לסיים את הקורס ולהתחיל לחפש.</strong> החיפוש התחיל בשבוע 11.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<p>הפרק הוא עשרים השאלות. אחרי שעניתי על כולן בקול: איזו תשובה הייתה הכי חלשה, ואיזה מספר חסר לי כדי לחזק
+אותה? זה מה שמודדים מחר.</p>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/32-project-evaluation-and-interview.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>ארבעה חלקים:</strong> רלוונטיות (60, P@8 0.75, Spearman 0.5) · נאמנות (20, הסכמה 0.8) · קיבוץ (30 זוגות, P 0.9 /
+  R 0.75) · הזרקה (5+, 1.0). לכל אחד: מה לא מוכח.</li>
+<li><strong><code>make eval</code></strong> לפני כל שינוי ובסוף שבוע; <code>--offline</code> ב־CI = מבנה בלבד.</li>
+<li><strong>20 שאלות:</strong> מערכת (1–10), החלטות (11–15), קנה מידה ועתיד (16–20). המספרים שלי: ___</li>
+<li><strong>קו״ח:</strong> שלוש שורות עם X. <strong>הדגמה:</strong> הדוח, לא רק העיתון; מגבלות בקול.</li>
+<li><strong>יום 80:</strong> רשימות, רטרוספקטיבה, החיפוש כפרויקט.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">eval      make eval  -&gt;  docs/eval-latest.md  -&gt;  paste into docs/eval.md with the date; README table = latest, not best
+numbers   cost/issue from run-report.md; faithfulness agreement + kappa from eval; precision@8; partial-run rate from a week of reports
+answer    what -&gt; why -&gt; alternative + cost -&gt; evidence (&quot;in my project: ...&quot;)
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> להריץ את ההערכה המלאה, לענות על עשרים השאלות בקול עם המספרים שלך, לכתוב את שלוש השורות
+הסופיות, ולהקליט את ההדגמה פעם נוספת עם הדוח. <strong>זמן:</strong> זה התוכן של ימי 76 עד 80 יחד עם פרקים 27 עד 29.
+<strong>ידע מקדים:</strong> הפרויקט.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li><code>docs/eval.md</code> עם הטבלה האחרונה והתאריך, ו־README עם אותה טבלה.</li>
+<li>עשרים תשובות בקול, כל אחת עם מספר או ראיה; השלוש החלשות בפתק עם „מה חסר”.</li>
+<li>שלוש שורות קורות חיים עם המספרים; הדגמה מוקלטת שמראה את הדוח.</li>
+<li>רשימות נספח ה מסומנות; רטרוספקטיבה של עמוד.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>שלחי את ה־README לחברה שלא ראתה את הפרויקט, ובקשי שתריץ אותו מה־README בלבד. כל שאלה שלה היא
+  שורה חסרה.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="31-project-milestones.html">← פרק 31: תשע אבני הדרך</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

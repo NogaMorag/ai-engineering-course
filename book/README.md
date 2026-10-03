@@ -102,9 +102,9 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 30: מפרט וארכיטקטורה | `30-project-spec-and-architecture.md` | ⏳ |
-| פרק 31: תשע אבני הדרך | `31-project-milestones.md` | ⏳ |
-| פרק 32: הערכה, ראיון והצגה של הפרויקט | `32-project-evaluation-and-interview.md` | ⏳ |
+| פרק 30: מפרט וארכיטקטורה | [`30-project-spec-and-architecture.md`](30-project-spec-and-architecture.md) | ✅ |
+| פרק 31: תשע אבני הדרך | [`31-project-milestones.md`](31-project-milestones.md) | ✅ |
+| פרק 32: הערכה, ראיון והצגה של הפרויקט | [`32-project-evaluation-and-interview.md`](32-project-evaluation-and-interview.md) | ✅ |
 
 ## נספחים
 

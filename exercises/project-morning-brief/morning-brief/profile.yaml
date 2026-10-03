@@ -1,0 +1,34 @@
+# The reader profile. No name, no email: identity lives in .env and in secrets, not here.
+language: he
+issue_size: 10
+top_stories: 3
+follow_up_days: 14
+topics:
+  - name: rust and build tooling
+    weight: 1.0
+    keywords: [rust, cargo, compile, build cache, toolchain]
+  - name: python ecosystem
+    weight: 0.8
+    keywords: [python, uv, pytest, pydantic, django]
+  - name: ai engineering
+    weight: 1.0
+    keywords: [llm, rag, embedding, agent, eval, prompt]
+  - name: kubernetes and cloud operations
+    weight: 0.6
+    keywords: [kubernetes, helm, cluster, cloud, outage, postmortem]
+  - name: security
+    weight: 0.7
+    keywords: [cve, breach, vulnerability, passkey, supply chain]
+skip_topics: [sports, celebrity, crypto trading]
+sources:
+  - name: devwire
+    kind: rss
+    url: https://example.com/feeds/devwire.xml
+    weight: 1.0
+  - name: stackdaily
+    kind: rss
+    url: https://example.com/feeds/stackdaily.xml
+    weight: 0.9
+  - name: hn
+    kind: hn
+    weight: 0.8

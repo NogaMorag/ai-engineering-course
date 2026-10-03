@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 31: תשע אבני הדרך</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="30-project-spec-and-architecture.html">← פרק 30: מפרט וארכיטקטורה</a> · <a href="32-project-evaluation-and-interview.html">פרק 32: הערכה, ראיון והצגה של הפרויקט →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#310">31.0 שיטת העבודה</a></li>
+<li><a href="#m1-51-53">M1 יסודות ומקורות (ימים 51 עד 53)</a></li>
+<li><a href="#m2-54-55">M2 סיכומים ודירוג (ימים 54 עד 55)</a></li>
+<li><a href="#m3-56-57">M3 כפילויות וזיכרון (ימים 56 עד 57)</a></li>
+<li><a href="#m4-58-59">M4 תזמור ומחקר (ימים 58 עד 59)</a></li>
+<li><a href="#m5-60-61">M5 הרכבה ומשלוח (ימים 60 עד 61)</a></li>
+<li><a href="#m6-62-63">M6 הערכה (ימים 62 עד 63)</a></li>
+<li><a href="#m7-64-65">M7 תפעול (ימים 64 עד 65)</a></li>
+<li><a href="#m8-66-67">M8 אבטחה ופרטיות (ימים 66 עד 67)</a></li>
+<li><a href="#m9-68-69-70">M9 תזמון ותיעוד (ימים 68 עד 69, ו־70 אופציונלי)</a></li>
+<li><a href="#3110">31.10 מה לעשות כשנתקעים</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="31">פרק 31: תשע אבני הדרך</h1>
+<p>המפרט של פרק 30 הופך כאן לעבודה: תשע אבני דרך (milestones), כל אחת יומיים עד שלושה, כל אחת עם מטרה,
+מושגים מהספר שמתורגלים, הצעדים המדויקים, המודולים והבדיקות, הפלט הצפוי, קריטריון סיום, טעויות
+נפוצות, והרחבה אופציונלית. נקודת ההתחלה היא <code>morning-brief-starter/</code>: מבנה הפרויקט המלא, 21 בדיקות
+ו־5 בדיקות הערכה, הקבצים לדוגמה, התיעוד וה־workflows, כשכל גוף פונקציה הוא <code>raise NotImplementedError</code>.
+הבדיקות הן המפרט: אבן דרך מסתיימת כשהבדיקות שלה ירוקות. המימוש הייחוס ב־<code>morning-brief/</code> עומד
+לידך למקרה שנתקעת, ולא לפני.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>איך עובדים עם starter שהבדיקות שלו הן רשימת המשימות.</li>
+<li>תשע אבני הדרך, אחת אחרי השנייה, עם הקשר לפרקים.</li>
+<li>הפקודות, הפלטים והקריטריונים שהופכים „עבדתי על זה” ל„סיימתי”.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרק 30, ו־<code>exercises/project-morning-brief/README.md</code> (סעיף „לפני אבן הדרך הראשונה”). לכל אבן דרך
+רשומים הפרקים שלה; אם פרק לא מוכר, חוזרים אליו קודם.</p>
+<h2 id="310">31.0 שיטת העבודה</h2>
+<table>
+<thead>
+<tr>
+<th>כלל</th>
+<th>למה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>הבדיקות קודם.</strong> <code>uv run pytest -q</code> בתחילת כל יום; מממשים עד שהבדיקות של אבן הדרך ירוקות</td>
+<td>הן המפרט המדויק של מה שצריך</td>
+</tr>
+<tr>
+<td><strong>ריצה לא־מקוונת בכל ערב.</strong> <code>uv run morning-brief run --offline</code></td>
+<td>הצינור כולו רץ בלי מפתח; מה שנשבר נראה מיד</td>
+</tr>
+<tr>
+<td><strong>ריצה אמיתית אחת ליום מאבן דרך 2</strong></td>
+<td>הנתונים האמיתיים שונים מהקבצים לדוגמה; הפתעות מוקדמות זולות</td>
+</tr>
+<tr>
+<td><strong>commit בסוף כל אבן דרך</strong>, עם ההודעה מהברייף</td>
+<td>ההיסטוריה מספרת את הסיפור בראיון</td>
+</tr>
+<tr>
+<td><strong>פתק של חמש שורות לכל אבן דרך:</strong> מה הפתיע, מה החלטת, מה דחית</td>
+<td>התזכירים של פרק 26 וה־ADR של פרק 29 נכתבים מכאן</td>
+</tr>
+</tbody>
+</table>
+<h2 id="m1-51-53">M1 יסודות ומקורות (ימים 51 עד 53)</h2>
+<p><strong>מטרה.</strong> מאגר, קונפיגורציה, מסד; איסוף מפידים ומ־HN; חילוץ טקסט. אחרי M1 יש לך 50 כתבות ומעלה ב־SQLite
+עם טקסט, וריצה חוזרת לא מוסיפה כפילויות.</p>
+<p><strong>מושגים.</strong> <code>pydantic-settings</code> ופרופיל ב־YAML (פרק 25), SQLite עם מיגרציות, קליטה אידמפוטנטית לפי כתובת
+קנונית (פרק 15), קבצים לדוגמה לפידים (פרק 18), כשל חלקי (פרק 23).</p>
+<p><strong>מודולים.</strong> <code>config.py</code> (נתון), <code>sources/base.py</code> (נתון), <code>sources/rss.py</code>, <code>sources/hn.py</code>,
+<code>sources/__init__.py</code> (<code>collect</code>), <code>store.py</code>, <code>extract.py</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 51: קראי את <code>config.py</code> ואת <code>sources/base.py</code> (נתונים במלואם): <code>Settings</code>, <code>Profile</code>, <code>Article</code>,
+   <code>canonical_url</code>, <code>article_id</code>. הריצי <code>uv run pytest -q tests/test_sources_store.py</code> וקראי את הכישלונות.</li>
+<li>ממשי את <code>store.py</code>: <code>migrate</code>, <code>upsert_articles</code> (עם <code>INSERT OR IGNORE</code>, מחזיר כמה נוספו),
+   <code>update_extraction</code>, <code>get_article</code>, <code>save_summary</code> ו־<code>get_summary</code>, <code>record_delivery</code> (מחזיר <code>False</code>
+   בפעם השנייה), <code>start_run</code>/<code>finish_run</code>. הבדיקה: <code>test_store_ingestion_and_delivery_are_idempotent</code>.</li>
+<li>יום 52: <code>sources/rss.py</code> (<code>parse_feed</code> טהורה מבייטים, <code>fetch_feed</code>, <code>collect_rss</code>), <code>sources/hn.py</code>
+   (<code>parse_hn</code>, <code>collect_hn</code>), ו־<code>collect</code> שמבודד כשל של פיד אחד. בדיקות: <code>test_parse_feed_and_hn_skip_broken_entries</code>,
+   <code>test_collect_isolates_a_dead_feed</code>.</li>
+<li>ערכי את <code>profile.yaml</code> לפידים אמיתיים שלך והריצי <code>uv run --env-file .env morning-brief run --stop-after collect</code>.
+   <code>data/runs/&lt;date&gt;/collect.json</code> צריך להכיל 50 פריטים ומעלה; הריצי שוב ובדקי ש־<code>collect.done</code> במעקב
+   אומר „0 new”.</li>
+<li>יום 53: <code>extract.py</code>: <code>extract_text</code> עם <code>trafilatura</code>, <code>fetch_and_extract</code> עם זמן קצוב, סוג תוכן, אורך
+   מינימלי ומקסימלי, וכשל שהופך לסטטוס עם הבלורב של הפיד כגיבוי; <code>extract_all</code> עם מאגר חוטים. בדיקה:
+   <code>test_extraction_statuses_and_fallbacks</code>. ואז <code>--stop-after extract</code> על הנתונים האמיתיים.</li>
+</ol>
+<p><strong>פלט צפוי.</strong></p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">| stage   | items in | items out | seconds | failures |
+| collect | 3        | 57        | 2.1     | 0        |
+| extract | 57       | 49        | 18.4    | 8        |
+</code></pre>
+
+
+</div>
+
+<p><strong>קריטריון סיום.</strong> 50 כתבות ומעלה במסד; ריצה חוזרת מוסיפה אפס; 80 אחוז ומעלה מחולצות; שלוש הבדיקות
+של <code>test_sources_store.py</code> ובדיקת החילוץ ירוקות.</p>
+<p><strong>טעויות נפוצות.</strong> לתת לחריגה של פיד אחד להפיל את האיסוף; לשכוח לנרמל <code>utm_</code> (כפילויות); לשלוח HTML גולמי
+הלאה (עלות, פרק 23); חילוץ בלי זמן קצוב.</p>
+<p><strong>הרחבה.</strong> מטמון של HTML גולמי לפי גיבוב הכתובת, כדי לא להוריד פעמיים בפיתוח.</p>
+<h2 id="m2-54-55">M2 סיכומים ודירוג (ימים 54 עד 55)</h2>
+<p><strong>מטרה.</strong> סיכום מובנה לכל כתבה עם עלות; ציון רלוונטיות מול הפרופיל עם נימוק. אחרי M2 הרשימה המדורגת של
+היום נראית לך נכונה, ויש 20 תוויות זהב ראשונות.</p>
+<p><strong>מושגים.</strong> פלט מובנה ותיקון אחד (פרק 9), מקביליות עם סמפור (פרק 19), מעקב ועלות (פרק 22), גרסאות הנחיה
+(פרק 8), תוויות זהב (פרק 16).</p>
+<p><strong>מודולים.</strong> <code>summarize.py</code>, <code>rank.py</code>, <code>llm/client.py</code>, <code>tracing.py</code>, <code>budget.py</code>. <code>llm/schemas.py</code> ו־<code>llm/prompts.py</code>
+נתונים.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 54: <code>llm/client.py</code> לפי פרק 11 (היררכיית שגיאות, <code>with_retries</code>, <code>GeminiClient</code>, <code>FakeClient</code>,
+   <code>resilient_complete</code>); <code>tracing.py</code> לפי פרק 22; <code>budget.py</code> לפי פרק 23. אלה העתקה של דפוסים שכבר כתבת,
+   מותאמים.</li>
+<li><code>summarize.py</code>: <code>summarize_one</code> (ניסיון תיקון אחד), <code>summarize_articles</code> (דילוג על מה ששמור, בידוד כשלים,
+   מאגר חוטים, אירוע מעקב לכל קריאה, חיוב השומר). בדיקות: <code>test_summarize_*</code>.</li>
+<li>ריצה אמיתית <code>--stop-after summarize</code>; קראי עשרה סיכומים ליד הכתבות. <strong>בפתק:</strong> כמה מהם נאמנים? זה הזרע
+   של סט ההערכה.</li>
+<li>יום 55: <code>rank.py</code>: <code>rule_boosts</code> (משקל מקור, רעננות, נושאים לדלג, מילות מפתח) ו־<code>score_articles</code> (המודל
+   נותן ציון ונימוק, הקוד מוסיף את החיזוקים; כשל הופך לציון ניטרלי). הפרופיל הוא הקידומת היציבה של ההנחיה.
+   בדיקה: <code>test_rule_boosts_and_scoring</code>.</li>
+<li>ריצה אמיתית <code>--stop-after score</code>; הסתכלי על עשרת הראשונים ב־<code>score.json</code>. תייגי 20 כתבות 0/1/2 בפתק:
+   זה סט הרלוונטיות של M6.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> <code>summarize</code> עם 49 פריטים ועלות של כמה אלפיות דולר ברשימת העלות לפי שלב; <code>score.json</code> ממוין
+יורד, עם <code>reason</code> לכל פריט ו־<code>boosts</code> שמסבירים את ההפרש מהציון של המודל.</p>
+<p><strong>קריטריון סיום.</strong> סיכומים שמורים לכל כתבות היום; ריצה חוזרת משתמשת בהם (<code>reused</code>); עשרת הראשונים
+סבירים בעיניך; 20 תוויות זהב; הבדיקות ירוקות.</p>
+<p><strong>טעויות נפוצות.</strong> לחשב עלות מהערכה במקום מ־<code>usage</code>; לדרג עם המודל בלבד (בלי חיזוקי כללים הפרופיל לא
+נאכף); לשים את הפרופיל בסוף ההנחיה (אין מטמון).</p>
+<p><strong>הרחבה.</strong> ניתוב (פרק 19): הנחיית סיכום לפי סוג כתבה.</p>
+<h2 id="m3-56-57">M3 כפילויות וזיכרון (ימים 56 עד 57)</h2>
+<p><strong>מטרה.</strong> אשכולות של אותה ידיעה בין מקורות; „המשך ל” מול ימים קודמים. אחרי M3 העיתון לא מראה ידיעה פעמיים.</p>
+<p><strong>מושגים.</strong> שיכונים, ספים ואזור אפור, מטמון (פרק 12); Chroma עם מסנן תאריך, שם מודל במטא־נתונים, שימור (פרק 14).</p>
+<p><strong>מודולים.</strong> <code>embeddings.py</code>, <code>cluster.py</code>, <code>memory.py</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 56: <code>embeddings.py</code> (ממשק, <code>GeminiEmbedder</code>, <code>FakeEmbedder</code>, <code>CachedEmbedder</code>), <code>cluster.py</code>
+   (<code>story_text</code>, <code>cluster_items</code> עם union-find, נציג לפי עדיפות). בדיקות: <code>test_cluster_*</code>, <code>test_cached_embedder_hits</code>.</li>
+<li>ריצה אמיתית <code>--stop-after group</code>; קראי את <code>group.json</code>: אילו אשכולות נוצרו? כוונני את הסף (ברירת המחדל
+   0.86) לפי מה שאת רואה, כמו ביום 22. <strong>בפתק:</strong> הסף, האזור האפור, זוג אחד שהפתיע.</li>
+<li>יום 57: <code>memory.py</code>: <code>StoryMemory</code> על Chroma (<code>remember</code>, <code>follow_ups</code> עם חלון ימים, <code>prune</code>, סירוב למודל
+   אחר). בדיקה: <code>test_story_memory_*</code>.</li>
+<li>הריצי יומיים ברצף (או שני תאריכים עם אותם פידים): ביום השני ידיעה שחזרה מסומנת <code>follow_up_of</code>.</li>
+<li><strong>הערת ההחלטה</strong> (פרק 14): numpy ליום, Chroma לזיכרון. למה. ב־<code>docs/decisions.md</code>.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> <code>group.json</code> עם אשכולות של 2 ומעלה חברים לידיעות שסוקרו בכמה מקורות, ו־<code>follow_ups</code> לא ריק
+ביום השני.</p>
+<p><strong>קריטריון סיום.</strong> קבוצות כפילויות מוצגות; חזרה למחרת מסומנת; הערת החלטה כתובה; הבדיקות ירוקות.</p>
+<p><strong>טעויות נפוצות.</strong> סף מהספר; לערבב וקטורים משני מודלים; חשבון תאריכים במספרים שלמים חוצה חודשים (יש
+<code>days_before</code>).</p>
+<p><strong>הרחבה.</strong> אימות של האזור האפור בשאלה קצרה למודל: „האם שתי הכותרות על אותו אירוע?”.</p>
+<h2 id="m4-58-59">M4 תזמור ומחקר (ימים 58 עד 59)</h2>
+<p><strong>מטרה.</strong> צינור עם שלבים מפורשים, תוצר לכל שלב, המשכה, תקרת עלות; וסוכן מחקר תחום לשלוש הידיעות
+הראשיות.</p>
+<p><strong>מושגים.</strong> תהליך עבודה מול סוכן (פרק 19), תוצרי שלבים ונקודות שמירה (פרק 20), תקציבים וסיבות עצירה,
+לולאת כלים ומשגר (פרק 10), בידוד כשלים (פרק 23).</p>
+<p><strong>מודולים.</strong> <code>pipeline.py</code>, <code>research.py</code>, <code>report.py</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 58: <code>pipeline.py</code>: <code>Pipeline.run</code> עם <code>RunContext</code>, <code>_run_stage</code> (תוצר JSON לכל שלב, <code>--resume</code> מדלג
+   על שלב עם תוצר, זמן וכשלים לכל שלב), שומר תקציב משותף, <code>report.py</code> שמסכם. בדיקות:
+   <code>test_offline_pipeline_end_to_end_resume_and_idempotent_delivery</code> (עדיין אדומה עד M5; השלבים עד <code>group</code>
+   ירוקים), <code>test_pipeline_stop_after_and_report_markdown</code>.</li>
+<li>הריצי <code>--stop-after group</code> ואז שוב עם <code>--resume</code>: המעקב מראה <code>stage.resumed</code> לכל שלב.</li>
+<li>יום 59: <code>research.py</code>: הכלים (<code>search_items</code>, <code>read_item</code>, <code>fetch_url</code> רק לקישורים מפריט שנקרא), <code>dispatch</code>,
+   הלולאה עם שלושה תקציבים, זיהוי לולאה, היסטוריה מפורשת, ו־<code>_structure</code> שהופך את הטקסט ל־<code>ResearchNote</code> כשהמקורות
+   מגיעים מהכלים ולא מהמודל. בדיקות: <code>test_tools_*</code>, <code>test_research_*</code>.</li>
+<li>ריצה אמיתית <code>--stop-after research</code>: שלושה פריטים ב־<code>research.json</code>, כל אחד עם <code>source_ids</code>. <strong>בפתק:</strong>
+   סיבות העצירה ומספר הצעדים.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> <code>research.call</code> במעקב עם <code>stop_reason</code>, <code>steps</code>, <code>tokens</code>, <code>sources</code>; שלוש הערות מחקר עם
+מקורות.</p>
+<p><strong>קריטריון סיום.</strong> ריצה מלאה עד <code>research</code> מסתיימת; <code>--resume</code> ממשיך מהשלב האחרון השלם; שלוש ידיעות
+מועשרות בתוך התקציב; הבדיקות ירוקות.</p>
+<p><strong>טעויות נפוצות.</strong> לשמור תוצר באמצע שלב; תקציב צעדים בלבד; לסמוך על המקורות שהמודל מצטט; <code>fetch_url</code> בלי
+רשימת קישורים מותרת.</p>
+<p><strong>הרחבה.</strong> חיפוש ברשת כ־<code>search_web</code> עם הערת עלות.</p>
+<h2 id="m5-60-61">M5 הרכבה ומשלוח (ימים 60 עד 61)</h2>
+<p><strong>מטרה.</strong> מודל <code>Issue</code>, Markdown ו־HTML, משלוח לקובץ ולמייל, פעם אחת בלבד. אחרי M5 העיתון מגיע לתיבת
+הדואר שלך.</p>
+<p><strong>מושגים.</strong> הרכבה מקלטים מובנים (פרק 9), Jinja2 עם בריחה (פרק 24), SMTP וסודות (פרקים 24, 25), רשומת משלוח
+אידמפוטנטית (פרק 20), הידרדרות (פרק 23).</p>
+<p><strong>מודולים.</strong> <code>compose.py</code>, <code>render/render.py</code>, <code>security.py</code>, <code>deliver/__init__.py</code>, <code>deliver/file.py</code>,
+<code>deliver/email.py</code>, ושלבי <code>compose</code> ו־<code>deliver</code> ב־<code>pipeline.py</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 60: <code>compose.py</code> (<code>IssueItem</code>, <code>Issue</code>, <code>build_item</code>, <code>write_intro</code> עם הידרדרות לברכה פשוטה,
+   <code>compose_issue</code>), <code>render/render.py</code> (שתי סביבות Jinja2: autoescape ל־HTML), <code>security.py</code>
+   (<code>check_model_text</code>, <code>scrub_model_text</code>, <code>check_issue</code>, <code>redact</code>). בדיקות: <code>test_compose_render_and_policy</code>,
+   <code>test_write_intro_degrades_to_a_plain_greeting</code>.</li>
+<li><code>uv run morning-brief run --offline</code> ואז <code>preview</code>: הגיליון הראשון, לא־מקוון. קראי אותו כקוראת.</li>
+<li>יום 61: <code>deliver/</code>: <code>deliver_once</code> (רשומת משלוח לפני „פעם שנייה”), <code>deliver_file</code>, <code>send_email</code> עם
+   <code>SMTP_SSL</code> וסיסמת אפליקציה של Gmail (ההגדרה: חשבון Google, אבטחה, אימות דו־שלבי, סיסמאות אפליקציה, שם
+   „morning-brief”, 16 התווים ל־<code>.env</code>). שלב <code>deliver</code> ב־pipeline עם בידוד: מייל שנפל לא מבטל את הקובץ.</li>
+<li>ריצה אמיתית מלאה <code>--channels file,email</code>. הגיליון במייל. ריצה שנייה: „already delivered”.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> <code>out/brief-&lt;date&gt;.md</code> ו־<code>.html</code>; מייל בתיבה; בריצה השנייה <code>deliver.json</code> עם
+<code>{"file": "already delivered", "email": "already delivered"}</code>.</p>
+<p><strong>קריטריון סיום.</strong> גיליון קריא בשני הפורמטים; כל קישור בו ממקור שנקרא (<code>check_issue</code> ריק); מגיע במייל;
+שליחה שנייה היא no-op; כל 21 הבדיקות ירוקות.</p>
+<p><strong>טעויות נפוצות.</strong> להדביק טקסט של מודל כ־HTML; קישור שמגיע מהמודל ולא מהקוד; לשלוח שוב אחרי ניסיון חוזר;
+סיסמת מייל ב־<code>profile.yaml</code>.</p>
+<p><strong>הרחבה.</strong> Telegram כערוץ שלישי (<code>deliver/telegram.py</code>) באותו <code>deliver_once</code>.</p>
+<h2 id="m6-62-63">M6 הערכה (ימים 62 עד 63)</h2>
+<p><strong>מטרה.</strong> סט זהב, רתמה, שופט, ניתוח כשלים, מקרי רגרסיה. אחרי M6 את יודעת מתי העיתון נהיה גרוע יותר.</p>
+<p><strong>מושגים.</strong> עיצוב הערכה (פרק 16), שופט מכויל, ניתוח כשלים (פרק 17), מקרי רגרסיה.</p>
+<p><strong>מודולים.</strong> <code>evals/run_eval.py</code> (נתון בחלקו: המדדים, השופטים; הרחבת המקרים היא העבודה), <code>evals/cases/*.jsonl</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 62: הרחיבי את <code>relevance.jsonl</code> ל־60 כתבות אמיתיות שלך (התוויות מ־M2 ועוד), את <code>faithfulness.jsonl</code>
+   ל־20 מקרים (סיכומים אמיתיים מ־M2 עם התווית שלך), את <code>duplicates.jsonl</code> ל־30 זוגות, והשאירי 5 מקרי הזרקה
+   לפחות. הריצי <code>--offline</code> (מבנה) ואז <code>make eval</code> (אמיתי). שמרי את הדוח כבסיס ב־<code>docs/eval.md</code>.</li>
+<li>יום 63: ניתוח כשלים (פרק 17) על גיליון אמיתי: 30 פריטים, תג לכל כשל, ספירה לפי שלב, שני תיקונים, ריצה
+   מחדש, טבלת לפני ואחרי ב־<code>docs/eval.md</code>, ומקרי רגרסיה בקבצי המקרים.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> <code>docs/eval-latest.md</code> עם ששת המדדים מול הספים; <code>docs/eval.md</code> עם בסיס ולפני־אחרי.</p>
+<p><strong>קריטריון סיום.</strong> דוח בסיס ב־Git; שני תיקונים נמדדים; שני מקרי רגרסיה; <code>test_evals.py</code> ירוק.</p>
+<p><strong>טעויות נפוצות.</strong> לשפוט „טוב” מגיליון אחד; לערוך הנחיה לפי מקרה holdout; לדווח ציון בלי מכנה.</p>
+<p><strong>הרחבה.</strong> השוואה זוגית (פרק 16) בין שתי גרסאות של הנחיית הסיכום.</p>
+<h2 id="m7-64-65">M7 תפעול (ימים 64 עד 65)</h2>
+<p><strong>מטרה.</strong> מעקבים ודוח, גיבויים, סבילות לכאוס, ומעבר עלות. אחרי M7 הריצה היומית אמינה ועולה סנטים.</p>
+<p><strong>מושגים.</strong> תצפיתיות (פרק 22), אמינות ומדרוג מודלים (פרק 23), מטמון קידומת (פרק 15).</p>
+<p><strong>מודולים.</strong> <code>tracing.py</code>, <code>report.py</code> (שיפורים), <code>llm/client.py</code> (<code>resilient_complete</code> עם גיבוי בשלב
+ההרכבה), בדיקות כאוס חדשות ב־<code>tests/</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 64: בדיקות כאוס: פיד מת (יש), 529 מהספק בסיכום (הוסיפי <code>LLMUnavailable</code> לתסריט ובדקי שהריצה
+   <code>partial</code> ולא <code>failed</code>), יום ריק (פידים בלי פריטים → גיליון עם <code>_No articles today._</code>). חברי את
+   <code>resilient_complete</code> עם המודל המהיר כגיבוי של החכם ב־<code>write_intro</code>. <strong>בפתק:</strong> על מה היית מתריעה
+   (פרק 22).</li>
+<li>יום 65: מעבר העלות (פרק 23): טבלת עלות לגיליון לפני ואחרי: מודל מהיר לציונים ולסיכומים (כבר), פרופיל
+   והוראות בתחילת ההנחיה (<code>cached</code> בדוח), פלט קצר, ואופציונלית Batch לסיכומים. ההערכה (M6) רצה שוב ולא
+   יורדת.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> דוח ריצה עם <code>partial</code> ורשימת כשלים כשמזריקים תקלה; טבלת עלות לגיליון ב־<code>docs/architecture.md</code>.</p>
+<p><strong>קריטריון סיום.</strong> בדיקות הכאוס ירוקות; עלות לגיליון מתחת ל־0.10 דולר (או מוסברת); ההערכה לא ירדה.</p>
+<p><strong>טעויות נפוצות.</strong> ניסיונות חוזרים בשתי שכבות; גיבוי שקט; חותמת זמן בתחילת ההנחיה (אין מטמון).</p>
+<p><strong>הרחבה.</strong> התרעה במייל כשהריצה <code>failed</code> או כשהעלות כפולה מהממוצע.</p>
+<h2 id="m8-66-67">M8 אבטחה ופרטיות (ימים 66 עד 67)</h2>
+<p><strong>מטרה.</strong> הגנות הזרקה, בריחה, רשימת קישורים, הערת זרימת נתונים, בדיקות כאוס. אחרי M8 פיד לא יכול לחטוף
+את העיתון שלך.</p>
+<p><strong>מושגים.</strong> גבולות אמון, מדיניות פלט, סודות, מזעור (פרק 24).</p>
+<p><strong>מודולים.</strong> <code>security.py</code> (קיים; הרחבה), <code>evals/cases/injection.jsonl</code>, <code>docs/security.md</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 66: הוסיפי פריט מורעל לקובץ פיד לדוגמה (העתק של <code>fixtures/devwire.xml</code> עם הוראה שתולה) והריצי
+   <code>--offline</code>: המדיניות תופסת קישור זר ו־HTML; „בוטל” היא עניין להערכה. הריצי את חלק ההזרקה של <code>make eval</code>
+   על המודל האמיתי. הריצי את ביקורת הסודות של פרק 24 על המאגר (<code>python -m ch24.secrets_audit .</code> מתוך
+   פרויקט הקורס, או העתיקי את הקובץ).</li>
+<li>יום 67: <code>docs/security.md</code> (נתון כתבנית; מלאי לפי המערכת שלך); מזעור בפרופיל (אין שם, אין מייל); הסתרה
+   בכל מה שנרשם; בדיקות כאוס: רשת למטה (http שזורק), פיד פגום (XML שבור), יום ריק.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> <code>injection_pass_rate: 1.0</code> בריצה האמיתית; ביקורת סודות נקייה; <code>docs/security.md</code> עם מודל
+איומים, גבולות אמון, זרימת נתונים.</p>
+<p><strong>קריטריון סיום.</strong> הערכת ההזרקה עוברת; בדיקות הסניטציה ירוקות; <code>docs/security.md</code> כתוב.</p>
+<p><strong>טעויות נפוצות.</strong> לסמוך על ההנחיה כהגנה; לשכוח את ההיסטוריה של Git בביקורת; לוגים עם טקסט מלא.</p>
+<p><strong>הרחבה.</strong> מסנן קלט למילות הוראה כאות (לא כהגנה), עם ספירה בדוח.</p>
+<h2 id="m9-68-69-70">M9 תזמון ותיעוד (ימים 68 עד 69, ו־70 אופציונלי)</h2>
+<p><strong>מטרה.</strong> GitHub Actions ב־07:00, README, ארכיטקטורה, החלטות, תסריט הדגמה. אחרי M9 הגיליון מגיע כשאת
+ישנה, וזרה יכולה להריץ את הפרויקט מה־README בעשר דקות.</p>
+<p><strong>מושגים.</strong> פריסה, גרסאות, cron ושעון קיץ (פרק 25); README ו־ADR (פרק 29).</p>
+<p><strong>מודולים.</strong> <code>.github/workflows/daily.yml</code> ו־<code>ci.yml</code> (נתונים), <code>versions.json</code>, <code>README.md</code>, <code>docs/</code>.</p>
+<p><strong>צעדים.</strong></p>
+<ol>
+<li>יום 68: סודות במאגר (<code>GEMINI_API_KEY</code>, ופרטי SMTP); <code>workflow_dispatch</code> ראשון; בדיקת שורות ה־cron מול
+   אזור הזמן שלך (<code>cron_for_local_time</code> מפרק 25); למחרת: ריצה מתוזמנת עם תוצר. חלופה: <code>run_daily.ps1</code> ב־Task
+   Scheduler.</li>
+<li>יום 69: README לפי פרק 29 (ארבע השאלות בעמוד הראשון; טבלת ההערכה האחרונה; העלות); <code>docs/architecture.md</code>
+   ו־<code>docs/decisions.md</code> עם ההחלטות <em>שלך</em> (מה שינית מהייחוס ולמה); <code>docs/demo.md</code>; <code>versions.json</code> מעודכן.</li>
+<li>יום 70 (אופציונלי): שער אישור ב־LangGraph (פרק 21): גרף של שלושה צמתים, טיוטה, הפרעה, שליחה, עם
+   <code>SqliteSaver</code>, ו־<code>--approve</code> ב־CLI; הערת החלטה „LangGraph או לולאה”.</li>
+</ol>
+<p><strong>פלט צפוי.</strong> job ירוק ב־Actions עם תוצר <code>out/</code> ו־<code>data/runs/</code>; גיליון שהגיע במייל מריצה מתוזמנת.</p>
+<p><strong>קריטריון סיום.</strong> ריצה מתוזמנת שלחה גיליון בלי שהיית ליד המקלדת; README מספיק לבד; <code>docs/</code> מלא;
+כל הבדיקות וה־CI ירוקים.</p>
+<p><strong>טעויות נפוצות.</strong> cron בזמן מקומי; סוד בקובץ ה־workflow; README שמתחיל בהתקנה; לשכוח שהמצב (SQLite,
+Chroma) צריך לשרוד בין ריצות ב־Actions (ה־workflow משתמש ב־cache; חלופה: לשמור ל־artifact ולשחזר).</p>
+<p><strong>הרחבה.</strong> „שאל את הארכיון”: <code>ask_notes</code> של פרק 15 על כל הגיליונות שפורסמו.</p>
+<h2 id="3110">31.10 מה לעשות כשנתקעים</h2>
+<ol>
+<li>קראי את הבדיקה שנכשלת עד הסוף: היא אומרת מה צריך לקרות.</li>
+<li>הריצי <code>--offline</code> עם <code>--stop-after</code> על השלב הבעייתי, וקראי את התוצר ואת המעקב.</li>
+<li>פתחי את המודול המקביל במימוש הייחוס, קראי, סגרי, וכתבי.</li>
+<li>רשמי בפתק מה היה חסר לך: זה המקרה הבא בהערכה או הבדיקה הבאה.</li>
+</ol>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>תשע אבני דרך, הבדיקות הן המפרט, ריצה לא־מקוונת כל ערב, ריצה אמיתית כל יום מ־M2.</li>
+<li>M1 יסודות ומקורות; M2 סיכומים ודירוג; M3 כפילויות וזיכרון; M4 תזמור ומחקר; M5 הרכבה ומשלוח; M6 הערכה;
+  M7 תפעול; M8 אבטחה; M9 תזמון ותיעוד.</li>
+<li>לכל אבן: קריטריון סיום מדיד, טעויות שמחכות, הרחבה שאפשר לדחות.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>אבן דרך</td>
+<td>milestone</td>
+<td>יחידת עבודה של יומיים עד שלושה עם קריטריון סיום</td>
+</tr>
+<tr>
+<td>starter</td>
+<td>starter</td>
+<td>מבנה הפרויקט עם בדיקות וגופי פונקציות ריקים</td>
+</tr>
+<tr>
+<td>מימוש ייחוס</td>
+<td>reference implementation</td>
+<td>גרסה מלאה להשוואה כשנתקעים</td>
+</tr>
+<tr>
+<td>תוצר שלב</td>
+<td>stage artifact</td>
+<td>קובץ JSON לכל שלב בריצה; הבסיס להמשכה</td>
+</tr>
+<tr>
+<td>ריצה לא־מקוונת</td>
+<td>offline run</td>
+<td>פידים לדוגמה ומודלים מזויפים; בלי מפתח</td>
+</tr>
+<tr>
+<td>סט זהב</td>
+<td>golden set</td>
+<td>מקרים מתויגים ביד להערכה</td>
+</tr>
+<tr>
+<td>בדיקת כאוס</td>
+<td>chaos test</td>
+<td>תקלה מוזרקת: פיד מת, 529, יום ריק</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>לקפוץ לאבן דרך 4</strong> לפני שיש נתונים אמיתיים במסד.</li>
+<li><strong>להעתיק מהייחוס</strong> במקום לקרוא ולכתוב.</li>
+<li><strong>לדלג על הפתק</strong> של חמש השורות. ה־ADR וה־README נכתבים ממנו.</li>
+<li><strong>לדחות את הריצה האמיתית</strong> ל־M9. ההפתעות של הנתונים האמיתיים יקרות בסוף.</li>
+<li><strong>„עובד אצלי”</strong> בלי commit. ההיסטוריה היא חלק מהפרויקט.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>איך תכננת את העבודה על הפרויקט?</strong> תשע אבני דרך של יומיים עד שלושה, כל אחת עם בדיקות שהן המפרט
+   וקריטריון סיום מדיד; ריצה לא־מקוונת כל ערב וריצה אמיתית כל יום; commit ופתק לכל אבן.</li>
+<li><strong>מה בנית ראשון, ולמה?</strong> איסוף ואחסון אידמפוטנטי: בלי נתונים אמיתיים במסד כל השאר הוא ניחוש.</li>
+<li><strong>איפה היה הכי קשה?</strong> (התשובה שלך, מהפתקים. לרוב: הסף של הכפילויות, או ההמשכה של הצינור.)</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/31-project-milestones.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>שיטה:</strong> בדיקות קודם; <code>--offline</code> כל ערב; ריצה אמיתית כל יום מ־M2; commit ופתק לכל אבן.</li>
+<li><strong>M1</strong> מקורות ומסד (50+ כתבות, אפס כפילויות). <strong>M2</strong> סיכומים ודירוג (20 תוויות). <strong>M3</strong> אשכולות וזיכרון (סף,
+  הערת החלטה). <strong>M4</strong> צינור עם תוצרים והמשכה, סוכן מחקר תחום. <strong>M5</strong> הרכבה, רינדור, משלוח פעם אחת.</li>
+<li><strong>M6</strong> סט זהב, רתמה, שופט, ניתוח כשלים, רגרסיה. <strong>M7</strong> כאוס, גיבוי, עלות לגיליון. <strong>M8</strong> הזרקה, סודות,
+  זרימת נתונים. <strong>M9</strong> Actions ב־07:00, README, docs. <strong>אופציונלי:</strong> שער אישור ב־LangGraph.</li>
+<li><strong>כשנתקעים:</strong> הבדיקה עד הסוף; <code>--stop-after</code>; הייחוס לקריאה בלבד; פתק.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">loop      uv run pytest -q  -&gt;  implement  -&gt;  uv run morning-brief run --offline  -&gt;  real run --stop-after &lt;stage&gt;
+real      uv run --env-file .env morning-brief run [--stop-after collect|extract|summarize|score|group|research|compose] [--resume] [--channels file,email]
+eval      uv run --env-file .env python -m evals.run_eval --out docs/eval-latest.md      (offline: --offline)
+tests     tests/test_sources_store.py (M1) · test_extract_summarize_rank.py (M1-M2) · test_cluster_memory_research.py (M3-M4)
+          test_compose_render_pipeline.py (M4-M5) · test_evals.py (M6)
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p>הפרק הוא התרגיל: תשע אבני הדרך, ימים 51 עד 70. <strong>קריטריון סיום כולל:</strong> 21 הבדיקות ו־<code>test_evals.py</code> ירוקים;
+ריצה מתוזמנת שלחה גיליון; <code>docs/eval.md</code> עם בסיס ולפני־אחרי; README שעונה על ארבע השאלות.</p>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>קראי את ה־commits של המימוש הייחוס? אין כאלה: הוא נכתב כקובץ אחד. ההיסטוריה של הפרויקט <em>שלך</em> היא
+  מה שתוכלי להראות.</li>
+<li>„Working Effectively with Legacy Code” (Feathers): הפרק על characterization tests, שהוא בדיוק מה
+  שהבדיקות של ה־starter עושות בשבילך.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="30-project-spec-and-architecture.html">← פרק 30: מפרט וארכיטקטורה</a> · <a href="32-project-evaluation-and-interview.html">פרק 32: הערכה, ראיון והצגה של הפרויקט →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 30: מפרט וארכיטקטורה</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="29-portfolio-cv-presentation.html">← פרק 29: תיק עבודות, קורות חיים והצגת הפרויקט</a> · <a href="31-project-milestones.html">פרק 31: תשע אבני הדרך →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#301">30.1 סיפור המשתמשת והיקף</a></li>
+<li><a href="#302">30.2 דרישות</a></li>
+<li><a href="#303">30.3 תשעת השלבים</a></li>
+<li><a href="#304">30.4 הציור</a></li>
+<li><a href="#305">30.5 מודל הנתונים</a></li>
+<li><a href="#306">30.6 החלטות וחלופות פשוטות יותר</a></li>
+<li><a href="#307">30.7 מה כבר יש לך</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="30">פרק 30: מפרט וארכיטקטורה</h1>
+<p>כל מה שלמדת נפגש כאן. <strong>Morning Brief</strong> הוא סוכן מתוזמן שמקבל בבוקר כמה עשרות כתבות ממקורות
+שבחרת, ומגיש לך עיתון קצר: שמונה עד שתים־עשרה ידיעות שחשובות <em>לך</em>, כל אחת עם סיכום נאמן של שלוש
+נקודות, שורה אחת למה זה חשוב לך, קישורים למקור, „סוקר גם ב…” כשכמה מקורות כתבו על אותו דבר,
+ו„המשך לידיעה משלישי” כשראית אותה כבר. שלוש הידיעות הראשיות מקבלות פסקת הקשר נוספת מסוכן מחקר
+תחום. גיליון עולה סנטים, לא נשלח פעמיים, שורד פיד מת או ספק שנפל, מתעלם מהוראות ששתולות בכתבות,
+וכל טענה בו מקושרת למקור. הפרק הזה הוא המפרט: סיפור משתמשת, דרישות, שלבי הצינור, מודל הנתונים,
+הציור, איפה המודל ואיפה קוד, וההחלטות עם החלופות הפשוטות יותר. פרק 31 יהפוך אותו לתשע אבני דרך;
+פרק 32 יסגור בהערכה ובראיון.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>סיפור המשתמשת והיקף: מה בפנים, מה בחוץ ולמה.</li>
+<li>דרישות פונקציונליות ולא־פונקציונליות, וכיצד כל אחת נבדקת.</li>
+<li>תשעת שלבי הצינור: קלט, פלט, האם מודל, איזו צורה, איזה מודול.</li>
+<li>מודל הנתונים ב־SQLite וב־Chroma, ופרופיל הקוראת.</li>
+<li>הציור.</li>
+<li>טבלת ההחלטות: מה נבחר, מה היה פשוט יותר, ולמה.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>הספר כולו. הפרק מפנה לפרקים שבנו כל רכיב; אם משהו לא מוכר, זה הסימן לחזור אליו לפני אבן הדרך
+המתאימה.</p>
+<h2 id="301">30.1 סיפור המשתמשת והיקף</h2>
+<blockquote>
+<p>כל בוקר בשבע אני פותחת מייל אחד. בתוכו שלוש ידיעות עם הקשר ושאר הידיעות החשובות לי מהיום, כל
+אחת עם שלוש נקודות שאני יכולה לסמוך עליהן וקישור. אני לא רואה את אותה ידיעה פעמיים, ואם זה
+המשך של משהו שקראתי, כתוב לי שזה המשך. אם משהו נשבר בלילה, אני מקבלת עיתון חלקי עם הערה, לא
+כלום.</p>
+</blockquote>
+<p><strong>בהיקף:</strong> פידים ציבוריים (RSS/Atom) ו־Hacker News; קוראת אחת (את); משלוח לקובץ ולמייל; ריצה
+יומית מתוזמנת; הערכה; תפעול. <strong>מחוץ להיקף</strong> (מתועד ב־README כ„הבא”): כמה משתמשות, הזדהות, ממשק
+web, מקורות בתשלום, רשתות חברתיות, ו„שאל את הארכיון” כהרחבה אופציונלית. ההיקף הצר הוא החלטה: מערכת
+שלמה וכנה בהיקף קטן שווה בראיון יותר ממערכת גדולה שחצייה חסר.</p>
+<h2 id="302">30.2 דרישות</h2>
+<p><strong>פונקציונליות</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>דרישה</th>
+<th>הפרק שבנה את זה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>איסוף פריטים מרשימת פידים ומ־Hacker News</td>
+<td>10 (רשת), 25 (קונפיגורציה)</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>נרמול, כפילויות לפי כתובת קנונית, חילוץ טקסט עם גבול</td>
+<td>10 (<code>trafilatura</code>), 15 (גיבוב תוכן)</td>
+</tr>
+<tr>
+<td>F3</td>
+<td>סיכום מובנה לכל כתבה, עם אימות</td>
+<td>9</td>
+</tr>
+<tr>
+<td>F4</td>
+<td>ציון רלוונטיות מול פרופיל הקוראת, עם נימוק</td>
+<td>8, 9, 13</td>
+</tr>
+<tr>
+<td>F5</td>
+<td>קיבוץ ידיעות כפולות בין מקורות; זיהוי המשכים מימים קודמים</td>
+<td>12, 14</td>
+</tr>
+<tr>
+<td>F6</td>
+<td>הקשר נוסף לשלוש הידיעות הראשיות מסוכן תחום</td>
+<td>19, 20</td>
+</tr>
+<tr>
+<td>F7</td>
+<td>הרכבת הגיליון למקטעים; Markdown ו־HTML</td>
+<td>9, 24 (בריחה)</td>
+</tr>
+<tr>
+<td>F8</td>
+<td>משלוח לקובץ ולמייל; לעולם לא פעמיים</td>
+<td>20 (אידמפוטנטיות)</td>
+</tr>
+<tr>
+<td>F9</td>
+<td>ריצה כל בוקר בלי מחשב דלוק</td>
+<td>25</td>
+</tr>
+<tr>
+<td>F10</td>
+<td>הערכות, מעקב לכל ריצה, דוח ריצה ועלות לגיליון</td>
+<td>16, 22, 23</td>
+</tr>
+</tbody>
+</table>
+<p><strong>לא־פונקציונליות</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>דרישה</th>
+<th>איך נבדקת</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N1</td>
+<td>עלות עד 0.25 דולר לגיליון (יעד 0.10)</td>
+<td>דוח הריצה; שומר תקציב עוצר</td>
+</tr>
+<tr>
+<td>N2</td>
+<td>ריצה מסתיימת בעשר דקות</td>
+<td>זמן בדוח</td>
+</tr>
+<tr>
+<td>N3</td>
+<td>כשל חלקי נסבל: פיד, כתבה או קריאה אחת לא מפילים ריצה</td>
+<td>בדיקות כאוס</td>
+</tr>
+<tr>
+<td>N4</td>
+<td>אף הוראה ששתולה בכתבה לא מבוצעת; קישורים רק ממקורות שנקראו</td>
+<td>מקרי הזרקה בהערכה; בדיקות מדיניות פלט</td>
+</tr>
+<tr>
+<td>N5</td>
+<td>אין סודות ואין נתוני מעסיק במאגר</td>
+<td>ביקורת סודות ב־CI</td>
+</tr>
+<tr>
+<td>N6</td>
+<td>בדיקות רצות בלי רשת בשניות; בדיקות חיות מפורשות</td>
+<td><code>test</code> מול <code>eval</code></td>
+</tr>
+<tr>
+<td>N7</td>
+<td>כל גיליון רושם גרסאות הנחיה, מודל ואינדקס</td>
+<td>מטא־נתונים של הגיליון</td>
+</tr>
+</tbody>
+</table>
+<h2 id="303">30.3 תשעת השלבים</h2>
+<table>
+<thead>
+<tr>
+<th>שלב</th>
+<th>קלט ופלט</th>
+<th>מודל?</th>
+<th>צורה</th>
+<th>מודול</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 איסוף</td>
+<td>פידים ו־HN → שורות <code>Article</code></td>
+<td>לא</td>
+<td>תהליך עבודה</td>
+<td><code>sources/</code></td>
+</tr>
+<tr>
+<td>2 חילוץ</td>
+<td>כתובת → טקסט מרכזי (עם תקרה)</td>
+<td>לא</td>
+<td>תהליך עבודה</td>
+<td><code>extract.py</code></td>
+</tr>
+<tr>
+<td>3 סיכום</td>
+<td>טקסט → <code>ArticleSummary</code></td>
+<td>מהיר, פלט מובנה</td>
+<td>תהליך עבודה מקבילי</td>
+<td><code>summarize.py</code></td>
+</tr>
+<tr>
+<td>4 ציון</td>
+<td>סיכום ופרופיל → <code>Relevance</code> (ציון, נימוק) ועוד חיזוקי כללים</td>
+<td>מהיר</td>
+<td>תהליך עבודה מקבילי</td>
+<td><code>rank.py</code></td>
+</tr>
+<tr>
+<td>5 קיבוץ</td>
+<td>סיכומים → אשכולות (שיכונים, קוסינוס) והמשכים מול הזיכרון</td>
+<td>שיכונים</td>
+<td>תהליך עבודה</td>
+<td><code>cluster.py</code>, <code>memory.py</code></td>
+</tr>
+<tr>
+<td>6 מחקר</td>
+<td>שלוש ידיעות → הקשר נוסף עם מקורות</td>
+<td>חכם, עם כלים</td>
+<td><strong>סוכן תחום</strong></td>
+<td><code>research.py</code></td>
+</tr>
+<tr>
+<td>7 הרכבה</td>
+<td>קלטים מובנים → <code>Newsletter</code> → Markdown ו־HTML</td>
+<td>חכם</td>
+<td>תהליך עבודה</td>
+<td><code>compose.py</code>, <code>render/</code></td>
+</tr>
+<tr>
+<td>8 משלוח</td>
+<td>גיליון → קובץ, מייל, רשומת משלוח</td>
+<td>לא</td>
+<td>תהליך עבודה</td>
+<td><code>deliver/</code></td>
+</tr>
+<tr>
+<td>9 דוח</td>
+<td>מעקבים → דוח ריצה (עלות, זמן, כשלים)</td>
+<td>לא</td>
+<td>תהליך עבודה</td>
+<td><code>tracing.py</code>, <code>report.py</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>קוד רגיל במקום שקוד רגיל מנצח:</strong> נרמול כתובות, משקלי מקורות, דעיכת רעננות, רשימת קישורים מותרת,
+בריחה, תזמון, משלוח, תקציבים. המודל רק איפה שהבנת שפה היא המשימה: סיכומים, רלוונטיות עם נימוק,
+מחקר, הרכבה. ספרי: שלב אחד מתשעה הוא סוכן; ארבעה משתמשים במודל; בכולם המודל ממלא טופס שהקוד
+מאמת.</p>
+<h2 id="304">30.4 הציור</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-mermaid">flowchart LR
+  subgraph Sources
+    RSS[RSS / Atom feeds]
+    HN[Hacker News API]
+  end
+  RSS --&gt; C[1 K collect &amp; normalize]
+  HN --&gt; C
+  C --&gt; X[2 K extract main text]
+  X --&gt; S[3 M summarize&lt;br/&gt;structured output]
+  S --&gt; R[4 M+K score relevance&lt;br/&gt;vs profile]
+  S --&gt; G[5 K group duplicates&lt;br/&gt;embeddings]
+  M[(story memory&lt;br/&gt;Chroma)] &lt;--&gt; G
+  R --&gt; T[K top-N selection]
+  G --&gt; T
+  T --&gt; A[6 A research agent&lt;br/&gt;bounded tools]
+  A --&gt; P[7 M compose issue&lt;br/&gt;Newsletter model]
+  P --&gt; V[K render Markdown + HTML]
+  V --&gt; D[8 K deliver file / email&lt;br/&gt;idempotent]
+  DB[(SQLite: articles, summaries,&lt;br/&gt;runs, deliveries)] &lt;--&gt; C
+  DB &lt;--&gt; S
+  DB &lt;--&gt; D
+  TR[9 K tracer -&gt; run report&lt;br/&gt;cost, latency, failures] -.-&gt; S
+  TR -.-&gt; R
+  TR -.-&gt; A
+  TR -.-&gt; P
+</code></pre>
+
+
+</div>
+
+<p>הציור הזה הוא מה שתציירי בראיון (פרק 27) ומה שיפתח את ה־README (פרק 29). K, M ו־A על הקופסאות
+הם הטיעון כולו.</p>
+<h2 id="305">30.5 מודל הנתונים</h2>
+<p><strong>SQLite</strong> (קובץ אחד, כותב אחד, אפס תפעול):</p>
+<table>
+<thead>
+<tr>
+<th>טבלה</th>
+<th>שדות עיקריים</th>
+<th>למה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>articles</code></td>
+<td><code>id</code> (גיבוב הכתובת הקנונית), <code>url</code>, <code>source</code>, <code>published_at</code>, <code>title</code>, <code>text</code>, <code>fetched_at</code>, <code>extract_status</code></td>
+<td>מקור האמת לפריטים; המזהה הקנוני מונע כפילויות בין ריצות</td>
+</tr>
+<tr>
+<td><code>summaries</code></td>
+<td><code>article_id</code>, <code>schema_version</code>, <code>json</code>, <code>model</code>, <code>tokens_in</code>, <code>tokens_out</code>, <code>cost</code></td>
+<td>סיכום נשמר פעם אחת; ריצה חוזרת לא משלמת שוב</td>
+</tr>
+<tr>
+<td><code>scores</code></td>
+<td><code>article_id</code>, <code>run_id</code>, <code>score</code>, <code>reason</code>, <code>boosts_json</code></td>
+<td>הציון תלוי בפרופיל ובריצה, לכן לפי ריצה</td>
+</tr>
+<tr>
+<td><code>clusters</code></td>
+<td><code>run_id</code>, <code>cluster_id</code>, <code>representative_article_id</code>, <code>member_ids_json</code></td>
+<td>„סוקר גם ב…”</td>
+</tr>
+<tr>
+<td><code>issues</code></td>
+<td><code>run_id</code>, <code>date</code>, <code>markdown</code>, <code>html</code>, <code>metadata_json</code></td>
+<td>הגיליון עצמו, עם גרסאות הנחיה, מודל ואינדקס (N7)</td>
+</tr>
+<tr>
+<td><code>runs</code></td>
+<td><code>id</code>, <code>date</code>, <code>started_at</code>, <code>finished_at</code>, <code>status</code>, <code>cost</code>, <code>report_json</code></td>
+<td>דוח הריצה</td>
+</tr>
+<tr>
+<td><code>deliveries</code></td>
+<td><code>issue_id</code>, <code>channel</code>, <code>delivered_at</code>, <code>idempotency_key</code></td>
+<td>לעולם לא פעמיים (F8)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chroma</strong>, אוסף <code>story_memory</code>: שיכון של כותרת ושורת פתיחה לכל אשכול, מטא־נתונים <code>{day, cluster_id,
+url}</code>, שימור 60 יום. זה המקום היחיד שבו מאגר וקטורים מוצדק (פרק 14): התמדה בין ימים ומסנן תאריך.
+כפילויות של אותו יום נשארות ב־numpy.</p>
+<p><strong>פרופיל הקוראת</strong> (<code>profile.yaml</code>): נושאי עניין עם משקלים, רשימת נושאים לדלג, מקורות עם משקלים,
+שפה, אורך הגיליון, ערוץ משלוח. נטען פעם אחת ונכנס לקידומת ההנחיה (מטמון הנחיות). בלי כתובת מייל
+ובלי שם מלא: אלה בסודות ובסביבה, לא בפרופיל (מזעור, פרק 24).</p>
+<h2 id="306">30.6 החלטות וחלופות פשוטות יותר</h2>
+<table>
+<thead>
+<tr>
+<th>החלטה</th>
+<th>נבחר</th>
+<th>החלופה הפשוטה</th>
+<th>למה כך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAG קלאסי על קורפוס?</td>
+<td><strong>לא.</strong> אחזור מופיע רק כזיכרון סיפורים וכשלב המחקר שקורא מקורות</td>
+<td>אין</td>
+<td>אין קורפוס לשאול ממנו; RAG כאן היה קישוט. „שאל את הארכיון” הרחבה אופציונלית</td>
+</tr>
+<tr>
+<td>מאגר וקטורים?</td>
+<td><strong>Chroma</strong> לזיכרון בין ימים</td>
+<td>וקטורים כ־BLOB ב־SQLite וסריקת numpy</td>
+<td>עד 50 אלף וקטורים הסריקה עובדת; Chroma מוצדק במסנן תאריך ובהתמדה, וכי למדת אותו. הערה אומרת זאת</td>
+</tr>
+<tr>
+<td>סוכן?</td>
+<td><strong>רק שלב המחקר</strong> (שלוש ידיעות, עד שישה צעדים, תקציבי זמן ועלות, כלים לקריאה בלבד)</td>
+<td>לדלג על מחקר</td>
+<td>המחקר דורש בחירה בזמן ריצה (איזה קישור לקרוא); כל השאר רצף קבוע</td>
+</tr>
+<tr>
+<td>LangGraph?</td>
+<td><strong>לא בליבה.</strong> הרחבה: שער אישור לפני שליחה עם interrupt ו־SqliteSaver</td>
+<td>דגל <code>--approve</code> ומצב ב־SQLite</td>
+<td>אין הסתעפות ואין שער אנושי בליבה; הלולאה הפשוטה שקופה יותר</td>
+</tr>
+<tr>
+<td>מודלים</td>
+<td>מהיר לסיכומים ולציונים; חכם למחקר ולהרכבה</td>
+<td>מודל אחד</td>
+<td>המדרוג נמדד (הערכה ללא שינוי, טוקנים ירדו) באבן דרך 7</td>
+</tr>
+<tr>
+<td>שיכונים</td>
+<td>מודל השיכון של הספק (חינמי, רב־לשוני, 768)</td>
+<td>מודל מקומי</td>
+<td>אין מה להתקין, אותו מפתח, עברית ואנגלית</td>
+</tr>
+<tr>
+<td>משלוח</td>
+<td>תמיד קובץ Markdown ו־HTML; וגם מייל דרך SMTP של Gmail עם „סיסמת אפליקציה”</td>
+<td>קובץ בלבד; או Telegram</td>
+<td>מייל הוא המדיום הטבעי ועולה אפס; הקובץ שומר מסלול בלי הגדרות; המודול קטן וניתן להחלפה</td>
+</tr>
+<tr>
+<td>תזמון</td>
+<td>GitHub Actions cron</td>
+<td>Task Scheduler במחשב</td>
+<td>המחשב אולי כבוי בשבע; Actions מלמד CI, סודות ותזמון</td>
+</tr>
+<tr>
+<td>אחסון</td>
+<td>SQLite</td>
+<td>Postgres</td>
+<td>משתמשת אחת, כותב אחד, אפס תפעול</td>
+</tr>
+<tr>
+<td>חילוץ טקסט</td>
+<td><code>trafilatura</code></td>
+<td>שירותי קריאה בתשלום</td>
+<td>חינמי וטוב מספיק; כשלים נסבלים לכל כתבה</td>
+</tr>
+<tr>
+<td>חיפוש ברשת</td>
+<td>אופציונלי</td>
+<td>אין; קוראים רק את הקישורים של הכתבה</td>
+<td>המחקר עובד בלי חיפוש; חיפוש הוא הרחבה עם הערת עלות</td>
+</tr>
+</tbody>
+</table>
+<p>הטבלה הזאת היא <code>docs/decisions.md</code> של הפרויקט, והיא התשובה לרוב שאלות ה„למה לא” בפרק 32.</p>
+<h2 id="307">30.7 מה כבר יש לך</h2>
+<p>כמעט כל רכיב בצינור נבנה כתרגיל:</p>
+<table>
+<thead>
+<tr>
+<th>שלב</th>
+<th>מה כבר כתבת</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>סיכום</td>
+<td><code>ArticleSummary</code>, אימות ותיקון (פרק 9); <code>summarize_text</code> (פרק 11)</td>
+</tr>
+<tr>
+<td>לקוח</td>
+<td><code>LLMClient</code>, <code>GeminiClient</code>, <code>FakeClient</code>, ניסיונות, זמן קצוב (פרק 11); <code>resilient_call</code> (פרק 23)</td>
+</tr>
+<tr>
+<td>שיכונים ואשכולות</td>
+<td><code>Embedder</code>, מטמון, <code>near_duplicate_pairs</code> (פרק 12)</td>
+</tr>
+<tr>
+<td>זיכרון</td>
+<td><code>HeadlineStore</code> על Chroma עם מסנן תאריך ואינדוקס מחדש (פרק 14)</td>
+</tr>
+<tr>
+<td>סוכן</td>
+<td><code>run_agent</code>, תקציבים, סיבות עצירה (פרק 19); זיהוי לולאה, אישור, אידמפוטנטיות, נקודות שמירה (פרק 20)</td>
+</tr>
+<tr>
+<td>הערכה</td>
+<td>רתמה, שופט, קאפה, דוח, השוואה (פרק 16); טקסונומיה (פרק 17); קלטות וחוזים (פרק 18)</td>
+</tr>
+<tr>
+<td>תפעול</td>
+<td><code>Tracer</code>, דוח ריצה (פרק 22); שומר תקציב, מפסק זרם (פרק 23)</td>
+</tr>
+<tr>
+<td>אבטחה</td>
+<td>מדיניות פלט, ביקורת סודות, הסתרה (פרק 24)</td>
+</tr>
+<tr>
+<td>פריסה</td>
+<td>משימה יומית, cron עם שעון קיץ, גרסאות (פרק 25)</td>
+</tr>
+</tbody>
+</table>
+<p>הפרויקט הוא הרכבה: להעתיק את הדפוסים (לא את הקוד כמו שהוא, כי הפרויקט עומד בפני עצמו), לחבר
+אותם לצינור אחד, ולמדוד. המימוש הייחוס ב־<code>exercises/project-morning-brief/</code> מראה הרכבה אחת כזאת
+במלואה; פרק 31 מלמד לבנות אותה אבן אחרי אבן.</p>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>עיתון בוקר אישי: שמונה עד שתים־עשרה ידיעות, סיכומים נאמנים, למה זה חשוב לך, קישורים, „סוקר גם”,
+  „המשך ל”, הקשר לשלוש הראשיות. סנטים לגיליון, פעם אחת, שורד כשלים, מתעלם מהוראות שתולות.</li>
+<li>עשר דרישות פונקציונליות ושבע לא־פונקציונליות, כל אחת עם בדיקה.</li>
+<li>תשעה שלבים; אחד סוכן; ארבעה עם מודל; השאר קוד. SQLite לאמת, Chroma לזיכרון, פרופיל בקידומת.</li>
+<li>ההחלטות עם החלופות הפשוטות: לא RAG, Chroma רק לזיכרון, סוכן רק למחקר, LangGraph כהרחבה.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>סיפור משתמשת</td>
+<td>user story</td>
+<td>מה המשתמשת מקבלת, במילים שלה</td>
+</tr>
+<tr>
+<td>דרישה לא־פונקציונלית</td>
+<td>non-functional requirement</td>
+<td>עלות, זמן, עמידות, אבטחה; עם דרך בדיקה</td>
+</tr>
+<tr>
+<td>כתובת קנונית</td>
+<td>canonical URL</td>
+<td>הכתובת אחרי הסרת פרמטרי מעקב ועוגנים; המזהה של כתבה</td>
+</tr>
+<tr>
+<td>דעיכת רעננות</td>
+<td>recency decay</td>
+<td>חיזוק שיורד עם גיל הפריט</td>
+</tr>
+<tr>
+<td>אשכול</td>
+<td>cluster</td>
+<td>קבוצת כתבות שהן אותה ידיעה</td>
+</tr>
+<tr>
+<td>המשך</td>
+<td>follow-up</td>
+<td>ידיעה שדומה לאשכול מימים קודמים</td>
+</tr>
+<tr>
+<td>רשומת משלוח</td>
+<td>delivery record</td>
+<td>שורה שאומרת שגיליון נשלח, עם מפתח אידמפוטנטיות</td>
+</tr>
+<tr>
+<td>פרופיל קוראת</td>
+<td>reader profile</td>
+<td>נושאים, משקלים, מקורות, שפה, אורך; בלי זהות</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>להרחיב את ההיקף</strong> לפני שהצינור רץ מקצה לקצה. קודם גיליון אחד אמיתי, ואז הרחבות.</li>
+<li><strong>לשים את המודל בכל שלב.</strong> חמישה שלבים מתוך תשעה הם קוד.</li>
+<li><strong>לבנות RAG כי „צריך RAG בפרויקט”.</strong> אין קורפוס לשאלות; יש זיכרון סיפורים.</li>
+<li><strong>פרופיל עם מייל ושם.</strong> זה סוד וזהות; נשארים בסביבה.</li>
+<li><strong>לדלג על הדרישות הלא־פונקציונליות.</strong> הן מה שהופך הדגמה למערכת, והן מה שנשאל בראיון.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>למה Morning Brief ולא צ׳אט על מסמכים?</strong> כי זה פרויקט שמחייב את כל הרכיבים ביחד: איסוף, פלט
+   מובנה, דירוג, שיכונים, סוכן תחום, הרכבה, משלוח אידמפוטנטי, הערכה, מעקב, פריסה. וכי יש בו
+   משתמשת אמיתית, אני, כל בוקר.</li>
+<li><strong>מה מחוץ להיקף, ולמה?</strong> כמה משתמשות, הזדהות, ממשק, מקורות בתשלום. היקף צר ושלם עדיף על רחב
+   וחסר; הגדלה לאלף משתמשות היא תשובה מוכנה (סיכום פעם אחת לכתבה, דירוג לכל משתמשת).</li>
+<li><strong>איפה המודל ואיפה קוד, ולמה?</strong> מודל בסיכום, בציון עם נימוק, במחקר ובהרכבה: שם הבנת שפה היא
+   המשימה. קוד בנרמול, כפילויות, חיזוקים, בריחה, משלוח, תקציב: שם קוד צפוי וזול ונבדק.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/30-project-spec-and-architecture.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>הפיץ׳:</strong> 8 עד 12 ידיעות לי, סיכום נאמן, למה חשוב לי, קישורים, „סוקר גם”, „המשך ל”, הקשר ל־3. סנטים,
+  פעם אחת, שורד כשלים, מתעלם מהזרקות.</li>
+<li><strong>F1–F10 / N1–N7</strong>, כל אחת עם בדיקה: עלות ≤ 0.25, ≤ 10 דק׳, כשל חלקי, הזרקה, סודות, בדיקות
+  offline, גרסאות בגיליון.</li>
+<li><strong>9 שלבים:</strong> איסוף K, חילוץ K, סיכום M, ציון M+K, קיבוץ K (שיכונים), מחקר A, הרכבה M, משלוח K, דוח K.</li>
+<li><strong>נתונים:</strong> SQLite (articles, summaries, scores, clusters, issues, runs, deliveries); Chroma <code>story_memory</code>
+  60 יום; <code>profile.yaml</code> בלי זהות.</li>
+<li><strong>החלטות:</strong> לא RAG; Chroma רק לזיכרון; סוכן רק למחקר; LangGraph הרחבה; מהיר/חכם; Gmail SMTP; Actions.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">stages    collect -&gt; extract -&gt; summarize -&gt; score -&gt; group(+memory) -&gt; research(top 3) -&gt; compose -&gt; deliver -&gt; report
+ids       article id = sha256(canonical url)[:16]; issue idempotency key = f&quot;{date}:{channel}&quot;
+budgets   cost &lt;= 0.25 USD/issue (target 0.10); run &lt;= 10 min; research &lt;= 6 steps / 90 s
+versions  issue metadata: prompt_version, model_fast, model_smart, embedding_model, index_version
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> לקרוא את המפרט ולהפוך אותו לשלך: לכתוב את <code>profile.yaml</code> הראשון, לבחור שלושה עד חמישה
+פידים, ולסמן בציור כל קופסה ב־K, M או A במילים שלך. <strong>זמן:</strong> חצי יום לימוד (יום 51, החלק הראשון,
+כ־40 דקות), לפני אבן דרך 1. <strong>ידע מקדים:</strong> הספר.</p>
+<p>הצעדים נמצאים ב־<a href="../exercises/project-morning-brief/README.md"><code>exercises/project-morning-brief/README.md</code></a>,
+סעיף „לפני אבן הדרך הראשונה”.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li><code>profile.yaml</code> עם לפחות חמישה נושאים ממושקלים, שניים לדלג, ושלושה מקורות.</li>
+<li>הציור משורטט ביד עם K/M/A, ולכל קופסה משפט „למה”.</li>
+<li>משפט אחד לכל החלטה בטבלה 30.6, במילים שלך.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>קראי את <code>docs/decisions.md</code> של שני פרויקטי קוד פתוח שאת מעריכה. מה הם כותבים בעמודת „למה”?</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="29-portfolio-cv-presentation.html">← פרק 29: תיק עבודות, קורות חיים והצגת הפרויקט</a> · <a href="31-project-milestones.html">פרק 31: תשע אבני הדרך →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>
