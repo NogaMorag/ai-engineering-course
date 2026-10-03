@@ -1,0 +1,6 @@
+# version: 1
+# changelog: first attempt, a plain wish
+---
+Summarize this article.
+
+{{article}}

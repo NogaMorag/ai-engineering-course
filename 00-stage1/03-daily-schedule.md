@@ -144,21 +144,21 @@
 - You can explain: how examples bias outputs; when decomposition beats one mega-prompt; what prompt versioning buys.
 
 ### D14 — Structured outputs 💲
-- Objective: schemas with Pydantic and `messages.parse()`; validation and repair; schema ≠ truth.
+- Objective: schemas with Pydantic and `response_format`; validation and repair; schema ≠ truth.
 - Read: Ch 9.
 - Time: ~100 min (30 / 60 / 10).
-- Exercise: `ArticleSummary` (title, three bullets, why it matters, tags, entities, confidence enum)
-  extracted from five articles; one retry on validation failure; tests with fakes.
-- Done when: five valid objects are saved as JSON; a deliberate schema violation is handled.
+- Exercise: `ArticleSummary` (is_article, headline, three bullets, why it matters, tags, confidence enum)
+  extracted from the three Ch 8 articles; one repair attempt on validation failure; tests with fakes.
+- Done when: three valid objects are saved as JSON (the error page as `is_article: false`); a deliberate rule violation is repaired or rejected.
 - You can explain: the four meanings of "valid output"; what strict schemas guarantee and do not.
 
 ### D15 — Tool calling, the loop by hand 💲
-- Objective: the tool_use → tool_result cycle and a loop you own.
+- Objective: the function_call → function_result cycle and a loop you own.
 - Read: Ch 10 §10.1–10.4.
 - Time: ~100 min (30 / 60 / 10).
 - Exercise: tools `fetch_url(url)` (httpx + trafilatura) and `search_notes(query)`; write the loop; run "summarize this URL".
-- Done when: the trace shows tool_use → your execution → tool_result → final answer.
-- You can explain: a tool call is a proposal, not an execution; why results return as tool_result blocks.
+- Done when: the trace shows function_call → your execution → function_result → final answer.
+- You can explain: a tool call is a proposal, not an execution; why results return as function_result steps keyed by call_id.
 
 ## Week 4 — Tools, robustness, checkpoint
 
@@ -175,8 +175,8 @@
 - Objective: the client behaviors every production call needs.
 - Read: Ch 11 §11.1–11.4.
 - Time: ~90 min (30 / 50 / 10).
-- Exercise: streaming CLI (deltas, then `get_final_message()`); distinct handling of rate-limit,
-  status and connection errors; SDK retries and timeout configured; a test proving you do not double-retry.
+- Exercise: streaming (`step.delta` events, usage from `interaction.completed`); distinct handling of rate-limit,
+  status and connection errors via your own `LLMError` hierarchy; SDK retries disabled and timeout configured; tests proving retries apply only to transient errors.
 - Done when: streaming works; failure-injection tests pass; a note computes wall-clock = timeout × (retries + 1).
 - You can explain: TTFT vs. total latency; retryable vs. not; why a timeout does not mean "not billed".
 
@@ -184,7 +184,7 @@
 - Objective: isolate the provider behind one file and prove portability.
 - Read: Ch 11 §11.5–11.7.
 - Time: ~100 min (25 / 65 / 10).
-- Exercise: `llm/client.py` with an `LLMClient` protocol, `GeminiClient`, `FakeClient`; a second
+- Exercise: `ch11/llm_client.py` with an `LLMClient` protocol, `GeminiClient`, `FakeClient`; optional second
   backend through the OpenAI-compatible endpoint (same key, `openai` SDK) or a local model via Ollama;
   run the summarizer through the adapter.
 - Done when: summarizer code has no provider imports; tests use the fake; (optional) the same prompt ran through the second backend with notes on what differed.
@@ -194,7 +194,7 @@
 - Objective: a small finished tool that exercises Ch 7–11.
 - Read: Ch 11 checkpoint brief.
 - Time: ~120 min.
-- Exercise: `summarize.py <url>`: fetch → extract → structured summary → Markdown; tests with fakes and one recorded response; cost printed.
+- Exercise: `summarize_url.py <url>`: fetch → extract → structured summary → Markdown or JSON; exit codes; tests with `FakeClient`; tokens and attempts printed.
 - Done when: works on three live URLs; tests pass offline; a README snippet exists.
 - You can explain: the full request path and every failure-handling point.
 

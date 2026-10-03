@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 9: פלט מובנה</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="08-prompt-design-as-specification.html">← פרק 8: הנחיה כמפרט</a> · <a href="10-tool-calling.html">פרק 10: קריאה לכלים →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#91">9.1 ארבע משמעויות של „פלט תקין”</a></li>
+<li><a href="#92-json-schema">9.2 JSON Schema בעשר דקות</a></li>
+<li><a href="#93-pydantic">9.3 Pydantic כמקור אמת יחיד</a></li>
+<li><a href="#94">9.4 מה המודל מבטיח, ומה לא</a></li>
+<li><a href="#95">9.5 אימות, ניסיון תיקון אחד, וויתור</a></li>
+<li><a href="#96">9.6 עיצוב סכמה שמודלים ממלאים טוב</a></li>
+<li><a href="#97">9.7 פלט מובנה מול קריאה לכלים</a></li>
+<li><a href="#98">9.8 בפרויקט</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="9">פרק 9: פלט מובנה</h1>
+<p>עד עכשיו המודל החזיר טקסט, ואנחנו קראנו אותו בעיניים. תוכנה לא קוראת בעיניים. ברגע שקוד צריך
+להמשיך לעבוד עם התשובה, לשמור אותה, לדרג אותה, לשלוח אותה במייל, צריך צורה מוסכמת מראש. „פלט
+מובנה” (structured output) הוא המנגנון שבו המודל מתחייב לצורה: סכמת JSON שמוגדרת בקוד, שהשרת
+אוכף בזמן היצירה, ושאנחנו מאמתים שוב בצד שלנו. הפרק מלמד להגדיר את הצורה פעם אחת, לקבל אותה
+בחזרה, לדעת בדיוק מה מובטח ומה לא, ולתקן בצורה מסודרת כשמשהו לא עומד בכללים. בסופו תבני את
+<code>ArticleSummary</code>, הצורה של פריט אחד בעיתון הבוקר.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>ארבע המשמעויות של „פלט תקין”, ומי אוכף כל אחת.</li>
+<li>JSON Schema בעשר דקות, ומה המודל רואה ממנו.</li>
+<li>Pydantic כמקור אמת יחיד: מודל אחד משרת גם את הבקשה וגם את האימות.</li>
+<li>מה דקידוד מוגבל (constrained decoding) מבטיח, ומה הוא לא יכול להבטיח.</li>
+<li>אימות, ניסיון תיקון אחד, וויתור מסודר.</li>
+<li>עיצוב סכמות שמודלים ממלאים טוב.</li>
+<li>פלט מובנה מול קריאה לכלים: אותו מנגנון, שתי מטרות.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרק 8. היכרות עם Pydantic עוזרת אבל לא נדרשת; מה שצריך מוסבר כאן. התרגיל קורא ל־API.</p>
+<h2 id="91">9.1 ארבע משמעויות של „פלט תקין”</h2>
+<p>בפרק 8 ביקשנו סיכום בפורמט קבוע: כותרת, שלוש נקודות, משפט „למה זה חשוב”. הבקשה הייתה בטקסט, והתשובה
+הייתה בטקסט. כדי להמשיך משם בקוד היינו צריכים לפרסר (parse) את הטקסט: למצוא את הכותרת, לספור
+נקודות, לקוות שאין שורה מיותרת. זה נשבר מהר. אפשר לבקש JSON בהנחיה, וזה עובד לעיתים קרובות, אבל
+„לעיתים קרובות” הוא בדיוק מה שלא רוצים בקוד. דוגמאות למה שקורה כשמבקשים JSON בטקסט חופשי:</p>
+<ul>
+<li>המודל עוטף את ה־JSON בגדר של Markdown, ו־<code>json.loads</code> נכשל.</li>
+<li>המודל מוסיף משפט פתיחה: „הנה ה־JSON שביקשת:”.</li>
+<li>השדה נקרא <code>title</code> במקום <code>headline</code>, או שהוא מחרוזת במקום רשימה.</li>
+<li>יש שתי נקודות במקום שלוש.</li>
+<li>הכול תקין מבחינה טכנית, ואחת העובדות לא מופיעה בכתבה.</li>
+</ul>
+<p>הרשימה הזאת מסתירה ארבע רמות שונות של „תקין”, וחשוב להפריד ביניהן כי כל אחת נאכפת במקום אחר:</p>
+<table>
+<thead>
+<tr>
+<th>רמה</th>
+<th>השאלה</th>
+<th>מי אוכף</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. נפרס (parses)</td>
+<td>האם זה JSON חוקי?</td>
+<td>סכמה בבקשה; ו־<code>json.loads</code> אצלנו</td>
+</tr>
+<tr>
+<td>2. תואם סכמה (schema-valid)</td>
+<td>שמות שדות, טיפוסים, שדות חובה, ערכים מתוך רשימה סגורה</td>
+<td>סכמה בבקשה; ו־Pydantic אצלנו</td>
+</tr>
+<tr>
+<td>3. מקיים כללים (business rules)</td>
+<td>„בדיוק שלוש נקודות”, „כותרת עד 12 מילים”, „מתחיל ב־Why it matters”</td>
+<td>הקוד שלנו</td>
+</tr>
+<tr>
+<td>4. נאמן למקור (faithful)</td>
+<td>האם העובדות באמת מופיעות בכתבה?</td>
+<td>הערכה (חלק ה). שום סכמה לא בודקת אמת</td>
+</tr>
+</tbody>
+</table>
+<p>הפרק הזה סוגר את רמות 1 עד 3. רמה 4 היא נושא של חלק ה, וחשוב לזכור את זה: פלט שעבר את כל האימותים
+עדיין יכול להיות שקר מנוסח יפה.</p>
+<h2 id="92-json-schema">9.2 JSON Schema בעשר דקות</h2>
+<p>JSON Schema הוא תקן לתיאור צורה של JSON. לא צריך את כולו; לצורך עבודה עם מודלים מספיק תת־קבוצה
+קטנה. כך נראית סכמה של אובייקט עם שלושה שדות:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;is_article&quot;: {&quot;type&quot;: &quot;boolean&quot;, &quot;description&quot;: &quot;False for ads, error pages, empty pages.&quot;},
+    &quot;headline&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;description&quot;: &quot;At most 12 words, in your own words.&quot;},
+    &quot;confidence&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: [&quot;high&quot;, &quot;medium&quot;, &quot;low&quot;]}
+  },
+  &quot;required&quot;: [&quot;is_article&quot;, &quot;headline&quot;, &quot;confidence&quot;]
+}
+</code></pre>
+
+
+</div>
+
+<p>המילים שחשוב להכיר:</p>
+<table>
+<thead>
+<tr>
+<th>מילת מפתח</th>
+<th>משמעות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>אחד מתוך <code>object</code>, <code>array</code>, <code>string</code>, <code>number</code>, <code>integer</code>, <code>boolean</code></td>
+</tr>
+<tr>
+<td><code>properties</code></td>
+<td>השדות של אובייקט, כל אחד עם סכמה משלו</td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td>אילו שדות חייבים להופיע</td>
+</tr>
+<tr>
+<td><code>items</code></td>
+<td>הסכמה של כל איבר במערך</td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td>רשימה סגורה של ערכים מותרים</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>טקסט חופשי. המודל קורא אותו; זו התיעוד של השדה</td>
+</tr>
+</tbody>
+</table>
+<p>שתי עובדות על איך המודל משתמש בסכמה. ראשית, השרת משתמש בה כדי להגביל את היצירה: בכל צעד הוא מרשה
+רק טוקנים שעדיין יכולים להוביל ל־JSON תקין לפי הסכמה (זהו דקידוד מוגבל). שנית, המודל קורא את
+הסכמה כטקסט, כולל התיאורים, ולכן <code>description</code> טוב משפר את התוכן, לא רק את הצורה. סכמה בלי תיאורים
+היא כמו פונקציה בלי שמות פרמטרים.</p>
+<p>מה כדאי להימנע ממנו: הפניות (<code>$ref</code> ו־<code>$defs</code>), קינון עמוק, ביטויים רגולריים ב־<code>pattern</code>, פורמטים
+כמו <code>date-time</code>. חלקם לא נתמכים בכל ספק, וחלקם נתמכים אבל מבלבלים את המודל. כל כלל כזה עובר לרמה 3,
+לקוד שלנו.</p>
+<h2 id="93-pydantic">9.3 Pydantic כמקור אמת יחיד</h2>
+<p>לכתוב סכמת JSON ביד ואז לכתוב מחלקה שמייצגת אותה בפייתון זה כפל, ובכפל יש סחף. Pydantic פותר את זה:
+כותבים מחלקה אחת, מפיקים ממנה את הסכמה לבקשה, ומאמתים איתה את התשובה.</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">from typing import Literal
+
+from pydantic import BaseModel, Field
+
+Confidence = Literal[&quot;high&quot;, &quot;medium&quot;, &quot;low&quot;]
+
+
+class ArticleSummary(BaseModel):
+    is_article: bool = Field(description=&quot;False for ads, error pages, empty or broken pages.&quot;)
+    headline: str = Field(description=&quot;At most 12 words, in your own words. Empty string if not an article.&quot;)
+    bullets: list[str] = Field(description=&quot;Exactly three one-sentence facts taken from the article.&quot;)
+    why_it_matters: str = Field(description=&quot;One sentence that starts with 'Why it matters:'.&quot;)
+    tags: list[str] = Field(description=&quot;One to four short lowercase topic tags.&quot;)
+    confidence: Confidence = Field(description=&quot;How well the article text supports the summary.&quot;)
+</code></pre>
+
+
+</div>
+
+<p>מה כל חלק עושה:</p>
+<ul>
+<li><code>Literal["high", "medium", "low"]</code> הופך ל־<code>enum</code> בסכמה. רשימה סגורה בקוד היא רשימה סגורה למודל.</li>
+<li><code>Field(description=...)</code> הופך ל־<code>description</code>. זו ההנחיה של השדה; כותבים אותה כמו כלל, לא כמו שם.</li>
+<li><code>list[str]</code> הופך ל־<code>array</code> עם <code>items</code> מסוג מחרוזת.</li>
+</ul>
+<p>הסכמה מופקת בשורה אחת, ואז עוברת ניקוי קטן: Pydantic מוסיף לכל שדה מפתח <code>title</code> עם שם השדה באותיות
+גדולות. זה רעש שעולה טוקנים ולא מוסיף כלום, אז מסירים אותו (הפונקציה <code>clean_schema</code> בתרגיל עושה את
+זה רקורסיבית). התיאורים נשארים.</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">RESPONSE_FORMAT = {
+    &quot;type&quot;: &quot;text&quot;,
+    &quot;mime_type&quot;: &quot;application/json&quot;,
+    &quot;schema&quot;: clean_schema(ArticleSummary.model_json_schema()),
+}
+
+interaction = client.interactions.create(
+    model=model,
+    input=prompt,
+    system_instruction=SYSTEM,
+    response_format=RESPONSE_FORMAT,
+    generation_config={&quot;temperature&quot;: 0.1, &quot;max_output_tokens&quot;: 600},
+)
+summary = ArticleSummary.model_validate_json(interaction.output_text)
+</code></pre>
+
+
+</div>
+
+<p>הפרמטר <code>response_format</code> אומר לשרת: הפלט הוא טקסט מסוג JSON, והוא חייב להתאים לסכמה הזאת. בצד
+השני, <code>model_validate_json</code> עושה את שלוש העבודות בבת אחת: פרסור, בדיקת סכמה, והרצת כללי האימות
+שנכתוב בסעיף הבא. אם משהו נכשל נזרקת <code>ValidationError</code> עם הודעה מדויקת: איזה שדה, מה היה, מה ציפו.</p>
+<h2 id="94">9.4 מה המודל מבטיח, ומה לא</h2>
+<p>כשהבקשה כוללת סכמה והסטטוס שחוזר הוא <code>completed</code>, הפלט נפרס ותואם את הסכמה. זו הבטחה של המנגנון,
+לא של המזל: רמות 1 ו־2 סגורות. מכאן מתחילות ההסתייגויות, וכדאי לדעת אותן בעל פה.</p>
+<p><strong>הסכמה לא אוכפת מה שהיא לא מבטאת.</strong> „בדיוק שלוש נקודות” אפשר לכתוב ב־JSON Schema עם <code>minItems</code>
+ו־<code>maxItems</code>, אבל לא כל ספק מכבד את זה בדקידוד, ו„כותרת עד 12 מילים” או „מתחיל במילים Why it
+matters” אי אפשר לבטא כלל. את הכללים האלה הקוד שלנו בודק.</p>
+<p><strong>הסכמה לא אוכפת אמת.</strong> <code>confidence: "high"</code> הוא שיפוט של המודל, לא מדידה. עובדה בנקודה שלישית
+יכולה להיות מומצאת ולעבור כל אימות.</p>
+<p><strong>פלט קטוע הוא לא פלט.</strong> אם <code>max_output_tokens</code> נמוך מדי, היצירה נעצרת באמצע והסטטוס הוא
+<code>incomplete</code>. ה־JSON חתוך, ושום ניסיון תיקון לא יעזור; הפתרון הוא להגדיל את המגבלה. לכן בודקים
+את הסטטוס לפני שמנסים לפרסר.</p>
+<p><strong>סכמה גורמת למודל למלא טופס גם כשאין מה למלא.</strong> אם הקלט הוא דף שגיאה, מודל שחייב להחזיר כותרת
+ושלוש נקודות ימציא אותן. לכן יש בסכמה שדה <code>is_article</code>: דרך חוקית להגיד „לא”. כלל אצבע: לכל סכמה
+צריך להיות מוצא מכובד למקרה שהמשימה לא ישימה; אחרת המודל ימציא את התשובה.</p>
+<h2 id="95">9.5 אימות, ניסיון תיקון אחד, וויתור</h2>
+<p>הכללים שהסכמה לא מבטאת נכתבים כמאמת (validator) על המודל של Pydantic, ורצים אוטומטית בתוך
+<code>model_validate_json</code>:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">from pydantic import model_validator
+
+
+class ArticleSummary(BaseModel):
+    ...
+
+    @model_validator(mode=&quot;after&quot;)
+    def check_rules_the_schema_cannot_express(self) -&gt; &quot;ArticleSummary&quot;:
+        if self.is_article:
+            if len(self.bullets) != 3:
+                raise ValueError(&quot;an article needs exactly three bullets&quot;)
+            if len(self.headline.split()) &gt; 12:
+                raise ValueError(&quot;the headline must be at most 12 words&quot;)
+            if not self.why_it_matters.startswith(&quot;Why it matters:&quot;):
+                raise ValueError(&quot;why_it_matters must start with 'Why it matters:'&quot;)
+        elif self.headline.strip() or self.bullets or self.why_it_matters.strip():
+            raise ValueError(&quot;a non-article must have an empty headline, bullets and why_it_matters&quot;)
+        return self
+</code></pre>
+
+
+</div>
+
+<p>ומה עושים כשהאימות נכשל? המדיניות בקורס ובפרויקט היא „ניסיון תיקון אחד, ואז ויתור בקול”:</p>
+<table>
+<thead>
+<tr>
+<th>צעד</th>
+<th>מה קורה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>קוראים למודל עם ההנחיה והסכמה</td>
+</tr>
+<tr>
+<td>2</td>
+<td>אם הסטטוס <code>incomplete</code>: זורקים שגיאת קיטוע. לא מנסים שוב</td>
+</tr>
+<tr>
+<td>3</td>
+<td>מריצים <code>model_validate_json</code>. הצליח: מחזירים את האובייקט</td>
+</tr>
+<tr>
+<td>4</td>
+<td>נכשל: בונים הנחיית תיקון: ההנחיה המקורית, הפלט הפסול, והודעת המאמת כלשונה</td>
+</tr>
+<tr>
+<td>5</td>
+<td>קוראים שוב. הצליח: מחזירים. נכשל: זורקים שגיאה עם ההודעה האחרונה</td>
+</tr>
+</tbody>
+</table>
+<p>למה בדיוק ניסיון אחד? כי כישלון שני כמעט תמיד אומר שהסכמה או ההנחיה לא ברורות, לא שהיה חוסר מזל,
+ולולאה לא תפתור בעיית הגדרה. כי כל ניסיון עולה טוקנים וזמן. וכי לולאה בלי גבול היא באג שמחכה
+לחשבון. למה לצרף את הודעת המאמת? כי היא מדויקת („an article needs exactly three bullets”) ומודלים
+מתקנים לפי הודעה כזאת היטב. למה לזרוק ולא להחזיר אובייקט חלקי? כי הקוד שממשיך אחרינו חייב לדעת שמה
+שהוא מקבל תקין. בעיתון הבוקר עדיף לדלג על פריט מאשר להדפיס פריט שבור.</p>
+<h2 id="96">9.6 עיצוב סכמה שמודלים ממלאים טוב</h2>
+<ul>
+<li><strong>שטוחה.</strong> אובייקט אחד עם שדות פשוטים. קינון של שתי רמות הוא המקסימום הנוח.</li>
+<li><strong>תיאור שהוא כלל.</strong> „Exactly three one-sentence facts taken from the article” עדיף על „the bullets”.</li>
+<li><strong>רשימות סגורות ל־enum.</strong> כל ערך שאפשר למנות מראש, מונים. זה מונע וריאציות כמו <code>High</code> ו־<code>high</code>.</li>
+<li><strong>סדר השדות הוא סדר החשיבה.</strong> <code>is_article</code> ראשון: המודל מחליט אם זו כתבה לפני שהוא ממלא כותרת.
+  הסדר בסכמה הוא בדרך כלל הסדר שבו המודל כותב.</li>
+<li><strong>מוצא מכובד.</strong> שדה שמאפשר למודל לומר „לא ישים” במקום להמציא.</li>
+<li><strong>להפריד ידיעה משיפוט.</strong> עובדות בשדה אחד, <code>confidence</code> בשדה אחר. כך אפשר להשתמש בשיפוט בלי
+  לערבב אותו בתוכן.</li>
+<li><strong>רשימות עם גבול.</strong> „one to four tags”, לא „tags”. בלי גבול מודלים נוטים להאריך.</li>
+<li><strong>לא לבקש עולם בקריאה אחת.</strong> אובייקט של ארבעים שדות הוא סימן לפרק משימה, לפי פרק 8.</li>
+</ul>
+<h2 id="97">9.7 פלט מובנה מול קריאה לכלים</h2>
+<p>בפרק הבא המודל יבקש להפעיל פונקציות. גם זה, מתחת למכסה, פלט מובנה: המודל מייצר JSON שתואם לסכמת
+הפרמטרים של הפונקציה. ההבדל הוא במטרה ובזרימה:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>פלט מובנה</th>
+<th>קריאה לכלים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>מה המודל מייצר</td>
+<td>את התשובה עצמה, בצורה ידועה</td>
+<td>בקשה לפעולה, עם ארגומנטים</td>
+</tr>
+<tr>
+<td>מי ממשיך</td>
+<td>הקוד שלנו, עם האובייקט</td>
+<td>הקוד שלנו מריץ, ומחזיר תוצאה למודל להמשך</td>
+</tr>
+<tr>
+<td>כמה סבבים</td>
+<td>אחד</td>
+<td>כמה שצריך, עם גבול</td>
+</tr>
+<tr>
+<td>דוגמה</td>
+<td>סיכום כתבה</td>
+<td>„הורד את הדף הזה ואז סכם אותו”</td>
+</tr>
+</tbody>
+</table>
+<p>כלל אצבע: אם את יודעת מראש איזו צורה את צריכה ואין פעולות באמצע, פלט מובנה. אם המודל צריך לבחור מה
+לעשות או לקבל מידע נוסף תוך כדי, כלים.</p>
+<h2 id="98">9.8 בפרויקט</h2>
+<p><code>ArticleSummary</code> היא הצורה של פריט אחד בעיתון הבוקר, והיא תלווה אותנו עד הסוף:</p>
+<ul>
+<li>בחלק ד, הטקסט של <code>headline</code> ו־<code>bullets</code> יהפוך ל־embedding לזיהוי כפילויות.</li>
+<li>בחלק ה, <code>confidence</code> וזוג העובדות ישמשו להערכות: האם העובדות באמת בכתבה.</li>
+<li>בחלק ו, הסוכן יחליט לפי <code>tags</code> ו־<code>confidence</code> אילו פריטים ראויים למחקר נוסף.</li>
+<li>האחסון יהיה שורות JSON ב־SQLite: <code>model_dump_json</code> בכניסה, <code>model_validate_json</code> ביציאה.</li>
+</ul>
+<p>החלטה אחת שכבר נלקחה כאן ותתברר כחשובה: שדה <code>is_article</code>. בלעדיו, כל דף שגיאה ברשימת הקריאה היה הופך
+לפריט בעיתון.</p>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>„תקין” הוא ארבע רמות: נפרס, תואם סכמה, מקיים כללים, נאמן למקור. הסכמה סוגרת שתיים; הקוד שלנו
+  את השלישית; ההערכה את הרביעית.</li>
+<li>מודל Pydantic אחד הוא מקור האמת: ממנו הסכמה לבקשה, ואיתו האימות של התשובה.</li>
+<li>דקידוד מוגבל מבטיח צורה כשהסטטוס <code>completed</code>. פלט <code>incomplete</code> הוא קטוע ולא מתקנים אותו.</li>
+<li>כללים שהסכמה לא מבטאת נכתבים כמאמת; כשהוא נכשל, ניסיון תיקון אחד עם הודעת השגיאה, ואז ויתור בקול.</li>
+<li>סכמה טובה: שטוחה, עם תיאורים שהם כללים, רשימות סגורות, סדר שדות הגיוני, ומוצא מכובד.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פלט מובנה</td>
+<td>structured output</td>
+<td>פלט שהמודל מתחייב לצורתו דרך סכמה</td>
+</tr>
+<tr>
+<td>סכמת JSON</td>
+<td>JSON Schema</td>
+<td>תקן לתיאור צורה: טיפוסים, שדות חובה, רשימות סגורות</td>
+</tr>
+<tr>
+<td>דקידוד מוגבל</td>
+<td>constrained decoding</td>
+<td>השרת מרשה בכל צעד רק טוקנים שמובילים ל־JSON תואם</td>
+</tr>
+<tr>
+<td>אימות</td>
+<td>validation</td>
+<td>בדיקה שהתשובה מקיימת סכמה וכללים, בצד שלנו</td>
+</tr>
+<tr>
+<td>מאמת</td>
+<td>validator</td>
+<td>פונקציה על מודל Pydantic שבודקת כלל שהסכמה לא מבטאת</td>
+</tr>
+<tr>
+<td>ניסיון תיקון</td>
+<td>repair attempt</td>
+<td>קריאה חוזרת עם הפלט הפסול והודעת השגיאה</td>
+</tr>
+<tr>
+<td>מוצא מכובד</td>
+<td>escape hatch</td>
+<td>שדה שמאפשר למודל לומר „לא ישים” במקום להמציא</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>לבקש JSON בהנחיה ולפרסר בתקווה.</strong> בלי סכמה בבקשה אין הבטחה; עם סכמה יש.</li>
+<li><strong>לחשוב שסכמה מבטיחה נכונות.</strong> היא מבטיחה צורה. העובדות הן עניין להערכה.</li>
+<li><strong>לנסות לתקן פלט קטוע.</strong> סטטוס <code>incomplete</code> דורש מגבלה גדולה יותר, לא קריאה חוזרת.</li>
+<li><strong>לולאת תיקון בלי גבול.</strong> ניסיון אחד. כישלון שני הוא בעיית הגדרה.</li>
+<li><strong>סכמה בלי דרך להגיד „לא”.</strong> המודל ימלא את הטופס גם על דף שגיאה.</li>
+<li><strong>לכתוב סכמה ביד ליד המחלקה.</strong> שני מקורות אמת נסחפים זה מזה. מודל אחד, סכמה מופקת.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>מה ההבדל בין פלט שתואם סכמה לפלט נכון?</strong> תואם סכמה: נפרס, שמות וטיפוסים נכונים, ערכים מתוך
+   הרשימות המותרות. נכון: גם מקיים כללי עסק שהסכמה לא מבטאת, וגם נאמן למקור. את השתיים הראשונות
+   השרת מבטיח; את השלישית הקוד שלי בודק; הרביעית נמדדת בהערכות.</li>
+<li><strong>איך את מטפלת בפלט שנכשל באימות?</strong> בודקת קודם שהוא לא קטוע; אם כן, מגדילה את מגבלת הטוקנים.
+   אחרת ניסיון תיקון אחד עם ההנחיה המקורית, הפלט הפסול והודעת המאמת כלשונה. אם גם הוא נכשל,
+   זורקת שגיאה ולא מחזירה אובייקט חלקי.</li>
+<li><strong>למה Pydantic ולא סכמת JSON ידנית?</strong> מקור אמת אחד: אותה מחלקה מפיקה את הסכמה לבקשה ומאמתת את
+   התשובה, כולל כללים שסכמה לא מבטאת. בלי זה שני ייצוגים נסחפים זה מזה.</li>
+<li><strong>מתי תעדיפי פלט מובנה ומתי קריאה לכלים?</strong> כשאני יודעת מראש איזו צורה אני צריכה ואין פעולות
+   באמצע: פלט מובנה. כשהמודל צריך לבחור פעולה או לקבל מידע תוך כדי: כלים. מתחת למכסה שניהם
+   JSON לפי סכמה; ההבדל הוא הלולאה.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/09-structured-outputs.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>ארבע רמות של „תקין”:</strong> נפרס, תואם סכמה, מקיים כללים, נאמן למקור. שרת, שרת, הקוד שלי, הערכה.</li>
+<li><strong>מודל Pydantic אחד:</strong> סכמה לבקשה (<code>model_json_schema</code>, בלי <code>title</code>), אימות לתשובה
+  (<code>model_validate_json</code>).</li>
+<li><strong>מובטח:</strong> צורה כש־<code>completed</code>. <strong>לא מובטח:</strong> ספירות ומילים שהסכמה לא מבטאת, ואמת.</li>
+<li><strong>קטוע לא מתקנים.</strong> <code>incomplete</code> = להגדיל את המגבלה.</li>
+<li><strong>ניסיון תיקון אחד</strong> עם הודעת המאמת, ואז ויתור בקול. אף פעם לא אובייקט חלקי.</li>
+<li><strong>סכמה טובה:</strong> שטוחה, תיאור = כלל, enum לרשימות סגורות, סדר = חשיבה, מוצא מכובד.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">request   response_format={&quot;type&quot;:&quot;text&quot;,&quot;mime_type&quot;:&quot;application/json&quot;,&quot;schema&quot;: clean_schema(Model.model_json_schema())}
+validate  Model.model_validate_json(interaction.output_text)   -&gt; ValidationError on parse / schema / rule
+rules     @model_validator(mode=&quot;after&quot;)  -&gt; raise ValueError(&quot;exact rule in words&quot;)
+status    interaction.status == &quot;incomplete&quot;  -&gt; raise, do not repair; raise max_output_tokens
+repair    original prompt + &quot;rejected by the validator: &lt;error&gt;&quot; + previous output -&gt; ONE more call
+design    flat, description=rule, Literal -&gt; enum, is_article first, bounded lists
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> להגדיר את <code>ArticleSummary</code>, לקבל אותו מהמודל דרך סכמה, לאמת, לתקן פעם אחת, ולהוכיח את כל
+זה בבדיקות בלי רשת. <strong>זמן:</strong> יום לימוד אחד (יום 14), כ־60 דקות בנייה. <strong>ידע מקדים:</strong> הפרק, ומפתח API.</p>
+<p>הצעדים, קוד ההתחלה, הרמזים והפתרון נמצאים ב־
+<a href="../exercises/ch09-structured-outputs/README.md"><code>exercises/ch09-structured-outputs/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li>שלוש הכתבות מפרק 8 מסוכמות לאובייקטים תקינים שנשמרים כ־JSON; דף השגיאה מקבל <code>is_article: false</code>.</li>
+<li>שמונה הבדיקות עוברות: סכמה בלי <code>title</code>, כללי המאמת, ניסיון תיקון אחד, ויתור, וקיטוע שלא מנוסה שוב.</li>
+<li>בפתק: הפרה אחת שהמאמת תפס בפועל, או ההבדל בין v3 של פרק 8 לפלט המובנה כאן.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>התיעוד של Pydantic על <code>model_json_schema</code> ועל מאמתים מסביר מה עוד אפשר להפיק מהמחלקה.</li>
+<li>התיעוד של Gemini על פלט מובנה מפרט אילו מילות מפתח של JSON Schema נתמכות בדקידוד.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="08-prompt-design-as-specification.html">← פרק 8: הנחיה כמפרט</a> · <a href="10-tool-calling.html">פרק 10: קריאה לכלים →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

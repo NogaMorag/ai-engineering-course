@@ -1,0 +1,18 @@
+Northwind Tooling has published version 2.0 of Cargo-Lite, an open-source build cache for Rust
+projects, after eighteen months of development. The new release stores compiled artifacts in a
+content-addressed store shared across a team, so a crate that one developer has already compiled is
+downloaded rather than rebuilt by everyone else. The maintainers report that on their internal
+monorepo of 340 crates, a clean build on a laptop dropped from 41 minutes to under 6 minutes when
+the shared cache was warm.
+
+The release also changes the configuration format. The previous TOML file is replaced by a small
+Rust module that is type-checked at build time, which the team says removed an entire class of
+misconfiguration bugs reported by users. Projects on the old format can run a migration command
+that rewrites the configuration automatically, but support for the old format will be removed in
+version 3.0, planned for next spring.
+
+Two features that were announced last year did not make it into the release: remote execution of
+build steps and Windows support for the shared cache. The maintainers wrote that Windows support is
+"the most requested item in the tracker" and is now the top priority for the 2.1 release. Cargo-Lite
+is licensed under Apache 2.0 and is used by about 1,200 public repositories according to the
+project's own telemetry, which is opt-in.

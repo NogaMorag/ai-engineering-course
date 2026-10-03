@@ -1,0 +1,128 @@
+---
+direction: rtl
+lang: he
+---
+
+<div dir="rtl" lang="he">
+
+# תרגיל פרק 8: חבילת הנחיות עם גרסאות, והשוואת שלוש גרסאות
+
+**מטרה:** לבנות את המנגנון שבו כל ההנחיות בקורס ובפרויקט יחיו: קבצים עם גרסאות ויומן שינויים,
+ופונקציית `render` שנכשלת בקול. ואז להשוות שלוש גרסאות של הנחיית סיכום על שלוש כתבות, אחת מהן
+בכלל לא כתבה.
+
+**זמן משוער:** שני ימי לימוד (ימים 12 ו־13), כ־50 דקות בנייה בכל אחד. **ידע מקדים:** פרק 8, ומפתח API.
+ההשוואה מבצעת תשע קריאות.
+
+## מה בתיקייה הזאת
+
+| קובץ | תפקיד |
+| --- | --- |
+| `starter/prompts/__init__.py` | טעינה ומילוי של תבניות, עם שני `TODO` |
+| `solution/prompts/__init__.py` | הפתרון המלא |
+| `solution/prompts/summarize.v1.txt`, `.v2.txt`, `.v3.txt` | שלוש גרסאות של הנחיית הסיכום: משאלה, מפרט, מפרט עם דוגמאות |
+| `solution/compare_prompts.py` | מריץ כל גרסה על כל כתבה ומדפיס זה לצד זה |
+| `data/articles/*.txt` | שתי כתבות מומצאות ודף שגיאה אחד |
+| `tests/test_ch08.py` | שבע בדיקות, בלי רשת |
+
+## יום 12: החבילה
+
+**1. חבילה חדשה** עם תת־חבילה להנחיות, והעתקת הקבצים.
+
+<div dir="ltr" align="left">
+
+```powershell
+mkdir ch08
+New-Item ch08\__init__.py -ItemType File
+Copy-Item -Recurse <path-to-course>\exercises\ch08-prompt-design\starter\prompts ch08\prompts
+Copy-Item <path-to-course>\exercises\ch08-prompt-design\solution\prompts\summarize.v*.txt ch08\prompts\
+Copy-Item -Recurse <path-to-course>\exercises\ch08-prompt-design\data ch08\data
+Copy-Item <path-to-course>\exercises\ch08-prompt-design\solution\compare_prompts.py ch08\
+```
+
+</div>
+
+**2. מלאי את שני ה־`TODO`** ב־`ch08\prompts\__init__.py`: טעינה (פירוק כותרת וגוף, יומן שינויים,
+שגיאות ברורות) ומילוי (בדיקת משתנים חסרים ומיותרים, ואז החלפה).
+
+**3. בדיקות.**
+
+<div dir="ltr" align="left">
+
+```powershell
+Copy-Item <path-to-course>\exercises\ch08-prompt-design\tests\test_ch08.py tests\
+uv run pytest -q
+```
+
+</div>
+
+## יום 13: ההשוואה
+
+**4. קראי את שלוש הגרסאות** לפני ההרצה, וכתבי בפתק מה את מצפה שישתנה בין v1 ל־v2 ובין v2 ל־v3,
+ובפרט מה יקרה עם דף השגיאה.
+
+**5. הריצי** וקראי את הפלטים זה לצד זה (הם נשמרים גם בתיקייה `ch08\out`).
+
+<div dir="ltr" align="left">
+
+```powershell
+uv run --env-file .env python -m ch08.compare_prompts
+```
+
+</div>
+
+**6. רשמי בפתק** לפחות שני הבדלים קונקרטיים בין v1 ל־v3, מה קרה עם דף השגיאה בכל גרסה, ואיזו גרסה
+היית בוחרת ולמה. שימי לב גם למספר טוקני הקלט: v3 יקרה יותר בכל קריאה; האם היא שווה את זה?
+
+**7. התחייבות.** `git add .` ואז `git commit -m "Chapter 8: prompts as versioned files"`. התיקייה `out`
+יכולה להיכנס ל־Git או להיות מוחרגת; החלטי והוסיפי ל־`.gitignore` אם תרצי.
+
+## פלט צפוי (צורה)
+
+<div dir="ltr" align="left">
+
+```text
+model: gemini-3.5-flash-lite   articles: ['01-rust-build-tool', '02-city-traffic-pilot', '03-not-an-article']   prompt versions: [1, 2, 3]
+
+=== 01-rust-build-tool  v1  (first attempt, a plain wish)  in=312 out=118 ===
+Cargo-Lite 2.0 is a new release of ... (free-form summary, length and shape vary)
+
+=== 01-rust-build-tool  v2  (the five-part specification ...)  in=472 out=96 ===
+Cargo-Lite 2.0 brings shared build caches and typed configuration
+- ...
+- ...
+- ...
+Why it matters: ...
+
+=== 03-not-an-article  v1  (...) ===
+The page describes an error ... (v1 summarizes the error page as if it were news)
+
+=== 03-not-an-article  v2  (...) ===
+NOT_AN_ARTICLE
+```
+
+</div>
+
+## רשימת בדיקה
+
+- [ ] שבע הבדיקות עוברות
+- [ ] תשעה פלטים נוצרו, אחד לכל צירוף של כתבה וגרסה
+- [ ] בפתק: הציפיות שרשמת לפני ההרצה, ולידן מה קרה בפועל
+- [ ] דף השגיאה: v1 „סיכם” אותו; v2 ו־v3 החזירו את המילה המוסכמת (או שרשמת שלא, וזה ממצא)
+- [ ] את יודעת להגיד כמה טוקני קלט נוספו בגלל הדוגמאות ב־v3
+
+## רמזים
+
+1. `str.partition("\n---\n")` מחזיר שלושה חלקים; החלק האמצעי ריק אם המפריד לא נמצא.
+2. `removeprefix` ו־`strip` מנקים את שורת יומן השינויים.
+3. ב־`render`: `set(variables)` נותן את שמות המשתנים שהתקבלו; השוואה לקבוצה `template.variables`.
+4. ההחלפה: `_PLACEHOLDER.sub(lambda m: variables[m.group(1)], template.body)`.
+5. אם המודל מחזיר Markdown למרות ההוראה: רשמי את זה. זה בדיוק סוג הכשל שפרק 9 פותר עם סכמה.
+
+## הפתרון
+
+הקבצים בתיקייה `solution/` מכילים את המימוש המלא. **מה הפתרון מדגים:** הנחיות כקוד עם גרסאות
+ויומן; מילוי משתנים שלא יכול להיכשל בשקט; ואת ההבדל, במו עינייך, בין משאלה למפרט, כולל מקרה הקצה
+שהמפרט תופס והמשאלה לא.
+
+</div>

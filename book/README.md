@@ -49,11 +49,11 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 7: ממשק ה־Interactions | `07-the-interactions-api.md` | ⏳ |
-| פרק 8: הנחיה כמפרט | `08-prompt-design-as-specification.md` | ⏳ |
-| פרק 9: פלט מובנה | `09-structured-outputs.md` | ⏳ |
-| פרק 10: קריאה לכלים | `10-tool-calling.md` | ⏳ |
-| פרק 11: לקוחות עמידים וניידות בין ספקים | `11-robust-clients.md` | ⏳ |
+| פרק 7: ממשק ה־Interactions | [`07-the-interactions-api.md`](07-the-interactions-api.md) | ✅ |
+| פרק 8: הנחיה כמפרט | [`08-prompt-design-as-specification.md`](08-prompt-design-as-specification.md) | ✅ |
+| פרק 9: פלט מובנה | [`09-structured-outputs.md`](09-structured-outputs.md) | ✅ |
+| פרק 10: קריאה לכלים | [`10-tool-calling.md`](10-tool-calling.md) | ✅ |
+| פרק 11: לקוחות עמידים וניידות בין ספקים | [`11-robust-clients.md`](11-robust-clients.md) | ✅ |
 
 ## חלק ד: Embeddings, אחזור ו־RAG
 

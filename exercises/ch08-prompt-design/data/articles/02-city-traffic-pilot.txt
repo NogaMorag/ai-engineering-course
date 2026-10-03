@@ -1,0 +1,17 @@
+The coastal city of Marisol has completed a six-month pilot in which traffic lights on its main
+north-south corridor were timed by a machine learning system instead of fixed schedules. The
+system, built by the municipal technology office with a local university, used counts from existing
+cameras to predict traffic ten minutes ahead and adjusted green-light durations at fourteen
+intersections.
+
+According to the report published on Monday, average travel time along the corridor fell by 11
+percent during morning rush hour and by 7 percent in the evening, while the number of vehicles
+running red lights did not change. Bus delays on the two routes that use the corridor fell by 15
+percent, which the transit agency attributes to the system giving buses slightly longer green
+phases when they are behind schedule.
+
+The report also lists problems. On three days with heavy rain the camera counts were unreliable and
+the system fell back to the fixed schedule, and residents of two side streets complained of longer
+waits at their intersections, which the report confirms. The city council will vote next month on
+extending the system to two more corridors. The university team says it will publish the prediction
+model and an anonymized version of the traffic counts, but not the camera footage.
