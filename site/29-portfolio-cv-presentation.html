@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 29: תיק עבודות, קורות חיים והצגת הפרויקט</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="28-interview-question-bank.html">← פרק 28: בנק שאלות ראיון</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#291-readme">29.1 README: ארבע שאלות בעמוד הראשון</a></li>
+<li><a href="#292">29.2 מסמך הארכיטקטורה</a></li>
+<li><a href="#293">29.3 הדגמה של שלוש דקות</a></li>
+<li><a href="#294">29.4 שורות קורות חיים: מה, החלטה, ראיה</a></li>
+<li><a href="#295">29.5 סיכום לינקדאין</a></li>
+<li><a href="#296">29.6 כללי יושר</a></li>
+<li><a href="#297">29.7 קצב חיפוש העבודה לצד הלימוד</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="29">פרק 29: תיק עבודות, קורות חיים והצגת הפרויקט</h1>
+<p>פרויקט שאף אחד לא יכול להבין בחמש דקות לא קיים. הפרק הזה הוא על ההצגה: README שמראיינת קוראת
+לפני השיחה, מסמך ארכיטקטורה עם ציור אחד, תסריט הדגמה של שלוש דקות, שורות קורות חיים בנוסחה
+קבועה, סיכום לינקדאין, וכללי יושר שמחזיקים את כל זה. ובסוף, קצב חיפוש העבודה לצד הלימוד: כי
+הקורס נגמר, והחיפוש הוא הפרויקט הבא.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>README שעונה על ארבע שאלות בעמוד הראשון.</li>
+<li>מסמך ארכיטקטורה: ציור אחד, החלטות וחלופות.</li>
+<li>תסריט הדגמה של שלוש דקות, עם שעון.</li>
+<li>שורות קורות חיים: מה, החלטה, ראיה.</li>
+<li>סיכום לינקדאין.</li>
+<li>כללי יושר: מה בנית, מה השתמשת, מה לא עובד.</li>
+<li>קצב חיפוש העבודה.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרויקט שעובד (חלק ט), או לפחות שלב 5 שלו. התבניות ב־<code>exercises/ch29-portfolio/templates/</code>.</p>
+<h2 id="291-readme">29.1 README: ארבע שאלות בעמוד הראשון</h2>
+<p>מי שפותחת את המאגר שלך נותנת לו שתי דקות. בשתי הדקות האלה ה־README חייב לענות:</p>
+<table>
+<thead>
+<tr>
+<th>שאלה</th>
+<th>איפה</th>
+<th>איך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>מה זה עושה?</td>
+<td>שורה ראשונה ופסקה</td>
+<td>משפט אחד למי ולמה; ציור או צילום מסך של התוצר</td>
+</tr>
+<tr>
+<td>איך זה עובד?</td>
+<td>ציור הצינור</td>
+<td>Mermaid עם K, M, A על הקופסאות; קישור למסמך הארכיטקטורה</td>
+</tr>
+<tr>
+<td>איך יודעים שזה עובד?</td>
+<td>טבלת הערכה</td>
+<td>הדוח האחרון: מונה ומכנה לפי קטגוריה, עלות לגיליון</td>
+</tr>
+<tr>
+<td>איך מריצים?</td>
+<td>פקודות</td>
+<td>שלוש פקודות: התקנה, הרצה יבשה, הרצה אמיתית; ואיך זה מתוזמן</td>
+</tr>
+</tbody>
+</table>
+<p>ואחרי העמוד הראשון, לפי הסדר: החלטות וחלופות (קישור ל־ADR־lite), מה לא עובד (סעיף יושר), מבנה
+המאגר, רישיון. התבנית: <code>templates/README-template.md</code>. דבר אחד שאסור: README שמתחיל בהתקנה.
+ההתקנה היא השאלה הרביעית.</p>
+<h2 id="292">29.2 מסמך הארכיטקטורה</h2>
+<p>עמוד אחד עד שניים, <code>docs/architecture.md</code>:</p>
+<ol>
+<li><strong>הציור.</strong> צינור אחד, קופסאות ממוספרות, אות K, M או A בכל אחת, חץ בין כל שתיים, המאגרים מתחת
+   (SQLite, Chroma, קבצים). Mermaid, כדי שהוא ירונדר ב־GitHub.</li>
+<li><strong>איפה המודל ואיפה קוד.</strong> פסקה: „המודל משמש בשלבים 3, 4 (נימוק), 6 ו־7; כל השאר קוד.”</li>
+<li><strong>מודל הנתונים.</strong> הטבלאות והאוסף, במשפט לכל אחד.</li>
+<li><strong>החלטות וחלופות</strong> (ADR־lite): טבלה של החלטות, לכל אחת: ההחלטה, החלופה, למה, ומה ישנה את
+   דעתך. חמש עד שמונה שורות. זה המסמך שראיינת טכנית תפתח.</li>
+<li><strong>מגבלות ידועות.</strong> שלוש שורות כנות.</li>
+</ol>
+<p>התבנית: <code>templates/architecture-template.md</code>. את החומר כבר כתבת: הסקיצה של יום 42, התזכירים של
+פרק 26, ומסמך ההחלטות של הפרויקט.</p>
+<h2 id="293">29.3 הדגמה של שלוש דקות</h2>
+<p>הדגמה טובה היא תסריט מתוזמן, לא סיור. שלוש דקות, חמישה חלקים:</p>
+<table>
+<thead>
+<tr>
+<th>זמן</th>
+<th>מה</th>
+<th>מה רואים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0:00 עד 0:20</td>
+<td>הבעיה והפתרון במשפט</td>
+<td>העיתון של הבוקר, פתוח</td>
+</tr>
+<tr>
+<td>0:20 עד 1:00</td>
+<td>הציור</td>
+<td>הצינור; אצבע על K, M, A; „רק שלב אחד הוא סוכן, והנה למה”</td>
+</tr>
+<tr>
+<td>1:00 עד 1:50</td>
+<td>הרצה חיה או מוקלטת</td>
+<td><code>--dry-run</code> או ריצה אמיתית קצרה; המעקב; הדוח עם העלות</td>
+</tr>
+<tr>
+<td>1:50 עד 2:30</td>
+<td>ההערכה</td>
+<td>טבלת הקטגוריות; „4 מתוך 20 נכשלו בנאמנות, התיקון היה…”</td>
+</tr>
+<tr>
+<td>2:30 עד 3:00</td>
+<td>מה לא עובד ומה הלאה</td>
+<td>שתי מגבלות, שלב הבא אחד</td>
+</tr>
+</tbody>
+</table>
+<p>כללים: תמיד להציג ריצה שכבר הצליחה כגיבוי (הקלטה או פלט שמור); לא לגלול קוד; המספר של העלות
+נאמר בקול; ומסיימים בזמן. התסריט המלא עם משפטים לדוגמה: <code>templates/pitch-script.md</code>. מתזמנים
+אותו ביום 75 שלוש פעמים.</p>
+<h2 id="294">29.4 שורות קורות חיים: מה, החלטה, ראיה</h2>
+<p>שורה בקורות חיים היא לא תיאור משימה; היא טענה עם ראיה. הנוסחה:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">[what you built] · [the decision you made and why] · [the measured result]
+</code></pre>
+
+
+</div>
+
+<p>דוגמאות מהפרויקט:</p>
+<ul>
+<li>Built a scheduled newsletter agent (Python, Gemini API, Chroma) that turns 40 daily articles into a
+  personalized brief; kept the pipeline a plain workflow with a single bounded agent step; runs at
+  $0.08 per issue with a 95% faithfulness score on a 30-case eval.</li>
+<li>Designed the evaluation harness: 30 labeled cases across six categories, deterministic checks plus a
+  calibrated LLM judge (kappa 0.8 against my labels); used it to pick the cheaper model with no loss in
+  validity, cutting cost 64%.</li>
+<li>Implemented retrieval with hybrid BM25 + embeddings and reciprocal rank fusion; measured recall@5 from
+  0.78 to 0.85 on 20 labeled queries before adding a reranker.</li>
+<li>Hardened the pipeline against indirect prompt injection: output policy (links only from sources),
+  allowlisted read-only tools, five injection cases in the eval; documented what the defenses do not
+  guarantee.</li>
+<li>Built observability I own: JSONL traces per run with cost and latency per stage, redaction by default;
+  a budget guard that stops a run at $0.25.</li>
+<li>Deployed on GitHub Actions with DST-aware scheduling, secrets, artifacts and a versions file tying
+  prompt, model and index together; one-command rollback.</li>
+</ul>
+<p>שימי לב: כל שורה באנגלית (קורות חיים לתעשייה), עם מספר, ועם החלטה. „עבדתי עם LLM” אינה שורה. על
+הניסיון הקודם שלך (C++, Rust, Python, מערכות) חלה אותה נוסחה, והוא נכס: מהנדסת מערכות שלמדה
+AI שווה יותר ממי שלמדה רק AI.</p>
+<h2 id="295">29.5 סיכום לינקדאין</h2>
+<p>שלוש עד חמש שורות, בגוף ראשון, בלי מילות באזז:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">Backend engineer (C++/Rust/Python) moving into applied AI engineering. I build systems around models:
+structured outputs, retrieval, bounded agents, evals and cost control — and I measure them. Latest:
+Morning Brief, a scheduled newsletter agent with a 30-case eval, traces and a budget guard, open on
+GitHub. Looking for an AI engineering role where reliability and measurement matter.
+</code></pre>
+
+
+</div>
+
+<p>התבנית ושלוש גרסאות: <code>templates/linkedin-summary.md</code>. הכותרת (headline) היא התפקיד שאת רוצה, לא
+התפקיד שהיה.</p>
+<h2 id="296">29.6 כללי יושר</h2>
+<table>
+<thead>
+<tr>
+<th>כלל</th>
+<th>למה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>„בניתי” מול „השתמשתי”</td>
+<td>בנית את הצינור, ההערכה והמעקב; השתמשת במודל, ב־Chroma וב־Actions. מראיינת תשאל, והבלבול יקר</td>
+</tr>
+<tr>
+<td>הדגמה אינה ייצור</td>
+<td>משתמשת אחת, 40 כתבות ביום. אומרים את זה; ואומרים מה היה נשבר ראשון בפי אלף (פרק 28)</td>
+</tr>
+<tr>
+<td>מספרים עם מכנה</td>
+<td>„95 אחוז” הוא „19 מתוך 20 במקרי הפיתוח, 9 מתוך 10 ב־holdout”</td>
+</tr>
+<tr>
+<td>„לא עובד” בקול</td>
+<td>סעיף במסמך הארכיטקטורה וב־README. מי שאומרת מה לא עובד נשמעת כמו מי שמדדה</td>
+</tr>
+<tr>
+<td>נתונים ציבוריים בלבד</td>
+<td>הפרויקט קורא פידים ציבוריים. אין בו דבר של מעסיק קודם, ואת אומרת את זה אם נשאלת</td>
+</tr>
+<tr>
+<td>עזרה של AI בכתיבת קוד</td>
+<td>מותרת ומקובלת; מה שחשוב הוא שאת יכולה להסביר כל שורה. אם שואלים, התשובה היא „כן, וזה מה שאני בודקת אחרי”</td>
+</tr>
+</tbody>
+</table>
+<h2 id="297">29.7 קצב חיפוש העבודה לצד הלימוד</h2>
+<p>חיפוש עבודה הוא פרויקט עם צינור משלו, ולא כדאי להתחיל אותו ביום 80. מהשבוע ה־11 (תחילת הפרויקט):</p>
+<table>
+<thead>
+<tr>
+<th>שבוע</th>
+<th>מה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11 עד 12</td>
+<td>לינקדאין וקורות חיים בגרסה ראשונה; רשימת 20 חברות; שתי שיחות עם אנשים שעובדים בתפקיד</td>
+</tr>
+<tr>
+<td>13 עד 14</td>
+<td>README ומסמך ארכיטקטורה; חמש הגשות בשבוע, מותאמות; ראיון מדומה אחד</td>
+</tr>
+<tr>
+<td>15</td>
+<td>הדגמה מוקלטת; הגשות ממשיכות; שאלות ראיון בקול פעמיים בשבוע</td>
+</tr>
+<tr>
+<td>16</td>
+<td>שני ראיונות מדומים; פרסום; רשימת החזרות מהרשימות של נספח ה</td>
+</tr>
+</tbody>
+</table>
+<p>ואחרי הקורס: שתי שעות ביום, בשעה קבועה, עם לוח אחד (חברה, תפקיד, תאריך, שלב, הבא). דחייה היא
+נתון בלוח, לא משפט על עצמך. ובכל שבוע, פרק אחד מהספר לחזרה: הידע נשמר כשחוזרים אליו.</p>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>README: מה, איך, איך יודעים, איך מריצים; בעמוד הראשון; ההתקנה אחרונה.</li>
+<li>ארכיטקטורה: ציור עם K, M, A; איפה המודל; נתונים; החלטות וחלופות; מגבלות.</li>
+<li>הדגמה של שלוש דקות: בעיה, ציור, ריצה, הערכה, מגבלות. מתוזמנת, עם גיבוי.</li>
+<li>שורות קורות חיים: מה, החלטה, ראיה; באנגלית, עם מספר; הניסיון הקודם הוא נכס.</li>
+<li>יושר: בניתי מול השתמשתי; הדגמה אינה ייצור; מספרים עם מכנה; „לא עובד” בקול.</li>
+<li>החיפוש מתחיל בשבוע 11, שעתיים ביום אחרי הקורס, עם לוח.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>תיק עבודות</td>
+<td>portfolio</td>
+<td>הפרויקטים שמראים מה את יודעת, עם מדידה</td>
+</tr>
+<tr>
+<td>רשומת החלטה</td>
+<td>ADR, architecture decision record</td>
+<td>החלטה, חלופה, למה, ומה ישנה את דעתך</td>
+</tr>
+<tr>
+<td>תסריט הדגמה</td>
+<td>demo script</td>
+<td>הדגמה מתוזמנת של שלוש דקות עם גיבוי</td>
+</tr>
+<tr>
+<td>נוסחת השורה</td>
+<td>what / decision / evidence</td>
+<td>מבנה של שורת קורות חיים</td>
+</tr>
+<tr>
+<td>כותרת לינקדאין</td>
+<td>headline</td>
+<td>התפקיד שאת רוצה</td>
+</tr>
+<tr>
+<td>כלל יושר</td>
+<td>honesty rule</td>
+<td>מה בנית, מה השתמשת, מה לא עובד, מספרים עם מכנה</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>README שמתחיל בהתקנה.</strong> מה זה עושה ואיך יודעים שזה עובד, קודם.</li>
+<li><strong>ציור בלי K, M, A.</strong> אז לא רואים את ההחלטה החשובה: רוב המערכת היא קוד.</li>
+<li><strong>הדגמה חיה בלי גיבוי.</strong> הרשת תיפול בדיוק אז.</li>
+<li><strong>שורות קורות חיים של משימות.</strong> „עבדתי עם” → „בניתי X, החלטתי Y, מדדתי Z”.</li>
+<li><strong>להסתיר את מה שלא עובד.</strong> המראיינת תמצא, ואז הכול נראה מוסתר.</li>
+<li><strong>לחכות עם החיפוש לסוף הקורס.</strong> הצינור של החיפוש ארוך; מתחילים בשבוע 11.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>ספרי לי על הפרויקט שלך בדקה.</strong> (תשובת־המודל בבנק של פרק 28, שאלה q40; תרגלי עם שעון.)</li>
+<li><strong>מה היית עושה אחרת?</strong> שתי מגבלות מסעיף היושר, ומה הלאה. בלי התנצלות: „זה מה שמדדתי, זה
+   הבא”.</li>
+<li><strong>מה בנית ומה השתמשת?</strong> הצינור, ההערכה, המעקב והאבטחה: בניתי. המודל, Chroma, Actions, uv:
+   השתמשתי, ואני יודעת להסביר למה כל אחד.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/29-portfolio-cv-presentation.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>README:</strong> מה / איך (ציור K-M-A) / איך יודעים (טבלת הערכה + עלות) / איך מריצים. התקנה אחרונה.</li>
+<li><strong>ארכיטקטורה:</strong> ציור, איפה המודל, נתונים, החלטות וחלופות (5 עד 8), מגבלות.</li>
+<li><strong>הדגמה 3 דקות:</strong> 0:20 בעיה / 1:00 ציור / 1:50 ריצה / 2:30 הערכה / 3:00 מגבלות. גיבוי מוקלט.</li>
+<li><strong>שורת קו״ח = מה · החלטה · ראיה.</strong> אנגלית, מספר, החלטה. הניסיון הקודם הוא נכס.</li>
+<li><strong>יושר:</strong> בניתי מול השתמשתי; הדגמה אינה ייצור; מכנה; „לא עובד” בקול; נתונים ציבוריים.</li>
+<li><strong>חיפוש:</strong> משבוע 11; שעתיים ביום אחרי הקורס; לוח אחד; דחייה = נתון.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">templates  exercises/ch29-portfolio/templates/: README-template.md, architecture-template.md, pitch-script.md, cv-bullets.md, linkedin-summary.md, honesty-checklist.md
+bullet     Built &lt;what&gt; (&lt;stack&gt;); &lt;decision and why&gt;; &lt;measured result with denominator&gt;.
+pitch      problem (0:20) -&gt; diagram (1:00) -&gt; run (1:50) -&gt; eval (2:30) -&gt; limits + next (3:00)
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> לסיים את ה־README ואת מסמך הארכיטקטורה של הפרויקט לפי התבניות, לכתוב שלוש שורות קורות
+חיים בנוסחה וסיכום לינקדאין, ולהקליט ולתזמן הדגמה של שלוש דקות. <strong>זמן:</strong> יום לימוד אחד (יום 75),
+כ־100 דקות. <strong>ידע מקדים:</strong> פרויקט בשלב 5 לפחות, והתבניות.</p>
+<p>הצעדים והתבניות נמצאים ב־<a href="../exercises/ch29-portfolio/README.md"><code>exercises/ch29-portfolio/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li>README שעונה על ארבע השאלות בעמוד הראשון; מסמך ארכיטקטורה עם ציור, ADR־lite ומגבלות.</li>
+<li>שלוש שורות קורות חיים עם מספר והחלטה, וסיכום לינקדאין של עד חמש שורות.</li>
+<li>הקלטה של ההדגמה בפחות משלוש דקות, עם הגיבוי מוכן.</li>
+<li>רשימת היושר (<code>honesty-checklist.md</code>) מסומנת.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>README של פרויקטי קוד פתוח שאת מעריכה: מה הם שמים בעמוד הראשון?</li>
+<li>„Architecture Decision Records” (Michael Nygard): הפורמט המקורי, שה־ADR־lite כאן הוא קיצור שלו.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="28-interview-question-bank.html">← פרק 28: בנק שאלות ראיון</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

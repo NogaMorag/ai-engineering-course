@@ -94,9 +94,9 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 27: ראיונות תכנון מערכות AI | `27-system-design-interviews.md` | ⏳ |
-| פרק 28: בנק שאלות ראיון | `28-interview-question-bank.md` | ⏳ |
-| פרק 29: תיק עבודות, קורות חיים והצגת הפרויקט | `29-portfolio-cv-presentation.md` | ⏳ |
+| פרק 27: ראיונות תכנון מערכות AI | [`27-system-design-interviews.md`](27-system-design-interviews.md) | ✅ |
+| פרק 28: בנק שאלות ראיון | [`28-interview-question-bank.md`](28-interview-question-bank.md) | ✅ |
+| פרק 29: תיק עבודות, קורות חיים והצגת הפרויקט | [`29-portfolio-cv-presentation.md`](29-portfolio-cv-presentation.md) | ✅ |
 
 ## חלק ט: הפרויקט המסכם: Morning Brief
 
