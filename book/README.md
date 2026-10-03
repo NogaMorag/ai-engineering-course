@@ -76,9 +76,9 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 19: תהליכי עבודה מול סוכנים, והלולאה ביד | `19-workflows-vs-agents.md` | ⏳ |
-| פרק 20: אמינות, מצב וזיכרון של סוכנים | `20-agent-reliability-state-memory.md` | ⏳ |
-| פרק 21: ספריות ופרוטוקולים: LangGraph ו־MCP | `21-frameworks-and-protocols.md` | ⏳ |
+| פרק 19: תהליכי עבודה מול סוכנים, והלולאה ביד | [`19-workflows-vs-agents.md`](19-workflows-vs-agents.md) | ✅ |
+| פרק 20: אמינות, מצב וזיכרון של סוכנים | [`20-agent-reliability-state-memory.md`](20-agent-reliability-state-memory.md) | ✅ |
+| פרק 21: ספריות ופרוטוקולים: LangGraph ו־MCP | [`21-frameworks-and-protocols.md`](21-frameworks-and-protocols.md) | ✅ |
 
 ## חלק ז: פרודקשן
 
