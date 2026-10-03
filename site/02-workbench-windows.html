@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 2: סביבת העבודה ב-Windows והקריאה הראשונה למודל</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="01-what-an-ai-engineer-builds.html">← פרק 1: מה בונה מהנדסת AI</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#21">2.1 מה מתקינים, ומה לא</a></li>
+<li><a href="#22-windows-terminal-powershell-7">2.2 הטרמינל: Windows Terminal ו־PowerShell 7</a></li>
+<li><a href="#23-git-vs-code-uv">2.3 התקנת Git, VS Code ו־uv</a></li>
+<li><a href="#24-python-312-uv">2.4 Python 3.12 דרך uv</a></li>
+<li><a href="#25">2.5 הקמת פרויקט הקורס</a></li>
+<li><a href="#26-api-google-ai-studio">2.6 מפתח ה־API: Google AI Studio</a></li>
+<li><a href="#27-hello_modelpy">2.7 הקריאה הראשונה: hello_model.py</a></li>
+<li><a href="#28-pytest">2.8 בדיקת עשן עם pytest</a></li>
+<li><a href="#29-git">2.9 ההתחייבות הראשונה ל־Git</a></li>
+<li><a href="#210-ollama">2.10 אופציונלי: מודל מקומי עם Ollama</a></li>
+<li><a href="#211">2.11 פתרון תקלות</a></li>
+<li><a href="#212">2.12 עצירה, הפעלה מחדש וניקוי</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="2-windows">פרק 2: סביבת העבודה ב־Windows והקריאה הראשונה למודל</h1>
+<p>בסוף הפרק הזה יהיה לך מחשב מוכן לכל הקורס, ותוכנית Python אחת שמדברת עם מודל שפה אמיתי ומדפיסה
+את התשובה שלו, כמה טוקנים היא עלתה וכמה זמן לקחה. ההתקנות מינימליות ומכוונות: רק מה שמשרת את
+הקורס, כל צעד עם דרך לוודא שהוא הצליח, וטבלת תקלות בסוף. הפקודות כולן ל־PowerShell ב־Windows 11.
+הקציבי לפרק כשעתיים, כולל זמן הורדות.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>מה מתקינים ולמה, ומה במכוון לא מתקינים.</li>
+<li>לעבוד עם Windows Terminal ו־PowerShell 7, כולל הגדרה אחת שמונעת בעיות עם עברית.</li>
+<li>להתקין Git, VS Code ו־uv באמצעות <code>winget</code>, ולנהל Python ותלויות עם uv בלבד.</li>
+<li>להקים את פרויקט הקורס עם מבנה תיקיות קבוע.</li>
+<li>להשיג מפתח API חינמי של Gemini, לשמור אותו נכון, ולא להדליף אותו לעולם.</li>
+<li>להריץ קריאה ראשונה למודל ולקרוא את דיווח הטוקנים שלה.</li>
+<li>לעצור, להפעיל מחדש ולנקות את כל מה שהתקנת.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרקים 0 ו־1. היכרות בסיסית עם טרמינל כלשהו.</p>
+<h2 id="21">2.1 מה מתקינים, ומה לא</h2>
+<table>
+<thead>
+<tr>
+<th>כלי</th>
+<th>מה הוא עושה בקורס</th>
+<th>איך מתקינים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows Terminal + PowerShell 7</td>
+<td>הטרמינל שבו תריצי הכול. גרסה 7 תומכת ב־UTF-8 כברירת מחדל, וזה חשוב לעברית.</td>
+<td>מובנה ב־Windows 11; PowerShell 7 דרך <code>winget</code></td>
+</tr>
+<tr>
+<td><code>winget</code></td>
+<td>מנהל ההתקנות של Windows. פקודה אחת לכל כלי, קל לוודא ולהסיר.</td>
+<td>מובנה ב־Windows 11</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>ניהול גרסאות לפרויקט הקורס ולתיק העבודות, ובהמשך GitHub Actions.</td>
+<td><code>winget</code></td>
+</tr>
+<tr>
+<td>VS Code</td>
+<td>העורך. אפשר במקומו Cursor, הכול זהה.</td>
+<td><code>winget</code></td>
+</tr>
+<tr>
+<td>uv</td>
+<td>מנהל גרסאות Python, סביבות וירטואליות ותלויות, עם קובץ נעילה. מריץ סקריפטים בתוך הסביבה.</td>
+<td><code>winget</code></td>
+</tr>
+<tr>
+<td>Python 3.12</td>
+<td>מותקן דרך uv, לא מאתר python.org.</td>
+<td><code>uv python install 3.12</code></td>
+</tr>
+<tr>
+<td>google-genai</td>
+<td>ה־SDK הרשמי של Gemini ל־Python.</td>
+<td><code>uv add</code></td>
+</tr>
+<tr>
+<td>pytest, ruff</td>
+<td>בדיקות ובדיקת סגנון.</td>
+<td><code>uv add --dev</code></td>
+</tr>
+</tbody>
+</table>
+<p>מה לא מתקינים, ולמה:</p>
+<ul>
+<li><strong>לא Python מהאתר הרשמי ולא Anaconda.</strong> uv מנהל גרסאות Python בעצמו, בלי להתנגש בשום דבר.</li>
+<li><strong>לא pip.</strong> uv מחליף אותו, ושומר קובץ נעילה.</li>
+<li><strong>לא Docker ולא WSL.</strong> לא נחוצים לקורס. אם את אוהבת לעבוד ב־WSL2 זה אפשרי, אבל אז כל הפקודות
+  הופכות לפקודות Linux, והספר לא ילווה אותך בזה.</li>
+<li><strong>לא מסד נתונים חיצוני.</strong> נשתמש ב־SQLite המובנה ב־Python.</li>
+</ul>
+<blockquote>
+<p><strong>מונח:</strong> סביבה וירטואלית (virtual environment) היא תיקייה (<code>.venv</code>) שמכילה את Python ואת
+החבילות של פרויקט אחד, מבודדת מפרויקטים אחרים. קובץ הנעילה (<code>uv.lock</code>) מתעד את הגרסה המדויקת של
+כל חבילה שהותקנה, כך שהסביבה ניתנת לשחזור במחשב אחר. uv יוצר ומנהל את שניהם, ואת לעולם לא צריכה
+„להפעיל” את הסביבה ידנית: הפקודה <code>uv run</code> עושה זאת בשבילך.</p>
+</blockquote>
+<h2 id="22-windows-terminal-powershell-7">2.2 הטרמינל: Windows Terminal ו־PowerShell 7</h2>
+<p>Windows 11 מגיע עם Windows Terminal. פתחי אותו (חפשי „Terminal” בתפריט התחל). ברירת המחדל שלו היא
+לרוב Windows PowerShell 5.1, הגרסה הישנה. נתקין את PowerShell 7 ונהפוך אותה לברירת המחדל:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">winget install --id Microsoft.PowerShell -e --source winget
+</code></pre>
+
+
+</div>
+
+<p>סגרי ופתחי מחדש את Windows Terminal. בהגדרות שלו (לחצי על החץ הקטן ליד הכרטיסיות, ואז Settings, ואז
+Startup, ואז Default profile) בחרי „PowerShell” בלי המילה Windows לפניו. פתחי כרטיסייה חדשה ובדקי:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">$PSVersionTable.PSVersion
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">Major  Minor  Patch  PreReleaseLabel BuildLabel
+-----  -----  -----  --------------- ----------
+7      5      0
+</code></pre>
+
+
+</div>
+
+<p>המספר הראשון צריך להיות 7. בספר, הפקודות מופיעות בלי התחילית <code>PS C:\...&gt;</code> שאת רואה במסך, כדי שתוכלי
+להעתיק אותן כמו שהן. כמה פקודות שימושיות שחוזרות לאורך הספר:</p>
+<table>
+<thead>
+<tr>
+<th>פקודה</th>
+<th>מה היא עושה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pwd</code></td>
+<td>מדפיסה את התיקייה הנוכחית (זו הראשונה שבודקים כשמשהו „לא נמצא”)</td>
+</tr>
+<tr>
+<td><code>cd &lt;תיקייה&gt;</code></td>
+<td>מעבר תיקייה; <code>cd $HOME</code> מחזיר לתיקיית המשתמשת</td>
+</tr>
+<tr>
+<td><code>ls</code></td>
+<td>רשימת הקבצים בתיקייה</td>
+</tr>
+<tr>
+<td><code>mkdir &lt;שם&gt;</code></td>
+<td>יצירת תיקייה</td>
+</tr>
+<tr>
+<td><code>cat &lt;קובץ&gt;</code></td>
+<td>הדפסת תוכן קובץ</td>
+</tr>
+<tr>
+<td><code>code .</code></td>
+<td>פתיחת התיקייה הנוכחית ב־VS Code</td>
+</tr>
+<tr>
+<td><code>Ctrl+C</code></td>
+<td>עצירת תוכנית שרצה</td>
+</tr>
+</tbody>
+</table>
+<p><strong>הגדרה אחת לעברית, פעם אחת.</strong> Python ב־Windows מניח לעיתים קידוד ישן לפלט, ואז עברית מודפסת
+כסימני שאלה או שהתוכנית קורסת עם <code>UnicodeEncodeError</code>. הפתרון הקבוע הוא משתנה סביבה
+(environment variable) בשם <code>PYTHONUTF8</code> עם הערך <code>1</code>. משתנה סביבה הוא ערך בשם שהמערכת מעבירה לכל
+תוכנית שרצה; נשתמש במנגנון הזה גם למפתח ה־API. הגדירי אותו ברמת המשתמשת, פעם אחת:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">[Environment]::SetEnvironmentVariable(&quot;PYTHONUTF8&quot;, &quot;1&quot;, &quot;User&quot;)
+</code></pre>
+
+
+</div>
+
+<p>הפקודה לא מדפיסה דבר. <strong>סגרי ופתחי מחדש את הטרמינל</strong>: משתנה סביבה חדש נקלט רק בחלונות שנפתחו
+אחרי ההגדרה. בדיקה (אחרי שנתקין Python בסעיף 2.4):</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">uv run python -c &quot;import sys; print(sys.flags.utf8_mode)&quot;
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">1
+</code></pre>
+
+
+</div>
+
+<h2 id="23-git-vs-code-uv">2.3 התקנת Git, VS Code ו־uv</h2>
+<p>הריצי את שלוש הפקודות, אחת אחרי השנייה. כל התקנה לוקחת דקה או שתיים ועשויה לבקש אישור במסך:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">winget install --id Git.Git -e --source winget
+winget install --id Microsoft.VisualStudioCode -e --source winget
+winget install --id=astral-sh.uv -e
+</code></pre>
+
+
+</div>
+
+<p>סגרי ופתחי מחדש את הטרמינל (ההתקנות מוסיפות תיקיות ל־<code>PATH</code>, רשימת המקומות שבהם הטרמינל מחפש
+פקודות, והיא נקראת מחדש רק בחלון חדש). ודאי ששלושת הכלים עונים:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">git --version
+code --version
+uv --version
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">git version 2.5x.x.windows.1
+1.10x.x
+...
+uv 0.12.x (...)
+</code></pre>
+
+
+</div>
+
+<p>המספרים המדויקים אצלך יהיו שונים; מה שחשוב הוא שאף פקודה לא מחזירה „is not recognized”. התקיני גם
+את תוסף Python של VS Code, מהטרמינל:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">code --install-extension ms-python.python
+</code></pre>
+
+
+</div>
+
+<blockquote>
+<p><strong>ב־Windows:</strong> אם <code>winget</code> עצמו אינו מוכר, התקיני מחנות Microsoft את „App Installer” ונסי שוב. אם
+אין לך הרשאות ל־<code>winget</code>, אפשר להשתמש במתקין הרשמי של uv (הפקודה שלמטה), ואת Git ו־VS Code להוריד
+מאתריהם. עדכון של uv בעתיד נעשה בפקודה <code>uv self update</code>.</p>
+</blockquote>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">powershell -ExecutionPolicy ByPass -c &quot;irm https://astral.sh/uv/install.ps1 | iex&quot;
+</code></pre>
+
+
+</div>
+
+<h2 id="24-python-312-uv">2.4 Python 3.12 דרך uv</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">uv python install 3.12
+uv python list
+</code></pre>
+
+
+</div>
+
+<p>הפקודה הראשונה מורידה Python 3.12 לתיקייה שמנוהלת על ידי uv, בלי לגעת בשום Python אחר במחשב.
+השנייה מציגה את הגרסאות המותקנות; ליד 3.12 צריך להופיע נתיב בתוך תיקיית uv. למה דווקא 3.12 ולא
+החדשה ביותר: כל הספריות בקורס מספקות עבורו חבילות מוכנות ל־Windows, וחלקן עדיין מפגרות בגרסאות
+חדשות יותר.</p>
+<h2 id="25">2.5 הקמת פרויקט הקורס</h2>
+<p>כל התרגילים בספר (פרט לפרויקט המסכם, שיקבל ריפו משלו בפרק 31) חיים בפרויקט אחד בשם <code>ai-course</code>
+בתיקיית המשתמשת. מבנה היעד:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">C:\Users\&lt;שם&gt;\ai-course\
+    pyproject.toml        הגדרות הפרויקט והתלויות
+    .python-version       מצביע על 3.12
+    uv.lock               גרסאות מדויקות של כל חבילה (נוצר אוטומטית)
+    .venv\                הסביבה הווירטואלית (נוצרת אוטומטית, לא נכנסת ל-Git)
+    .env                  המפתח שלך (לא נכנס ל-Git לעולם)
+    .env.example          תבנית ללא סודות (כן נכנסת ל-Git)
+    .gitignore
+    README.md
+    ch02\hello_model.py   התרגיל של הפרק
+    tests\test_smoke.py   בדיקות עשן
+</code></pre>
+
+
+</div>
+
+<p>הפקודות, מתוך הטרמינל:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">cd $HOME
+mkdir ai-course
+cd ai-course
+git init
+uv init --bare --python 3.12
+uv python pin 3.12
+uv add &quot;google-genai&gt;=2.28,&lt;3&quot; pydantic
+uv add --dev pytest ruff
+uv run python --version
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">Python 3.12.x
+</code></pre>
+
+
+</div>
+
+<p>מה כל פקודה עשתה:</p>
+<table>
+<thead>
+<tr>
+<th>פקודה</th>
+<th>מה היא עשתה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>git init</code></td>
+<td>ריפו Git ריק</td>
+</tr>
+<tr>
+<td><code>uv init --bare --python 3.12</code></td>
+<td>קובץ הגדרות מינימלי (<code>pyproject.toml</code>), בלי קבצי דוגמה ובלי הגדרות אריזה</td>
+</tr>
+<tr>
+<td><code>uv python pin 3.12</code></td>
+<td>הקובץ <code>.python-version</code>, שמצמיד את הפרויקט ל־3.12 גם כשמותקנות גרסאות חדשות יותר</td>
+</tr>
+<tr>
+<td><code>uv add ...</code></td>
+<td>הוספת התלויות לקובץ ההגדרות, פתרון הגרסאות לתוך <code>uv.lock</code>, יצירת <code>.venv</code> והתקנה</td>
+</tr>
+<tr>
+<td><code>uv add --dev ...</code></td>
+<td>אותו דבר, לחבילות שנחוצות רק לפיתוח</td>
+</tr>
+<tr>
+<td><code>uv run python --version</code></td>
+<td>הרצת ה־Python של הסביבה, בלי להפעיל אותה ידנית</td>
+</tr>
+</tbody>
+</table>
+<p>הסיומת <code>&lt;3</code> בשם החבילה נועלת את ה־SDK לגרסאות 2.x: גרסה 3 הוכרזה עם שינויים שוברים, ואנחנו לא רוצות
+שהקוד בספר ישתנה מתחת לרגליים.</p>
+<p>עכשיו צרי את קובץ <code>.gitignore</code>, שאומר ל־Git אילו קבצים לא לעקוב אחריהם. אפשר ב־VS Code (הפקודה
+<code>code .</code> פותחת את התיקייה), או ישירות מהטרמינל:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">@&quot;
+.venv/
+__pycache__/
+*.py[oc]
+.pytest_cache/
+.ruff_cache/
+.env
+&quot;@ | Set-Content .gitignore
+</code></pre>
+
+
+</div>
+
+<p>השורה האחרונה היא החשובה ביותר: קובץ הסודות <code>.env</code> (סעיף 2.6) לא ייכנס ל־Git לעולם. צרי גם קובץ
+<code>README.md</code> עם שורה אחת שמתארת את הפרויקט.</p>
+<p>פתחי את <code>pyproject.toml</code> והוסיפי בסופו את ההגדרה שמאפשרת לבדיקות למצוא את הקוד:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-toml">[tool.pytest.ini_options]
+pythonpath = [&quot;.&quot;]
+testpaths = [&quot;tests&quot;]
+</code></pre>
+
+
+</div>
+
+<p>ודאי שהקובץ מכיל שורות דומות לאלה (המספרים אצלך עשויים להיות גבוהים יותר):</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-toml">[project]
+name = &quot;ai-course&quot;
+version = &quot;0.1.0&quot;
+requires-python = &quot;&gt;=3.12&quot;
+dependencies = [
+    &quot;google-genai&gt;=2.28,&lt;3&quot;,
+    &quot;pydantic&gt;=2.13&quot;,
+]
+
+[dependency-groups]
+dev = [
+    &quot;pytest&gt;=9&quot;,
+    &quot;ruff&gt;=0.16&quot;,
+]
+
+[tool.pytest.ini_options]
+pythonpath = [&quot;.&quot;]
+testpaths = [&quot;tests&quot;]
+</code></pre>
+
+
+</div>
+
+<h2 id="26-api-google-ai-studio">2.6 מפתח ה־API: Google AI Studio</h2>
+<p>מפתח API (API key) הוא מחרוזת סודית שמזהה אותך מול שרתי Google ומשייכת אלייך כל קריאה. השגתו
+חינמית ואינה דורשת כרטיס אשראי:</p>
+<ol>
+<li>היכנסי לכתובת <code>https://aistudio.google.com/apikey</code> עם חשבון Google <strong>אישי</strong> (לא חשבון עבודה).</li>
+<li>לחצי „Create API key”. אם תתבקשי לבחור פרויקט, אשרי את ברירת המחדל; AI Studio יוצר פרויקט
+   בשבילך.</li>
+<li>העתיקי את המפתח. הוא יוצג פעם אחת כמחרוזת ארוכה. אל תדביקי אותו בשום מקום חוץ מהקובץ שבצעד
+   הבא.</li>
+<li>באותו אתר, בעמוד השימוש והמגבלות (Usage / Rate limits), תראי את המגבלות של המסלול החינמי לכל
+   מודל: בקשות לדקה ובקשות ליום. רשמי לעצמך את המספרים של <code>gemini-3.5-flash-lite</code>; נזדקק להם בפרק
+   11.</li>
+</ol>
+<p>עכשיו ניצור את קובץ הסודות. בתיקיית <code>ai-course</code>, צרי קובץ בשם <code>.env</code> (עם הנקודה בהתחלה) ובו שלוש
+שורות, כשבמקום <code>PASTE_YOUR_KEY_HERE</code> מודבק המפתח שלך:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">GEMINI_API_KEY=PASTE_YOUR_KEY_HERE
+MODEL_FAST=gemini-3.5-flash-lite
+MODEL_SMART=gemini-3.8-flash
+</code></pre>
+
+
+</div>
+
+<p>צרי גם קובץ <code>.env.example</code> עם אותן שורות אבל בלי המפתח (השאירי <code>GEMINI_API_KEY=</code> ריק): הוא ייכנס
+ל־Git ויסביר למי שמשכפל את הפרויקט אילו משתנים נדרשים. ולבסוף, ודאי ש־<code>.env</code> אכן מוחרג מ־Git:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">git check-ignore .env
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">.env
+</code></pre>
+
+
+</div>
+
+<p>אם הפקודה הדפיסה <code>.env</code>, הקובץ מוחרג. אם לא הדפיסה דבר, פתחי את <code>.gitignore</code> (סעיף 2.5) וודאי שיש
+בו שורה שמכילה בדיוק <code>.env</code>.</p>
+<blockquote>
+<p><strong>שימי לב:</strong> שלושה דברים על המפתח.</p>
+<ul>
+<li>ה־SDK קורא את המפתח ממשתנה סביבה. השם הרגיל הוא <code>GEMINI_API_KEY</code>.</li>
+<li>קיים גם שם חלופי, <code>GOOGLE_API_KEY</code>. אם שניהם מוגדרים, החלופי גובר. זה מקור לבלבול אם נשאר אצלך
+  מפתח ישן מפרויקט אחר.</li>
+<li>קובץ הסודות אינו נטען מעצמו. הדגל <code>--env-file .env</code> בפקודת ההרצה טוען אותו למשתני הסביבה של
+  אותה הרצה בלבד. כך המפתח לא נשמר באופן קבוע במערכת ולא נכנס לקוד. בפרק 25 נראה את אותו מנגנון
+  בשרת, עם הסודות של GitHub Actions.</li>
+</ul>
+</blockquote>
+<p>מה שמות המודלים האלה: <code>MODEL_FAST</code> הוא המודל הזול והמהיר שישמש לרוב התרגילים, ו־<code>MODEL_SMART</code>
+הוא מודל חזק יותר להשוואות ולמשימות שדורשות איכות. שניהם במסלול החינמי נכון לאוקטובר 2026. Google
+משחררת מודלים חדשים כל כמה חודשים, ולכן השמות חיים בקובץ ההגדרות ולא בקוד: כשיתפרסם מודל חדש,
+תשני שורה אחת. העמוד <code>https://ai.google.dev/gemini-api/docs/models</code> מציג את הרשימה העדכנית.</p>
+<h2 id="27-hello_modelpy">2.7 הקריאה הראשונה: <code>hello_model.py</code></h2>
+<p>צרי את התיקייה <code>ch02</code> ובתוכה קובץ ריק <code>__init__.py</code> (הוא הופך את התיקייה לחבילה שהבדיקות יודעות
+לייבא) וקובץ <code>hello_model.py</code> עם התוכן הבא:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">&quot;&quot;&quot;Chapter 2: the first call to a language model.
+
+Run from the course root (the folder that contains pyproject.toml):
+
+    uv run --env-file .env python ch02/hello_model.py
+
+Prints the model's answer, the token usage reported by the API, the latency,
+and what the call would have cost on the paid tier.
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import os
+import sys
+import time
+
+from google import genai
+
+# Paid-tier list prices per 1M tokens for the default fast model (checked 2026-10-03).
+# On the free tier the real cost is 0; this is for building intuition only.
+DEFAULT_PRICE_INPUT = 0.30
+DEFAULT_PRICE_OUTPUT = 2.50
+
+
+def estimate_paid_cost(
+    input_tokens: int,
+    output_tokens: int,
+    price_input: float = DEFAULT_PRICE_INPUT,
+    price_output: float = DEFAULT_PRICE_OUTPUT,
+) -&gt; float:
+    &quot;&quot;&quot;Return the price in USD for the given token counts at the given per-1M rates.&quot;&quot;&quot;
+    return (input_tokens * price_input + output_tokens * price_output) / 1_000_000
+
+
+def require_api_key() -&gt; None:
+    if not (os.environ.get(&quot;GEMINI_API_KEY&quot;) or os.environ.get(&quot;GOOGLE_API_KEY&quot;)):
+        sys.exit(&quot;No API key in the environment. Did you run with --env-file .env? See section 2.6.&quot;)
+
+
+def main() -&gt; None:
+    require_api_key()
+    model = os.environ.get(&quot;MODEL_FAST&quot;, &quot;gemini-3.5-flash-lite&quot;)
+    prompt = &quot;הסבירי בשני משפטים, בעברית, מה עושה מודל שפה.&quot;
+
+    client = genai.Client()  # reads GEMINI_API_KEY / GOOGLE_API_KEY from the environment
+    started = time.perf_counter()
+    # No try/except on purpose: if the key, the model name or the rate limit is wrong,
+    # the traceback's last line says exactly what happened. Chapter 11 adds real error handling.
+    interaction = client.interactions.create(model=model, input=prompt)
+    elapsed = time.perf_counter() - started
+
+    usage = interaction.usage
+    input_tokens = (usage.total_input_tokens if usage else None) or 0
+    output_tokens = (usage.total_output_tokens if usage else None) or 0
+    thought_tokens = (usage.total_thought_tokens if usage else None) or 0
+
+    print(interaction.output_text)
+    print(&quot;-&quot; * 40)
+    print(f&quot;model:           {model}&quot;)
+    print(f&quot;input tokens:    {input_tokens}&quot;)
+    print(f&quot;output tokens:   {output_tokens}&quot;)
+    print(f&quot;thought tokens:  {thought_tokens}&quot;)
+    print(f&quot;latency:         {elapsed:.2f} s&quot;)
+    print(f&quot;paid-tier price: ${estimate_paid_cost(input_tokens, output_tokens):.6f} (free tier: $0)&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+
+
+</div>
+
+<p>הריצי, מתוך תיקיית <code>ai-course</code>:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">uv run --env-file .env python ch02/hello_model.py
+</code></pre>
+
+
+</div>
+
+<p>פלט לדוגמה (הניסוח של המודל והמספרים ישתנו אצלך):</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">מודל שפה הוא תוכנה שלמדה מכמויות עצומות של טקסט לחזות את ההמשך הסביר ביותר של רצף מילים.
+כשנותנים לו שאלה או הוראה, הוא מייצר תשובה מילה אחר מילה על סמך הדפוסים שלמד.
+----------------------------------------
+model:           gemini-3.5-flash-lite
+input tokens:    21
+output tokens:   58
+thought tokens:  0
+latency:         1.38 s
+paid-tier price: $0.000151 (free tier: $0)
+</code></pre>
+
+
+</div>
+
+<p>שימי לב לארבעה דברים בקוד, כי הם יחזרו בכל פרק:</p>
+<ol>
+<li><strong>הלקוח (client).</strong> האובייקט שמייצג את החיבור לשירות נוצר בשורה <code>client = genai.Client()</code>. הוא
+   מוצא את המפתח במשתני הסביבה בעצמו; לעולם לא נעביר לו מפתח כמחרוזת בקוד.</li>
+<li><strong>הקריאה.</strong> הפונקציה <code>create</code> שולחת בקשה אחת ומחזירה אובייקט אינטראקציה (interaction). הטקסט
+   שהמודל יצר נמצא בשדה <code>output_text</code>. בפרק 7 נפתח את כל השדות האחרים: רשימת הצעדים, המזהה שמאפשר
+   להמשיך שיחה, ועוד.</li>
+<li><strong>דיווח השימוש (usage).</strong> השירות מחזיר כמה טוקנים נכנסו, כמה יצאו, וכמה שימשו ל„חשיבה” (במודל
+   המהיר זה בדרך כלל אפס). טוקן הוא יחידת הטקסט שהמודל עובד איתה, בערך שלושה רבעים ממילה באנגלית
+   ופחות מזה בעברית; פרק 5 מסביר. התשלום אצל כל הספקים נקבע לפי המספרים האלה, ולכן נדפיס אותם בכל
+   תרגיל. שמות השדות המדויקים מופיעים בקוד למעלה.</li>
+<li><strong>שגיאות.</strong> בכוונה אין כאן <code>try</code>/<code>except</code>. אם המפתח שגוי, שם המודל לא קיים או שחרגת ממגבלת הקצב,
+   Python יציג traceback, והשורה האחרונה שלו אומרת בדיוק מה קרה: שם מחלקת השגיאה (למשל
+   <code>RateLimitError</code> כשחורגים ממגבלת הקצב, קוד 429) וההודעה מהשרת. לקרוא את השורה האחרונה של
+   traceback היא המיומנות שצריך עכשיו, וטבלת התקלות בסעיף 2.11 ממפה את השורות הנפוצות. בפרק 11 נבנה
+   שכבת טיפול בשגיאות אמיתית, שמחליטה מה מנסים שוב ומה לא.</li>
+</ol>
+<blockquote>
+<p><strong>טעות נפוצה:</strong> להריץ <code>python ch02/hello_model.py</code> בלי <code>uv run</code>. אז רץ Python אחר במחשב (או אף
+אחד), בלי החבילות של הסביבה, ותקבלי <code>ModuleNotFoundError: No module named 'google'</code>. בקורס תמיד
+<code>uv run</code>.</p>
+</blockquote>
+<h2 id="28-pytest">2.8 בדיקת עשן עם pytest</h2>
+<p>נוסיף בדיקות קטנות שמוכיחות שהסביבה תקינה, בלי רשת ובלי מפתח. צרי <code>tests\test_smoke.py</code>:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">&quot;&quot;&quot;Smoke tests for the course workbench. No network, no API key needed.&quot;&quot;&quot;
+
+import sys
+
+import pytest
+
+from ch02.hello_model import estimate_paid_cost
+
+
+def test_python_version_is_3_12() -&gt; None:
+    assert sys.version_info[:2] == (3, 12)
+
+
+def test_sdk_is_installed() -&gt; None:
+    import google.genai  # noqa: F401  (import succeeding is the test)
+
+
+def test_paid_cost_estimate() -&gt; None:
+    # 1M input tokens at $0.30 plus 1M output tokens at $2.50 = $2.80
+    assert estimate_paid_cost(1_000_000, 1_000_000, 0.30, 2.50) == pytest.approx(2.80)
+    assert estimate_paid_cost(0, 0) == 0.0
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">uv run pytest -q
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">...                                                                      [100%]
+3 passed in 0.4s
+</code></pre>
+
+
+</div>
+
+<p>שימי לב להפרדה: החישוב <code>estimate_paid_cost</code> הוא פונקציה טהורה שאפשר לבדוק בלי רשת; הקריאה למודל
+נשארת ב־<code>main</code>. ההרגל הזה, להפריד בין לוגיקה שניתנת לבדיקה דטרמיניסטית לבין הקריאה למודל, הוא
+הבסיס לפרק 18 כולו.</p>
+<h2 id="29-git">2.9 ההתחייבות הראשונה ל־Git</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">git config --global user.name &quot;השם שלך&quot;
+git config --global user.email &quot;המייל האישי שלך&quot;
+git status
+git add .
+git commit -m &quot;Course workbench: uv project, first model call, smoke tests&quot;
+</code></pre>
+
+
+</div>
+
+<p>לפני ההתחייבות, ודאי שפלט הפקודה <code>git status</code> <strong>אינו</strong> מציג את קובץ הסודות ברשימת הקבצים. אם הוא
+מופיע, עצרי ותקני את קובץ ההחרגות לפי סעיף 2.5. השתמשי בזהות Git אישית: הפרויקט הזה ילווה אותך
+לתיק העבודות.</p>
+<h2 id="210-ollama">2.10 אופציונלי: מודל מקומי עם Ollama</h2>
+<p>Ollama מריץ מודלי משקלים פתוחים (open-weights) קטנים על המחשב שלך, בלי מפתח ובלי רשת אחרי ההורדה.
+נשתמש בו בפרק 11 כ„ספק שני” כדי להוכיח שהקוד שלנו לא תלוי בספק אחד. ההתקנה אופציונלית, ודורשת
+לפחות 16 GB זיכרון ו־5 GB מקום פנוי:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">winget install --id Ollama.Ollama -e
+ollama pull qwen3:4b
+ollama run qwen3:4b &quot;Say hello in Hebrew&quot;
+</code></pre>
+
+
+</div>
+
+<p>על מעבד בלי כרטיס גרפי ייעודי המודל יענה לאט (כמה מילים בשנייה), וביכולות קריאה לכלים הוא חלש
+מהמודלים בענן. זה כלי ללמידה ולחיסכון, לא תחליף.</p>
+<h2 id="211">2.11 פתרון תקלות</h2>
+<table>
+<thead>
+<tr>
+<th>מה רואים</th>
+<th>הסיבה הסבירה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>winget : The term 'winget' is not recognized</code></td>
+<td>App Installer חסר</td>
+<td>התקיני „App Installer” מחנות Microsoft, פתחי טרמינל חדש</td>
+</tr>
+<tr>
+<td><code>uv : The term 'uv' is not recognized</code> אחרי התקנה</td>
+<td>ה־PATH לא נטען</td>
+<td>סגרי את כל חלונות הטרמינל ופתחי חדש</td>
+</tr>
+<tr>
+<td><code>No API key in the environment</code></td>
+<td><code>.env</code> לא נטען או חסר</td>
+<td>הריצי עם <code>--env-file .env</code> מתוך התיקייה שבה הקובץ נמצא; בדקי <code>pwd</code></td>
+</tr>
+<tr>
+<td>traceback שמסתיים ב־<code>API key not valid</code></td>
+<td>מפתח שגוי, או <code>GOOGLE_API_KEY</code> ישן ממקום אחר שגובר</td>
+<td>בדקי את <code>.env</code>; הריצי <code>Get-ChildItem Env:GOOGLE_API_KEY</code> ואם קיים, הסירי אותו</td>
+</tr>
+<tr>
+<td>traceback שמסתיים ב־<code>NotFoundError</code> או <code>... not found</code></td>
+<td>שם מודל שגוי או לא זמין</td>
+<td>בדקי את השם מול עמוד המודלים; עדכני <code>.env</code></td>
+</tr>
+<tr>
+<td>traceback שמסתיים ב־<code>RateLimitError</code> או <code>RESOURCE_EXHAUSTED</code></td>
+<td>מגבלת הקצב של המסלול החינמי</td>
+<td>חכי דקה ונסי שוב; בפרק 11 נטפל בזה בקוד</td>
+</tr>
+<tr>
+<td><code>UnicodeEncodeError</code> או סימני שאלה במקום עברית</td>
+<td><code>PYTHONUTF8</code> לא מוגדר או הטרמינל לא נפתח מחדש</td>
+<td>סעיף 2.2; פתחי טרמינל חדש</td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'google'</code></td>
+<td>הרצה בלי <code>uv run</code></td>
+<td>תמיד <code>uv run python ...</code></td>
+</tr>
+<tr>
+<td><code>error: No interpreter found for Python 3.12</code></td>
+<td>Python לא הותקן דרך uv</td>
+<td><code>uv python install 3.12</code></td>
+</tr>
+<tr>
+<td>שגיאת SSL או <code>certificate verify failed</code></td>
+<td>רשת ארגונית עם proxy</td>
+<td>נסי מרשת ביתית; אל תבטלי אימות תעודות</td>
+</tr>
+<tr>
+<td><code>running scripts is disabled on this system</code></td>
+<td>מדיניות הרצת סקריפטים</td>
+<td>לא נדרש בקורס (אנחנו לא מפעילות <code>.venv</code> ידנית); אם נדרש: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="212">2.12 עצירה, הפעלה מחדש וניקוי</h2>
+<ul>
+<li><strong>לעצור תוכנית שרצה:</strong> המקשים <code>Ctrl+C</code>.</li>
+<li><strong>לבנות מחדש את הסביבה</strong> אם משהו השתבש: מוחקים את תיקיית הסביבה ומסנכרנים מחדש. קובץ הנעילה
+  מבטיח שתקבלי בדיוק את אותן גרסאות.</li>
+<li><strong>להסיר הכול:</strong> מנקים את המטמון של uv, מוחקים את התיקייה שבה הוא שומר גרסאות Python (הפקודה
+  <code>uv python dir</code> מדפיסה את מיקומה), מסירים את uv, ומוחקים את תיקיית הפרויקט.</li>
+<li><strong>לבטל מפתח שדלף:</strong> ב־AI Studio, בעמוד המפתחות, מחקי את המפתח וצרי חדש. מחיקת השורה מהקובץ
+  אינה מבטלת מפתח שכבר נחשף.</li>
+</ul>
+<p>הפקודות המתאימות:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell"># rebuild the environment
+Remove-Item -Recurse -Force .venv
+uv sync
+
+# remove everything
+uv cache clean
+uv python dir          # prints the folder that holds uv's Python versions; delete it if you want
+winget uninstall astral-sh.uv
+Remove-Item -Recurse -Force &quot;$HOME\ai-course&quot;
+</code></pre>
+
+
+</div>
+
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>הסביבה: טרמינל חדש, מנהל התקנות, Git, עורך, ו־uv שמנהל גם את Python עצמו.</li>
+<li>עברית: משתנה סביבה אחד ברמת המשתמשת, ואז טרמינל חדש.</li>
+<li>פרויקט אחד לכל הקורס: קובץ הגדרות, קובץ נעילה, קובץ סודות שמוחרג מ־Git, וקובץ דוגמה בלי סודות
+  שכן נכנס.</li>
+<li>המפתח חינמי, נשמר בקובץ הסודות, נטען בזמן ההרצה בלבד, ולעולם לא מופיע בקוד.</li>
+<li>הקריאה הראשונה: יוצרים לקוח, שולחים בקשה אחת, קוראים את טקסט התשובה ואת דיווח הטוקנים.</li>
+<li>שמות המודלים חיים בהגדרות, לא בקוד.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>סביבה וירטואלית</td>
+<td>Virtual environment</td>
+<td>תיקיית <code>.venv</code> עם Python והחבילות של פרויקט אחד</td>
+</tr>
+<tr>
+<td>קובץ נעילה</td>
+<td>Lockfile (<code>uv.lock</code>)</td>
+<td>הגרסאות המדויקות שהותקנו, לשחזור זהה במחשב אחר</td>
+</tr>
+<tr>
+<td>משתנה סביבה</td>
+<td>Environment variable</td>
+<td>ערך בשם שהמערכת מעבירה לתוכניות; כך נמסרים סודות והגדרות</td>
+</tr>
+<tr>
+<td>מפתח API</td>
+<td>API key</td>
+<td>מחרוזת סודית שמזהה אותך מול הספק; סיסמה לכל דבר</td>
+</tr>
+<tr>
+<td>ערכת פיתוח</td>
+<td>SDK</td>
+<td>ספריית Python שעוטפת את פרוטוקול ה־API באובייקטים ופונקציות</td>
+</tr>
+<tr>
+<td>אינטראקציה</td>
+<td>Interaction</td>
+<td>אובייקט התשובה של קריאה אחת: טקסט, צעדים, מזהה ושימוש</td>
+</tr>
+<tr>
+<td>דיווח שימוש</td>
+<td>Usage</td>
+<td>ספירת הטוקנים שנכנסו, יצאו ושימשו לחשיבה בקריאה אחת</td>
+</tr>
+<tr>
+<td>מגבלת קצב</td>
+<td>Rate limit</td>
+<td>מספר הבקשות המותר לדקה או ליום; שגיאת 429 כשחורגים</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>להתקין Python מ־python.org „ליתר ביטחון”.</strong> זה יוצר שני Python במחשב ובלבול לגבי מי רץ. uv
+  מספיק.</li>
+<li><strong>להדביק את המפתח בקוד „רק לבדיקה”.</strong> בקוד הוא נכנס ל־Git ולהיסטוריה לנצח. רק <code>.env</code>.</li>
+<li><strong>להפעיל את הסביבה ידנית</strong> (<code>.venv\Scripts\Activate.ps1</code>) ואז לשכוח. <code>uv run</code> עושה זאת בכל פקודה.</li>
+<li><strong>לקרוא ל־<code>output_text</code> ולהתעלם מ־<code>usage</code>.</strong> בלי המספרים האלה אין לך מושג כמה המערכת שלך תעלה
+  בייצור.</li>
+<li><strong>לנסות שוב מיד אחרי 429.</strong> זה רק מאריך את החסימה. ממתינים, ובפרק 11 עושים זאת נכון.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>איך את מנהלת סודות בפיתוח מקומי ובשרת?</strong> מקומית: קובץ <code>.env</code> מוחרג מ־Git, נטען לסביבת
+   ההרצה בלבד; בשרת: מנגנון הסודות של הפלטפורמה (למשל GitHub Actions secrets), אף פעם בקוד או
+   בתמונה. מפתח שדלף מבטלים, לא מוחקים.</li>
+<li><strong>למה קובץ נעילה חשוב בפרויקט AI במיוחד?</strong> כי ספריות ה־SDK משתנות מהר ושינוי גרסה יכול לשנות
+   התנהגות; הנעילה מאפשרת לשחזר בדיוק את הסביבה שבה מדדת תוצאות.</li>
+<li><strong>כמה עולה קריאה למודל, ואיך את יודעת?</strong> לפי דיווח ה־usage של הספק (טוקני קלט, פלט וחשיבה)
+   כפול המחירון של המודל; מדפיסים ומתעדים אותו בכל קריאה, לא מעריכים מראש.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/02-workbench-windows.md</code>. הוא בנוי משני חלקים: מושגים בעברית,
+ואחריהם דף־עזר (cheat sheet) באנגלית בלבד, בכוונה, כדי שפקודות ושמות לא יתערבבו בטקסט עברי.</p>
+<ul>
+<li><strong>מה הקמתי:</strong> טרמינל חדש, Git, עורך, ומנהל חבילות אחד שמנהל גם את Python עצמו.</li>
+<li><strong>איך מריצים:</strong> תמיד דרך uv, מתוך תיקיית הפרויקט, עם קובץ הסודות.</li>
+<li><strong>עברית בטרמינל:</strong> משתנה סביבה אחד ברמת המשתמשת, ואז לפתוח טרמינל חדש.</li>
+<li><strong>סודות:</strong> קובץ הסודות לא נכנס ל־Git. קובץ הדוגמה בלי המפתח כן נכנס.</li>
+<li><strong>הקריאה הראשונה:</strong> יוצרים לקוח, שולחים בקשה אחת, קוראים טקסט ושימוש בטוקנים.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">tools    PowerShell 7 | winget | Git | VS Code | uv | Python 3.12 (managed by uv)
+run      uv run --env-file .env python &lt;file&gt;          (from the ai-course folder)
+hebrew   PYTHONUTF8=1 as a User environment variable -&gt; open a new terminal
+secrets  .env is git-ignored | .env.example is committed | git check-ignore .env prints &quot;.env&quot;
+call     genai.Client() -&gt; client.interactions.create(model=..., input=...) -&gt; output_text, usage
+models   MODEL_FAST=__________   MODEL_SMART=__________
+limits   free tier: ____ requests/min, ____ requests/day   (from AI Studio)
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> סביבה עובדת וקריאה ראשונה למודל, עם בדיקות עשן וקובץ סודות מוגן.
+<strong>זמן:</strong> 90–120 דקות. <strong>ידע מקדים:</strong> הפרק כולו.</p>
+<p>הצעדים המלאים, קוד ההתחלה, רשימת הבדיקה, הרמזים והפתרון נמצאים ב־
+<a href="../exercises/ch02-first-call/README.md"><code>exercises/ch02-first-call/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li>הרצת התוכנית מדפיסה תשובה בעברית קריאה ושלושה מספרי טוקנים.</li>
+<li>הרצת הבדיקות מדווחת על שלוש בדיקות שעברו.</li>
+<li>הקובץ <code>.env</code> מוחרג מ־Git, וההתחייבות הראשונה קיימת ביומן של Git.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>תיעוד uv: הפרק „Projects” מסביר לעומק את קובץ ההגדרות, קובץ הנעילה ופקודת ההרצה.</li>
+<li>תיעוד Gemini API: עמוד ה־Quickstart ועמוד ה־Pricing. השוואת המחירים בין המודלים שם היא תרגיל
+  מצוין בקריאת מחירון.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="01-what-an-ai-engineer-builds.html">← פרק 1: מה בונה מהנדסת AI</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

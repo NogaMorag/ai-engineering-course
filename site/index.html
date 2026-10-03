@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תוכן העניינים</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"></nav>
+<main class="book">
+
+<h1 id="ai">הנדסת AI יישומית: ספר לימוד ותוכנית למידה</h1>
+<p>ספר לימוד בעברית למפתחת תוכנה מנוסה שעוברת להנדסת AI יישומית (Applied AI Engineering). הספר נכתב
+מאפס, נבנה סביב קוד שרץ באמת, ומסתיים בפרויקט תיק עבודות: סוכן שמכין עיתון בוקר אישי.</p>
+<p>איך קוראים: הדרך הנוחה היא גרסת ה־HTML בתיקייה <code>site/</code> (מופקת בפקודה
+<code>uv run --with markdown tools/build_html.py</code>). אפשר גם לפתוח את התיקייה <code>book/</code> ב־Obsidian עם התוסף
+RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגלית ב־<code>00-stage1/03-daily-schedule.md</code>).</p>
+<h2 id="_1">מצב הכתיבה</h2>
+<table>
+<thead>
+<tr>
+<th>סימון</th>
+<th>משמעות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅</td>
+<td>הפרק כתוב במלואו, כולל תרגיל ופתק Obsidian</td>
+</tr>
+<tr>
+<td>🛠</td>
+<td>בכתיבה</td>
+</tr>
+<tr>
+<td>⏳</td>
+<td>טרם נכתב</td>
+</tr>
+</tbody>
+</table>
+<h2 id="0">חלק 0: לפני שמתחילים</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 0: איך ללמוד מהספר הזה</td>
+<td><a href="00-how-to-study.html"><code>00-how-to-study.md</code></a></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">חלק א: התמצאות וסביבת עבודה</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 1: מה בונה מהנדסת AI</td>
+<td><a href="01-what-an-ai-engineer-builds.html"><code>01-what-an-ai-engineer-builds.md</code></a></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>פרק 2: סביבת העבודה ב־Windows והקריאה הראשונה למודל</td>
+<td><a href="02-workbench-windows.html"><code>02-workbench-windows.md</code></a></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">חלק ב: איך מודלים עובדים (בדיוק כמה שצריך)</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 3: למידת מכונה בפרק אחד</td>
+<td><code>03-machine-learning-in-one-chapter.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 4: המתמטיקה המינימלית</td>
+<td><code>04-minimal-math.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 5: בתוך מודל שפה</td>
+<td><code>05-inside-a-language-model.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 6: יצירת טקסט והכפתורים שלה</td>
+<td><code>06-generation-and-its-knobs.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">חלק ג: בנייה עם ממשקי מודלים</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 7: ממשק ה־Interactions</td>
+<td><code>07-the-interactions-api.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 8: הנחיה כמפרט</td>
+<td><code>08-prompt-design-as-specification.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 9: פלט מובנה</td>
+<td><code>09-structured-outputs.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 10: קריאה לכלים</td>
+<td><code>10-tool-calling.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 11: לקוחות עמידים וניידות בין ספקים</td>
+<td><code>11-robust-clients.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="embeddings-rag">חלק ד: Embeddings, אחזור ו־RAG</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 12: Embeddings ודמיון סמנטי</td>
+<td><code>12-embeddings.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 13: יסודות החיפוש</td>
+<td><code>13-search-fundamentals.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 14: מאגרי וקטורים</td>
+<td><code>14-vector-databases.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 15: RAG מקצה לקצה</td>
+<td><code>15-rag-end-to-end.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">חלק ה: הערכה ואיכות</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 16: הערכות (Evals)</td>
+<td><code>16-evals.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 17: ניתוח כשלים ודיבוג של מערכות AI</td>
+<td><code>17-failure-analysis.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 18: בדיקות ליישומי AI</td>
+<td><code>18-testing-ai-applications.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_6">חלק ו: סוכנים ותהליכי עבודה</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 19: תהליכי עבודה מול סוכנים, והלולאה ביד</td>
+<td><code>19-workflows-vs-agents.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 20: אמינות, מצב וזיכרון של סוכנים</td>
+<td><code>20-agent-reliability-state-memory.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 21: ספריות ופרוטוקולים: LangGraph ו־MCP</td>
+<td><code>21-frameworks-and-protocols.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">חלק ז: פרודקשן</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 22: תצפיתיות (Observability)</td>
+<td><code>22-observability.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 23: זמן תגובה, עלות ואמינות</td>
+<td><code>23-latency-cost-reliability.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 24: אבטחה ופרטיות</td>
+<td><code>24-security-and-privacy.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 25: פריסה ותזמון</td>
+<td><code>25-deployment-and-scheduling.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 26: בחירת מודלים ושיטות</td>
+<td><code>26-choosing-models-and-methods.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_8">חלק ח: קריירה</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 27: ראיונות תכנון מערכות AI</td>
+<td><code>27-system-design-interviews.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 28: בנק שאלות ראיון</td>
+<td><code>28-interview-question-bank.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 29: תיק עבודות, קורות חיים והצגת הפרויקט</td>
+<td><code>29-portfolio-cv-presentation.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="morning-brief">חלק ט: הפרויקט המסכם: Morning Brief</h2>
+<table>
+<thead>
+<tr>
+<th>פרק</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פרק 30: מפרט וארכיטקטורה</td>
+<td><code>30-project-spec-and-architecture.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 31: תשע אבני הדרך</td>
+<td><code>31-project-milestones.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>פרק 32: הערכה, ראיון והצגה של הפרויקט</td>
+<td><code>32-project-evaluation-and-interview.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_9">נספחים</h2>
+<table>
+<thead>
+<tr>
+<th>נספח</th>
+<th>קובץ</th>
+<th>מצב</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>א: מילון מונחים</td>
+<td><code>appendices/a-glossary.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>ב: פתרון תקלות התקנה</td>
+<td><code>appendices/b-troubleshooting.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>ג: מעקב עלויות ומחירים</td>
+<td><code>appendices/c-costs.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>ד: תבניות פתקים ל־Obsidian</td>
+<td><code>appendices/d-obsidian-templates.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>ה: רשימות בדיקה: למידה ומוכנות לראיון</td>
+<td><code>appendices/e-checklists.md</code></td>
+<td>⏳</td>
+</tr>
+<tr>
+<td>ו: לוח הלימוד היומי</td>
+<td><code>appendices/f-daily-schedule.md</code></td>
+<td>⏳</td>
+</tr>
+</tbody>
+</table>
+</main>
+<nav class="bottom"></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>
