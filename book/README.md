@@ -110,11 +110,11 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | נספח | קובץ | מצב |
 | --- | --- | --- |
-| א: מילון מונחים | `appendices/a-glossary.md` | ⏳ |
-| ב: פתרון תקלות התקנה | `appendices/b-troubleshooting.md` | ⏳ |
-| ג: מעקב עלויות ומחירים | `appendices/c-costs.md` | ⏳ |
-| ד: תבניות פתקים ל־Obsidian | `appendices/d-obsidian-templates.md` | ⏳ |
-| ה: רשימות בדיקה: למידה ומוכנות לראיון | `appendices/e-checklists.md` | ⏳ |
-| ו: לוח הלימוד היומי | `appendices/f-daily-schedule.md` | ⏳ |
+| א: מילון מונחים | [`appendices/a-glossary.md`](appendices/a-glossary.md) | ✅ |
+| ב: פתרון תקלות התקנה | [`appendices/b-troubleshooting.md`](appendices/b-troubleshooting.md) | ✅ |
+| ג: מעקב עלויות ומחירים | [`appendices/c-costs.md`](appendices/c-costs.md) | ✅ |
+| ד: תבניות פתקים ל־Obsidian | [`appendices/d-obsidian-templates.md`](appendices/d-obsidian-templates.md) | ✅ |
+| ה: רשימות בדיקה: למידה ומוכנות לראיון | [`appendices/e-checklists.md`](appendices/e-checklists.md) | ✅ |
+| ו: לוח הלימוד היומי | [`appendices/f-daily-schedule.md`](appendices/f-daily-schedule.md) | ✅ |
 
 </div>

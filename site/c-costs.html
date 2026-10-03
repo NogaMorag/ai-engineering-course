@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>נספח ג: מעקב עלויות ומחירים</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="b-troubleshooting.html">← נספח ב: פתרון תקלות התקנה</a> · <a href="d-obsidian-templates.html">נספח ד: תבניות פתקים ל־Obsidian →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#2026-10-03">טבלת המחירים (נבדקה 2026-10-03; לעדכן כשמשתנה)</a></li>
+<li><a href="#_2">איפה רואים שימוש אמיתי</a></li>
+<li><a href="#_3">תבנית מעקב (שבועית)</a></li>
+<li><a href="#_4">כללים</a></li>
+</ul>
+</div>
+
+<h1 id="_1">נספח ג: מעקב עלויות ומחירים</h1>
+<p>הקורס רץ בשכבה החינמית: אפס דולר, עם מגבלות קצב ומכסה יומית. הנספח נותן את טבלת המחירים של
+המסלול בתשלום (כדי שהעלות המשוערת בדוחות תהיה אמיתית), את המקום שבו רואים את השימוש, תבנית למעקב,
+ואת הכללים שהופכים „זול” למספר.</p>
+<h2 id="2026-10-03">טבלת המחירים (נבדקה 2026-10-03; לעדכן כשמשתנה)</h2>
+<table>
+<thead>
+<tr>
+<th>מודל</th>
+<th>קלט, דולר למיליון טוקנים</th>
+<th>פלט</th>
+<th>קלט ממטמון</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gemini-3.5-flash-lite</code></td>
+<td>0.30</td>
+<td>2.50</td>
+<td>0.075</td>
+<td>המודל המהיר של הקורס</td>
+</tr>
+<tr>
+<td><code>gemini-3.8-flash</code></td>
+<td>0.75</td>
+<td>3.75</td>
+<td>0.1875</td>
+<td>המודל החכם; מחיר מבצע עד סוף 2026</td>
+</tr>
+<tr>
+<td><code>gemini-embedding-2</code></td>
+<td>0.20</td>
+<td>0</td>
+<td>0.20</td>
+<td>שיכונים</td>
+</tr>
+</tbody>
+</table>
+<p>הטבלה הזאת היא <code>PRICES</code> ב־<code>ch22/tracing.py</code> ובפרויקט <code>src/morning_brief/tracing.py</code>. כשמשנים כאן, משנים
+שם, ורושמים תאריך. מודל שלא בטבלה מופיע בדוחות עם עלות 0 ודגל, לא עם ניחוש (פרק 22).</p>
+<p>הנוסחה:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">cost_usd = (input_tokens_excl_cached × price_in + output_tokens × price_out + cached_tokens × price_cached) / 1_000_000
+</code></pre>
+
+
+</div>
+
+<h2 id="_2">איפה רואים שימוש אמיתי</h2>
+<ul>
+<li><strong>AI Studio</strong> מראה את מגבלות הקצב ואת השימוש היומי לכל מודל. זה המקור לאמת על המכסה.</li>
+<li><strong><code>usage</code> בכל תשובה</strong> (<code>total_input_tokens</code>, <code>total_output_tokens</code>, <code>total_cached_tokens</code>) הוא המקור
+  לעלות של קריאה. לעולם לא להעריך כשאפשר למדוד.</li>
+<li><strong>דוח הריצה</strong> (פרקים 22 ו־25, והפרויקט) מסכם לפי שלב; שבוע של דוחות הוא גרף.</li>
+</ul>
+<h2 id="_3">תבנית מעקב (שבועית)</h2>
+<table>
+<thead>
+<tr>
+<th>שבוע</th>
+<th>קריאות</th>
+<th>טוקני קלט</th>
+<th>טוקני פלט</th>
+<th>ממטמון</th>
+<th>עלות משוערת</th>
+<th>429 שנתקלתי בהם</th>
+<th>הערה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>מתי לעבור למסלול בתשלום (Tier 1, תשלום מראש של כמה דולרים): כשהמכסה היומית עוצרת אותך בתרגיל, או
+כשאת לא רוצה שהתוכן ישמש לאימון (פרק 2). במחירים האלה, כל הקורס עולה כמה דולרים בודדים.</p>
+<h2 id="_4">כללים</h2>
+<ul>
+<li><strong>טוקן פלט יקר פי שמונה מקלט.</strong> פלט קצר שווה יותר מקלט קצר.</li>
+<li><strong>קידומת יציבה</strong> (פרופיל, הוראות, מסמכים) בתחילת ההנחיה, והשאלה בסוף: מטמון.</li>
+<li><strong>תקציב בקוד</strong> (<code>BudgetGuard</code>), לא בראש.</li>
+<li><strong>מודל זול איפה שההערכה מחזיקה.</strong> נמדד, לא מונח (פרק 23).</li>
+<li><strong>הערכה עולה כסף</strong>: 30 מקרים כפול קריאה כפול שופט כפול חזרות. מדפיסים את העלות בדוח.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="b-troubleshooting.html">← נספח ב: פתרון תקלות התקנה</a> · <a href="d-obsidian-templates.html">נספח ד: תבניות פתקים ל־Obsidian →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

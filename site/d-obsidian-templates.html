@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>נספח ד: תבניות פתקים ל־Obsidian</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="c-costs.html">← נספח ג: מעקב עלויות ומחירים</a> · <a href="e-checklists.html">נספח ה: רשימות בדיקה: למידה ומוכנות לראיון →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">פתק פרק</a></li>
+<li><a href="#_2">יומן תרגיל</a></li>
+<li><a href="#26">תזכיר החלטה (פרק 26)</a></li>
+<li><a href="#80">יומן יומי (80 ימים)</a></li>
+<li><a href="#_3">שלושה כללים לכספת</a></li>
+</ul>
+</div>
+
+<h1 id="obsidian">נספח ד: תבניות פתקים ל־Obsidian</h1>
+<p>ארבע תבניות: פתק פרק (זו שהספר מספק מוכנה לכל פרק), יומן תרגיל, תזכיר החלטה, ויומן יומי. העתיקי אותן
+לתיקיית התבניות של הכספת (Settings, Templates). הכלל מפרק 0: פתק הוא במילים שלך עם דוגמה, לא העתק של
+הספר.</p>
+<h2 id="_1">פתק פרק</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">---
+direction: rtl
+tags: [ai-course, book]
+chapter: {{chapter}}
+---
+# {{title}}
+
+- **הרעיון המרכזי במשפט:** ___
+- **שלושה דברים שאני לוקחת:** ___ / ___ / ___
+- **מה הפתיע אותי:** ___
+- **איפה זה בפרויקט:** ___
+- **שאלה פתוחה:** ___
+
+(כאן בלוק קוד מסוג text עם ה־cheat sheet: פקודות, חתימות, מספרים; באנגלית בלבד)
+
+קישורים: [[prev]] · [[next]]
+</code></pre>
+
+
+</div>
+
+<h2 id="_2">יומן תרגיל</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">---
+tags: [ai-course, exercise]
+chapter: {{chapter}}
+day: {{day}}
+---
+# תרגיל פרק {{chapter}}: {{name}}
+
+- **זמן בפועל:** ___ (יעד: ___)
+- **מה עבד מהפעם הראשונה:** ___
+- **איפה נתקעתי, ומה פתר:** ___
+- **פלט שווה שמירה:** (טבלה, מספרים, מעקב)
+- **מה הייתי עושה אחרת:** ___
+- **מקרה חדש להערכה או לבדיקה:** ___
+</code></pre>
+
+
+</div>
+
+<h2 id="26">תזכיר החלטה (פרק 26)</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">---
+tags: [ai-course, decision]
+date: {{date}}
+---
+# תזכיר החלטה: {{title}}
+
+**הכשל הנצפה.** ___
+**הראיות.** (קובץ תוצאות, מקרים) ___
+**ההחלטה.** ___
+**חלופות שנשקלו ולמה לא.** ___
+**עלות.** ___
+**סיכונים.** ___
+**איך נדע.** (מדד, סט, מתי) ___
+</code></pre>
+
+
+</div>
+
+<h2 id="80">יומן יומי (80 ימים)</h2>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">---
+tags: [ai-course, daily]
+day: {{day}}
+---
+# יום {{day}}: {{title}}
+
+- **קריאה:** פרק ___ סעיפים ___  (___ דק׳)
+- **תרגיל:** ___  (___ דק׳)
+- **קריטריון סיום:** [ ] ___
+- **שימוש היום (טוקנים / 429):** ___
+- **משפט אחד שאני יכולה להסביר עכשיו ולא יכולתי בבוקר:** ___
+- **מחר:** ___
+</code></pre>
+
+
+</div>
+
+<h2 id="_3">שלושה כללים לכספת</h2>
+<ol>
+<li><strong>פתק אחד לפרק, פתק אחד ליום.</strong> לא יותר. הכספת היא לחזרה, לא לאחסון.</li>
+<li><strong>כל פתק מסתיים ב„שאלה פתוחה”.</strong> היא מה שהופך קריאה ללמידה.</li>
+<li><strong>אחת לשבוע, עשר דקות:</strong> לעבור על „שאלות פתוחות” של השבוע ולסגור מה שנסגר.</li>
+</ol>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="c-costs.html">← נספח ג: מעקב עלויות ומחירים</a> · <a href="e-checklists.html">נספח ה: רשימות בדיקה: למידה ומוכנות לראיון →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>נספח ב: פתרון תקלות התקנה</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="a-glossary.html">← נספח א: מילון מונחים</a> · <a href="c-costs.html">נספח ג: מעקב עלויות ומחירים →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#powershell-windows">PowerShell ו־Windows</a></li>
+<li><a href="#uv-python">uv ו־Python</a></li>
+<li><a href="#api">המפתח וה־API</a></li>
+<li><a href="#_2">חבילות ספציפיות</a></li>
+<li><a href="#obsidian">Obsidian והספר</a></li>
+<li><a href="#_3">מה לעשות כשהנספח לא עוזר</a></li>
+</ul>
+</div>
+
+<h1 id="_1">נספח ב: פתרון תקלות התקנה</h1>
+<p>הנספח הזה הוא המקום הראשון שבודקים כשמשהו לא עובד בסביבה. לכל תקלה: איך היא נראית, מה הסיבה, ומה
+עושים. הסדר: Windows ו־PowerShell, uv ו־Python, המפתח וה־API, חבילות, ו־Obsidian. אם התקלה לא כאן, הכלל של
+פרק 0: לקרוא את הודעת השגיאה עד הסוף, ולחפש את השורה האחרונה שלה כלשונה.</p>
+<h2 id="powershell-windows">PowerShell ו־Windows</h2>
+<table>
+<thead>
+<tr>
+<th>איך זה נראה</th>
+<th>הסיבה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uv : The term 'uv' is not recognized</code></td>
+<td>הטרמינל נפתח לפני ההתקנה, או ש־PATH לא התעדכן</td>
+<td>לסגור ולפתוח טרמינל חדש. אם עדיין: <code>winget install astral-sh.uv</code> שוב, ואז טרמינל חדש</td>
+</tr>
+<tr>
+<td><code>... cannot be loaded because running scripts is disabled</code></td>
+<td>מדיניות הרצת סקריפטים</td>
+<td><code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> פעם אחת</td>
+</tr>
+<tr>
+<td>עברית מודפסת כסימני שאלה או ריבועים</td>
+<td>קידוד הטרמינל</td>
+<td>משתנה סביבה <code>PYTHONUTF8=1</code> ברמת המשתמשת (פרק 2), טרמינל חדש; ובטרמינל של Windows: גופן שתומך בעברית</td>
+</tr>
+<tr>
+<td><code>#</code> בשורת פקודה נותן שגיאה</td>
+<td>הערות בשורת פקודה לא תמיד מותרות</td>
+<td>לא להעתיק הערות מהספר לתוך הפקודה</td>
+</tr>
+<tr>
+<td>נתיבים עם <code>\</code> ב־Python נשברים</td>
+<td><code>\n</code>, <code>\t</code> בתוך מחרוזת</td>
+<td><code>Path(r"C:\...")</code> או <code>/</code> במקום <code>\</code></td>
+</tr>
+<tr>
+<td><code>Access is denied</code> בכתיבה לתיקייה</td>
+<td>OneDrive או הרשאות</td>
+<td>לעבוד מחוץ ל־OneDrive, למשל <code>C:\dev\</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="uv-python">uv ו־Python</h2>
+<table>
+<thead>
+<tr>
+<th>איך זה נראה</th>
+<th>הסיבה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uv init</code> יצר <code>src/</code> ו־<code>pyproject</code> לא צפוי</td>
+<td>גרסת uv יוצרת פרויקט ארוז</td>
+<td><code>uv init --bare --python 3.12</code> ואז <code>uv python pin 3.12</code> (פרק 2)</td>
+</tr>
+<tr>
+<td><code>No module named ch07</code></td>
+<td>הרצה לא מתוך תיקיית הפרויקט, או חסר <code>__init__.py</code></td>
+<td><code>cd</code> לתיקייה; <code>python -m ch07.chat</code>; לוודא <code>__init__.py</code> ריק בכל חבילה</td>
+</tr>
+<tr>
+<td><code>pytest</code> לא מוצא את החבילות</td>
+<td><code>pythonpath</code> חסר</td>
+<td>ב־<code>pyproject.toml</code>: <code>[tool.pytest.ini_options] pythonpath = ["."]</code> (ובפרויקט: <code>["src", "."]</code>)</td>
+</tr>
+<tr>
+<td><code>uv run</code> איטי מאוד בפעם הראשונה</td>
+<td>הורדת Python ותלויות</td>
+<td>פעם אחת; אחר כך מהיר</td>
+</tr>
+<tr>
+<td><code>uv add</code> נכשל על <code>chromadb</code></td>
+<td>חסר build tool</td>
+<td><code>uv python pin 3.12</code> (לא 3.13 בשלב זה), ואז שוב; לבדוק שאין רווחים עבריים בנתיב</td>
+</tr>
+<tr>
+<td><code>pip install</code> נראה קל יותר</td>
+<td>הרגל</td>
+<td>לא בפרויקט הזה: <code>uv add</code>. אחרת <code>pyproject.toml</code> ו־<code>uv.lock</code> נסחפים מהסביבה</td>
+</tr>
+</tbody>
+</table>
+<h2 id="api">המפתח וה־API</h2>
+<table>
+<thead>
+<tr>
+<th>איך זה נראה</th>
+<th>הסיבה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>API key not valid</code></td>
+<td>מפתח שגוי, או שהועתק עם רווח</td>
+<td>ליצור מפתח חדש ב־AI Studio; להדביק בלי מרכאות ובלי רווחים ל־<code>.env</code></td>
+</tr>
+<tr>
+<td><code>GEMINI_API_KEY</code> לא נקרא</td>
+<td><code>.env</code> לא נטען</td>
+<td><code>uv run --env-file .env ...</code>; לבדוק שהקובץ בתיקיית הפרויקט ושנקרא בדיוק <code>.env</code></td>
+</tr>
+<tr>
+<td><code>NotFoundError</code> על שם המודל</td>
+<td>שם לא קיים או לא זמין בחשבון</td>
+<td><code>MODEL_FAST</code> ו־<code>MODEL_SMART</code> ב־<code>.env</code> לפי רשימת המודלים ב־AI Studio</td>
+</tr>
+<tr>
+<td><code>RateLimitError</code> / <code>RESOURCE_EXHAUSTED</code></td>
+<td>מגבלת קצב או מכסה יומית</td>
+<td>להמתין דקה; לבדוק את המכסה היומית ב־AI Studio; להקטין <code>--items</code>; הלקוח מפרק 11 מנסה שוב לבד</td>
+</tr>
+<tr>
+<td>הפלט נקטע באמצע</td>
+<td><code>max_output_tokens</code> נמוך; סטטוס <code>incomplete</code></td>
+<td>להגדיל את המגבלה; לא לתקן את ה־JSON (פרק 9)</td>
+</tr>
+<tr>
+<td>שגיאה שלא נתפסת ב־<code>except errors.APIError</code></td>
+<td>שגיאות ה־Interactions הן היררכיה נפרדת</td>
+<td>לסווג לפי <code>status_code</code> (פרק 11)</td>
+</tr>
+<tr>
+<td>המפתח הודבק בצ׳אט או ב־Git בטעות</td>
+<td>חשיפה</td>
+<td>רוטציה מיידית ב־AI Studio; ביקורת סודות (פרק 24)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">חבילות ספציפיות</h2>
+<table>
+<thead>
+<tr>
+<th>איך זה נראה</th>
+<th>הסיבה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chroma: <code>Expected a name containing 3-512 characters</code></td>
+<td>שם אוסף קצר</td>
+<td>שם של 3 תווים ומעלה</td>
+</tr>
+<tr>
+<td>Chroma: <code>$gte</code> נכשל על תאריך</td>
+<td>מסננים משווים מספרים בלבד</td>
+<td>תאריך כמספר <code>yyyymmdd</code> (פרק 14)</td>
+</tr>
+<tr>
+<td>Chroma מנסה להוריד מודל</td>
+<td>פונקציית שיכון ברירת מחדל</td>
+<td>לשלוח <code>embeddings=</code> בעצמך; <code>Settings(anonymized_telemetry=False)</code></td>
+</tr>
+<tr>
+<td><code>trafilatura</code> מחזיר <code>None</code></td>
+<td>דף קצר, לא HTML, או חסום</td>
+<td>זה כשל של פריט אחד: סטטוס, לא קריסה; לבדוק <code>content-type</code></td>
+</tr>
+<tr>
+<td><code>feedparser</code> מחזיר אפס פריטים</td>
+<td>כתובת פיד שגויה או דף HTML במקום XML</td>
+<td>לפתוח את הכתובת בדפדפן; לחפש את קישור ה־RSS האמיתי</td>
+</tr>
+<tr>
+<td><code>mcp</code>: <code>No module named 'mcp.server.fastmcp'</code></td>
+<td>גרסה 2 של ה־SDK</td>
+<td><code>from mcp.server.mcpserver import MCPServer</code>; שדות ב־snake_case (פרק 21)</td>
+</tr>
+<tr>
+<td>LangGraph: <code>interrupt</code> לא עוצר</td>
+<td>אין checkpointer או <code>thread_id</code></td>
+<td><code>compile(checkpointer=SqliteSaver(...))</code> ו־<code>{"configurable": {"thread_id": ...}}</code></td>
+</tr>
+<tr>
+<td><code>ruff</code> מתלונן על <code>BLE001</code></td>
+<td><code>except Exception</code> רחב</td>
+<td>לצמצם, או <code># noqa: BLE001</code> עם הסבר, רק במשגר (פרק 10)</td>
+</tr>
+<tr>
+<td>Vitest/Vite לא רלוונטי כאן</td>
+<td></td>
+<td>הקורס הוא Python בלבד</td>
+</tr>
+</tbody>
+</table>
+<h2 id="obsidian">Obsidian והספר</h2>
+<table>
+<thead>
+<tr>
+<th>איך זה נראה</th>
+<th>הסיבה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>קוד מיושר לימין בתוך הפתקים</td>
+<td>כיוון RTL של הכספת</td>
+<td>הקטעים עטופים ב־<code>div dir="ltr"</code>; להפעיל את ה־snippet <code>obsidian/snippets/book-rtl.css</code></td>
+</tr>
+<tr>
+<td>קישורי <code>[[...]]</code> לא נפתחים</td>
+<td>הפתקים לא בכספת</td>
+<td>להעתיק את תיקיית <code>obsidian/</code> לתוך הכספת, או לפתוח אותה ככספת</td>
+</tr>
+<tr>
+<td>ה־HTML ב־<code>site/</code> לא מתעדכן</td>
+<td>לא נבנה מחדש</td>
+<td><code>uv run --no-project --with markdown python tools/build_html.py</code></td>
+</tr>
+<tr>
+<td><code>site/index.html</code> לא נמצא</td>
+<td>נתיב יחסי</td>
+<td>לפתוח מהתיקייה המקומית, או מהקובץ שבזיפ</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">מה לעשות כשהנספח לא עוזר</h2>
+<ol>
+<li>ההודעה עד הסוף; השורה האחרונה כלשונה לחיפוש.</li>
+<li><code>uv run python -c "import X; print(X.__version__)"</code> לכל חבילה מעורבת: הגרסה חשובה.</li>
+<li>סביבה נקייה: <code>Remove-Item -Recurse .venv; uv sync</code>.</li>
+<li>פתק: מה ניסית, מה קרה. ואז לשאול, עם הפתק.</li>
+</ol>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="a-glossary.html">← נספח א: מילון מונחים</a> · <a href="c-costs.html">נספח ג: מעקב עלויות ומחירים →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>
