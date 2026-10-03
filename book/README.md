@@ -68,9 +68,9 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 16: הערכות (Evals) | `16-evals.md` | ⏳ |
-| פרק 17: ניתוח כשלים ודיבוג של מערכות AI | `17-failure-analysis.md` | ⏳ |
-| פרק 18: בדיקות ליישומי AI | `18-testing-ai-applications.md` | ⏳ |
+| פרק 16: הערכות (Evals) | [`16-evals.md`](16-evals.md) | ✅ |
+| פרק 17: ניתוח כשלים ודיבוג של מערכות AI | [`17-failure-analysis.md`](17-failure-analysis.md) | ✅ |
+| פרק 18: בדיקות ליישומי AI | [`18-testing-ai-applications.md`](18-testing-ai-applications.md) | ✅ |
 
 ## חלק ו: סוכנים ותהליכי עבודה
 

@@ -1,6 +1,6 @@
 # AI Engineering Course — textbook + study program (Hebrew)
 
-**Status: Stage 1 approved on 2026-10-03 with changes (Windows instead of macOS, cheapest API, right-to-left Hebrew formatting, everything built from scratch). Stage 2, writing the chapters, is in progress: Parts 1–4 (Chapters 0–15, including Checkpoints 1, 2 and 3) are complete. The master table of contents with per-chapter completion status lives in `book/README.md`.**
+**Status: Stage 1 approved on 2026-10-03 with changes (Windows instead of macOS, cheapest API, right-to-left Hebrew formatting, everything built from scratch). Stage 2, writing the chapters, is in progress: Parts 1–5 (Chapters 0–18, including Checkpoints 1 to 4) are complete. The master table of contents with per-chapter completion status lives in `book/README.md`.**
 
 This directory will hold the complete course: a Hebrew textbook, per-chapter exercises with starter
 and reference solutions, Obsidian-ready notes, the daily study schedule, and the final portfolio

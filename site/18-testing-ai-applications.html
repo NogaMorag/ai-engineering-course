@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 18: בדיקות ליישומי AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="17-failure-analysis.html">← פרק 17: ניתוח כשלים ודיבוג של מערכות AI</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#181">18.1 הפירמידה</a></li>
+<li><a href="#182">18.2 יחידה עם מזויפים: מה כבר יש לך</a></li>
+<li><a href="#183">18.3 קלטות: להקליט פעם אחת, להשמיע לנצח</a></li>
+<li><a href="#184">18.4 בדיקות חוזה: מה שהמודל רואה לא משתנה בטעות</a></li>
+<li><a href="#185">18.5 טענות תכונה על פלט שמשתנה</a></li>
+<li><a href="#186">18.6 שלוש מדרגות, וסימונים</a></li>
+<li><a href="#187-ci">18.7 CI מודע לעלות</a></li>
+<li><a href="#188-4">18.8 נקודת ביקורת 4</a></li>
+<li><a href="#189">18.9 בפרויקט</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="18-ai">פרק 18: בדיקות ליישומי AI</h1>
+<p>בכל פרק עד כה כתבת בדיקות שרצות בלי רשת ובלי מפתח, עם לקוח מזויף ומשכן מזויף. זה לא היה מקרי:
+זו השכבה התחתונה של פירמידת הבדיקות ליישומי AI. הפרק הזה משלים את הפירמידה: הקלטה של תשובות
+אמיתיות והשמעה חוזרת שלהן, בדיקות חוזה לסכמות ולהצהרות כלים, טענות על <em>תכונות</em> של פלט
+לא־דטרמיניסטי במקום על טקסט מדויק, ושלוש מדרגות של בדיקות, מהירה ולא בתשלום, לילית עם שופט,
+וחיה, כל אחת עם סימון משלה. בסופו, נקודת ביקורת 4: חבילת בדיקות מלאה למסכם ול־<code>ask_notes</code>, שרצה
+בפחות מעשר שניות בלי מפתח, ויודעת לדלג על מה שדורש אותו.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>פירמידת הבדיקות ליישומי AI, ומה כל שכבה מוכיחה.</li>
+<li>בדיקות יחידה עם לקוחות מזויפים (חזרה).</li>
+<li>קלטות: להקליט פעם אחת, להשמיע לנצח.</li>
+<li>בדיקות חוזה לסכמות ולהצהרות כלים (snapshots).</li>
+<li>טענות תכונה על פלט שמשתנה.</li>
+<li>מדרגות: מהיר ב־CI, שופט בלילה, חי לפי דרישה; סימונים ודילוגים.</li>
+<li>CI מודע לעלות: תקציב טוקנים לבדיקה.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרקים 9 עד 11 (המסכם), 15 (<code>ask_notes</code>) ו־16 (הרתמה). התרגיל קורא ל־API רק בזמן הקלטה.</p>
+<h2 id="181">18.1 הפירמידה</h2>
+<table>
+<thead>
+<tr>
+<th>שכבה</th>
+<th>מה בודקת</th>
+<th>מה היא לא יכולה לדעת</th>
+<th>מהירות ועלות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>יחידה עם מזויפים</td>
+<td>הלוגיקה שלנו: אימות, ניסיונות חוזרים, משגר, חלוקה, מניפסט</td>
+<td>מה המודל באמת מחזיר</td>
+<td>אלפיות שנייה, חינם</td>
+</tr>
+<tr>
+<td>קלטות (recorded fixtures)</td>
+<td>שהקוד מתמודד נכון עם תשובות <em>אמיתיות</em> שהוקלטו</td>
+<td>האם המודל עדיין מחזיר אותן</td>
+<td>אלפיות שנייה, חינם אחרי ההקלטה</td>
+</tr>
+<tr>
+<td>חוזים (contracts)</td>
+<td>שמה שהמודל רואה, סכמות והצהרות, לא השתנה בטעות</td>
+<td>האם השינוי טוב</td>
+<td>מיידי, חינם</td>
+</tr>
+<tr>
+<td>תכונות (properties)</td>
+<td>שכל פלט מקובל מקיים כללים</td>
+<td>האם הפלט נכון</td>
+<td>מיידי, חינם</td>
+</tr>
+<tr>
+<td>הערכות עם שופט</td>
+<td>איכות, נאמנות, לפי קטגוריה</td>
+<td>רגרסיה בדקה הבאה</td>
+<td>דקות, בתשלום</td>
+</tr>
+<tr>
+<td>חי (live smoke)</td>
+<td>שה־API והמודל עדיין מתנהגים כמו הקלטות</td>
+<td>הכול על קלטים שלא נבדקו</td>
+<td>שניות, בתשלום, שביר</td>
+</tr>
+</tbody>
+</table>
+<p>ההפרדה החשובה: <strong>בדיקות</strong> מוכיחות שהקוד שלנו עושה מה שתכננו; <strong>הערכות</strong> מודדות עד כמה המערכת
+כולה טובה. בדיקה נכשלת פירושה באג; הערכה שירדה פירושה החלטה. שתיהן נחוצות, ושתיהן לא מחליפות
+זו את זו: מערכת עם 100 אחוז בדיקות ירוקות יכולה להזות בכל תשובה, ומערכת עם 95 אחוז בהערכה
+יכולה לקרוס על <code>None</code>.</p>
+<h2 id="182">18.2 יחידה עם מזויפים: מה כבר יש לך</h2>
+<p><code>FakeClient</code> (פרק 11) מחזיר תסריט של תשובות או חריגות; <code>FakeEmbedder</code> (פרק 12) מייצר וקטורים
+דטרמיניסטיים מטריגרמים; Chroma רצה בתיקייה זמנית. עם שלושתם בדקת: אימות ותיקון (9), משגר ולולאה
+(10), ניסיונות חוזרים עם שעון מזויף (11), מטמון (12), RRF ומדדים (13), מאגר (14), סנכרון וציטוטים
+(15), רתמה ושופט (16), תיוג (17). הכלל שאיפשר את זה: <strong>ההפרדה בין „מה שולחים ומה עושים עם מה
+שחוזר” לבין „לקרוא לרשת”.</strong> כל פונקציה שמקבלת לקוח כפרמטר ניתנת לבדיקה. זה לא תחליף לשום דבר
+אחר בפירמידה, אבל זה הבסיס שבלעדיו אין כלום.</p>
+<h2 id="183">18.3 קלטות: להקליט פעם אחת, להשמיע לנצח</h2>
+<p>מזויף מחזיר מה שכתבנו, וזה בדיוק החולשה שלו: הוא לא יודע איך תשובה אמיתית נראית. <strong>קלטת</strong>
+(cassette) פותרת את זה. בהרצה הראשונה, עם מפתח, <code>RecordingClient</code> עוטף את הלקוח האמיתי ושומר
+כל בקשה ותשובה בקובץ JSONL. מאז, <code>ReplayClient</code> מחזיר את התשובות מהקובץ, בלי רשת ובלי מפתח,
+וכל בקשה שלא הוקלטה היא כישלון רועש, לעולם לא קריאה שקטה לרשת.</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">client = client_for_tests(Path(&quot;tests/cassettes/summarize_cargo_lite.jsonl&quot;))   # replay by default
+summary = summarize_text(client, ARTICLE)                                         # real recorded output
+</code></pre>
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-powershell">$env:AI_COURSE_RECORD = &quot;1&quot;; uv run --env-file .env pytest tests\test_ch18_examples.py; Remove-Item Env:AI_COURSE_RECORD
+</code></pre>
+
+
+</div>
+
+<p>החלטות העיצוב:</p>
+<ul>
+<li><strong>המפתח של ההקלטה</strong> הוא גיבוב של הבקשה כולה: הנחיה, הוראות מערכת, סכמה, גבול פלט, טמפרטורה.
+  שינוי בכל אחד מהם הוא בקשה חדשה, ולכן קלטת ישנה לא תשרת הנחיה חדשה בטעות.</li>
+<li><strong>הקלטת נכנסת ל־Git.</strong> היא נתון של הבדיקה, כמו קובץ קלט. היא גם תיעוד: כך המודל ענה בתאריך
+  מסוים.</li>
+<li><strong>החמצה היא שגיאה</strong> (<code>CassetteMiss</code>) עם הוראה איך להקליט. בדיקה שמדלגת על החמצה (כמו בדוגמה)
+  עושה את זה במפורש, ומדווחת.</li>
+<li><strong>מה קלטת לא מוכיחה:</strong> שהמודל <em>עדיין</em> עונה כך. בשביל זה יש המדרגה החיה.</li>
+</ul>
+<h2 id="184">18.4 בדיקות חוזה: מה שהמודל רואה לא משתנה בטעות</h2>
+<p>הסכמה של <code>ArticleSummary</code> והצהרות הכלים הן ממשק: המודל קורא אותן. שינוי של <code>description</code> משנה
+התנהגות; הסרה של שדה שוברת קוד שקורא אותו. <strong>בדיקת חוזה</strong> (contract test) מצלמת את ה־JSON הזה
+לקובץ (snapshot) ונכשלת עם diff כשהוא משתנה:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">assert_matches_snapshot(&quot;article_summary_schema&quot;, RESPONSE_FORMAT[&quot;schema&quot;], snapshots_dir)
+assert_matches_snapshot(&quot;tool_declarations&quot;, tool_declarations(), snapshots_dir)
+</code></pre>
+
+
+</div>
+
+<p>בהרצה הראשונה הקובץ נוצר. אחר כך, שינוי מכוון מאושר עם משתנה סביבה
+(<code>AI_COURSE_UPDATE_SNAPSHOTS=1</code>) ונבדק ב־diff של Git; שינוי לא מכוון נתפס. זה אותו רעיון של
+גרסאות ההנחיות מפרק 8, לדברים שלא נראים כמו טקסט.</p>
+<h2 id="185">18.5 טענות תכונה על פלט שמשתנה</h2>
+<p>אי אפשר לכתוב <code>assert text == "..."</code> על פלט של מודל. אפשר לכתוב מה <strong>כל</strong> פלט מקובל מקיים:
+שלוש נקודות בדיוק, כותרת של עד 12 מילים, ציטוטים בטווח, תשובה נתמכת מצטטת משהו, תשובה לא
+נתמכת ריקה. אלה <strong>תכונות</strong> (properties), והבדיקה מייצרת הרבה קלטים ובודקת שכולן מתקיימות:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">@pytest.mark.parametrize(&quot;seed&quot;, range(25))
+def test_valid_summaries_pass_and_invalid_fail(seed):
+    rng = random.Random(seed)
+    assert article_summary_violations(random_article_summary(rng, valid=True)) == []
+    assert article_summary_violations(random_article_summary(rng, valid=False)) != []
+</code></pre>
+
+
+</div>
+
+<p>הגנרטור מייצר סיכומים תקינים, או כאלה עם פגם אקראי אחד, והבודק חייב להסכים עם המחולל. זה גם
+בודק את המאמת של פרק 9 מכיוון אחר: לא על שלוש דוגמאות שכתבנו ביד, אלא על 25 אקראיות. (ספריית
+Hypothesis עושה את זה בצורה שיטתית יותר; לקורס מספיק <code>random</code> עם זרעים.)</p>
+<h2 id="186">18.6 שלוש מדרגות, וסימונים</h2>
+<table>
+<thead>
+<tr>
+<th>מדרגה</th>
+<th>מה רץ</th>
+<th>מתי</th>
+<th>סימון</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>מהיר</td>
+<td>יחידה, קלטות, חוזים, תכונות</td>
+<td>כל דחיפה, פחות מעשר שניות, בלי מפתח</td>
+<td>ברירת מחדל</td>
+</tr>
+<tr>
+<td>שופט</td>
+<td>הערכות של פרק 16 עם שופט</td>
+<td>לילה, או לפני מיזוג גדול</td>
+<td><code>@pytest.mark.judge</code></td>
+</tr>
+<tr>
+<td>חי</td>
+<td>עשן מול ה־API האמיתי: סכמה עדיין תקינה, הקלטה עדיין נכונה</td>
+<td>שבועי, או כשהספק מודיע על שינוי</td>
+<td><code>@pytest.mark.live</code> ודגל <code>--live</code></td>
+</tr>
+</tbody>
+</table>
+<p>ה־<code>conftest.py</code> בתרגיל מגדיר את הסימונים, מוסיף דגל <code>--live</code>, ומדלג על בדיקות חיות כשאין דגל או
+כשאין מפתח, עם סיבה מודפסת. <code>live_enabled</code> היא פונקציה טהורה, ולכן גם היא נבדקת. בלי זה, בדיקה
+חיה שרצה בטעות ב־CI בלי מפתח נכשלת ב־401 ומכתימה את כל הריצה.</p>
+<p><strong>שתי פקודות</strong> בפרויקט, לא אחת: <code>test</code> (המהיר) ו־<code>eval</code> (השופט). מי שמריץ <code>eval</code> יודע שזה עולה
+כסף וזמן.</p>
+<h2 id="187-ci">18.7 CI מודע לעלות</h2>
+<p>קובץ GitHub Actions בתרגיל מגדיר שלושה jobs: <code>fast</code> על כל דחיפה, <code>judge</code> בתזמון לילי, <code>live-smoke</code>
+שבועי; שני האחרונים מקבלים את המפתח מסוד (secret) של המאגר. ועוד שני כלים קטנים:</p>
+<ul>
+<li><strong>תקציב טוקנים לבדיקה.</strong> fixture בשם <code>token_budget</code> סוכם את הטוקנים שבדיקה חיה מוציאה ונכשל
+  מעל גבול (4,000 כברירת מחדל). בדיקה שבטעות שולחת כתבה שלמה פי עשרים נתפסת.</li>
+<li><strong>ההנחיה שבה בדיקה נכשלת.</strong> כש־<code>live</code> נכשלת והמהיר עובר, המודל או ה־API השתנו, לא הקוד. כשהמהיר
+  נכשל, הקוד נשבר. ההפרדה הזאת היא מה ששווה את כל המבנה.</li>
+</ul>
+<h2 id="188-4">18.8 נקודת ביקורת 4</h2>
+<p>החבילה שאת סוגרת כאן, לפי שכבות:</p>
+<table>
+<thead>
+<tr>
+<th>שכבה</th>
+<th>למסכם (פרק 11)</th>
+<th>ל־<code>ask_notes</code> (פרק 15)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>יחידה</td>
+<td>כבר יש: <code>test_ch11.py</code></td>
+<td>כבר יש: <code>test_ch15.py</code></td>
+</tr>
+<tr>
+<td>קלטות</td>
+<td>קלטת לסיכום של כתבת Cargo-Lite</td>
+<td>קלטת לשאלה אחת על הפתקים</td>
+</tr>
+<tr>
+<td>חוזים</td>
+<td>סכמת <code>ArticleSummary</code></td>
+<td>הצהרות הכלים; סכמת <code>GroundedAnswer</code></td>
+</tr>
+<tr>
+<td>תכונות</td>
+<td>25 סיכומים אקראיים</td>
+<td>ציטוטים בטווח, נתמך מצטט, לא נתמך ריק</td>
+</tr>
+<tr>
+<td>שופט</td>
+<td>אין (אין ייחוס)</td>
+<td>הרתמה של פרק 16, <code>-m judge</code></td>
+</tr>
+<tr>
+<td>חי</td>
+<td>סכמה תקינה מהמודל, בתקציב</td>
+<td>אחת מהשאלות עם תשובה, בתקציב</td>
+</tr>
+</tbody>
+</table>
+<p>קריטריון: המהיר רץ בפחות מעשר שניות בלי מפתח; <code>--live</code> מדלג בלי מפתח ורץ איתו.</p>
+<h2 id="189">18.9 בפרויקט</h2>
+<p>תיקיית <code>tests/</code> של הפרויקט בנויה לפי אותן שכבות מהיום הראשון: מזויפים לכל שלב בצינור, קלטת
+לכל קריאת מודל (סיכום, דירוג, מחקר), חוזים לסכמות ולכלים, תכונות על הפריט בעיתון, והערכות של
+אבן דרך 6 תחת <code>judge</code>. <code>fast</code> רץ בכל דחיפה; העיתון עצמו רץ בתזמון נפרד (חלק ז).</p>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>פירמידה: יחידה עם מזויפים, קלטות, חוזים, תכונות, שופט, חי. בדיקות מוכיחות קוד; הערכות
+  מודדות מערכת.</li>
+<li>קלטת: הקלטה פעם אחת עם מפתח, השמעה לנצח בלי; המפתח הוא גיבוב הבקשה; החמצה היא שגיאה.</li>
+<li>חוזה: צילום של הסכמות וההצהרות שהמודל רואה; שינוי הוא החלטה עם diff.</li>
+<li>תכונות: מה שכל פלט מקובל מקיים, על קלטים אקראיים.</li>
+<li>מדרגות עם סימונים: מהיר תמיד, שופט בלילה, חי לפי דרישה; דילוג עם סיבה כשאין מפתח.</li>
+<li>CI מודע לעלות: סודות למדרגות בתשלום, תקציב טוקנים לבדיקה.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>פירמידת בדיקות</td>
+<td>test pyramid</td>
+<td>הרבה בדיקות זולות למטה, מעט יקרות למעלה</td>
+</tr>
+<tr>
+<td>לקוח מזויף</td>
+<td>fake client</td>
+<td>מימוש של הממשק שמחזיר תסריט; בלי רשת</td>
+</tr>
+<tr>
+<td>קלטת</td>
+<td>cassette, recorded fixture</td>
+<td>תשובות אמיתיות שהוקלטו ומושמעות מחדש</td>
+</tr>
+<tr>
+<td>החמצת קלטת</td>
+<td>cassette miss</td>
+<td>בקשה שלא הוקלטה; שגיאה, לא קריאה לרשת</td>
+</tr>
+<tr>
+<td>בדיקת חוזה</td>
+<td>contract test</td>
+<td>צילום של ממשק (סכמה, הצהרה) שנכשל כשהוא משתנה</td>
+</tr>
+<tr>
+<td>צילום</td>
+<td>snapshot</td>
+<td>הקובץ שמחזיק את הערך המצולם</td>
+</tr>
+<tr>
+<td>טענת תכונה</td>
+<td>property-based assertion</td>
+<td>כלל שכל פלט מקובל מקיים, נבדק על קלטים רבים</td>
+</tr>
+<tr>
+<td>סימון</td>
+<td>pytest marker</td>
+<td>תווית על בדיקה: <code>live</code>, <code>judge</code></td>
+</tr>
+<tr>
+<td>בדיקת עשן חיה</td>
+<td>live smoke test</td>
+<td>מעט קריאות אמיתיות שבודקות שהעולם לא זז</td>
+</tr>
+<tr>
+<td>תקציב טוקנים</td>
+<td>token budget</td>
+<td>גבול הוצאה לבדיקה אחת</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>לבדוק טקסט מדויק של מודל.</strong> נשבר מחר. תכונות, לא מחרוזות.</li>
+<li><strong>בדיקות שקוראות לרשת בשקט.</strong> איטיות, יקרות, הפכפכות. מזויפים או קלטות; החמצה היא שגיאה.</li>
+<li><strong>קלטת מחוץ ל־Git.</strong> היא נתון של הבדיקה.</li>
+<li><strong>לעדכן צילום בלי לקרוא את ה־diff.</strong> אז הוא לא בודק כלום.</li>
+<li><strong>בדיקה חיה בלי דילוג.</strong> נכשלת ב־CI בלי מפתח ומכתימה הכול.</li>
+<li><strong>הערכה בתוך <code>test</code>.</strong> מי שמריץ בדיקות לא מצפה לחשבון.</li>
+<li><strong>לחשוב שבדיקות ירוקות אומרות שהמערכת טובה.</strong> הן אומרות שהקוד עושה מה שתכננו. ההערכה
+  אומרת את השאר.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>איך בודקים קוד שתלוי במודל שפה?</strong> מפרידים את הלוגיקה מהקריאה; בודקים את הלוגיקה עם לקוח
+   מזויף; מקליטים תשובות אמיתיות לקלטות ומשמיעים אותן; מצלמים את הסכמות וההצהרות שהמודל רואה;
+   כותבים טענות על תכונות של הפלט במקום על טקסט; ומשאירים קריאות אמיתיות למדרגה חיה מסומנת
+   שמדלגת בלי מפתח.</li>
+<li><strong>מה ההבדל בין בדיקה להערכה?</strong> בדיקה מוכיחה שהקוד שלנו עושה מה שתכננו, רצה בכל דחיפה, חינם,
+   ונכשלת על באג. הערכה מודדת את איכות המערכת כולה על סט מקרים, עולה כסף, רצה בכוונה, ויורדת
+   כשהחלטה הייתה גרועה. שתיהן נחוצות.</li>
+<li><strong>מה קלטת מסתירה?</strong> שהמודל אולי כבר לא עונה כך. לכן יש מדרגה חיה שבודקת מדי שבוע שהעולם
+   לא זז, ושופט לילי שמודד איכות; הקלטת שומרת על המהיר מהיר וחינמי.</li>
+<li><strong>איך את מונעת מ־CI להוציא כסף בטעות?</strong> המדרגה המהירה בלי מפתח בכלל; בדיקות חיות מסומנות
+   ומדלגות בלי דגל ובלי מפתח; המדרגות בתשלום רצות בתזמון עם סוד; ותקציב טוקנים לבדיקה.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/18-testing-ai-applications.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>פירמידה:</strong> יחידה (מזויפים), קלטות, חוזים, תכונות, שופט, חי. בדיקות מוכיחות קוד; הערכות מודדות
+  מערכת.</li>
+<li><strong>קלטת:</strong> <code>RecordingClient</code> עם מפתח פעם אחת; <code>ReplayClient</code> תמיד; מפתח = גיבוב הבקשה; החמצה =
+  <code>CassetteMiss</code>.</li>
+<li><strong>חוזה:</strong> <code>assert_matches_snapshot(name, value, dir)</code>: נוצר, תואם, או נכשל עם diff; עדכון רק עם משתנה
+  סביבה.</li>
+<li><strong>תכונות:</strong> מה שכל פלט מקובל מקיים; גנרטור עם זרעים; הבודק חייב להסכים עם המחולל.</li>
+<li><strong>מדרגות:</strong> מהיר (תמיד, חינם) / <code>judge</code> (לילה) / <code>live</code> עם <code>--live</code> ומפתח, אחרת דילוג עם סיבה.</li>
+<li><strong>CI:</strong> שלושה jobs, סוד למפתח, <code>token_budget</code>. שתי פקודות: test ו־eval.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">record    $env:AI_COURSE_RECORD=&quot;1&quot;; uv run --env-file .env pytest tests\test_ch18_examples.py
+replay    client_for_tests(Path(&quot;tests/cassettes/x.jsonl&quot;)) -&gt; ReplayClient; miss -&gt; CassetteMiss
+snapshot  assert_matches_snapshot(&quot;tool_declarations&quot;, tool_declarations(), TESTS_DIR / &quot;snapshots&quot;)  update: AI_COURSE_UPDATE_SNAPSHOTS=1
+property  article_summary_violations(data) == []   random_article_summary(rng, valid=False) -&gt; defect
+tiers     uv run pytest -q            # fast, offline
+          uv run pytest -q -m judge   # nightly, paid
+          uv run pytest -q --live -m live   # weekly smoke, needs a key
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> לסגור את חלק ה עם חבילת בדיקות מלאה למסכם ול־<code>ask_notes</code>: קלטת מוקלטת, בדיקות חוזה,
+טענות תכונה, סימוני מדרגות עם דילוג, קובץ CI עם שלוש מדרגות, ותקציב טוקנים. <strong>זמן:</strong> יום לימוד
+אחד (יום 35), כ־60 דקות בנייה. <strong>ידע מקדים:</strong> הפרק, התרגילים של פרקים 11 ו־15, ומפתח API להקלטה.</p>
+<p>הצעדים, קוד ההתחלה, הרמזים והפתרון נמצאים ב־
+<a href="../exercises/ch18-testing/README.md"><code>exercises/ch18-testing/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li><code>uv run pytest -q</code> רץ בפחות מעשר שניות בלי מפתח, כולל השמעת הקלטות וצילומי החוזים.</li>
+<li><code>uv run pytest -q --live -m live</code> מדלג עם סיבה כשאין מפתח, ורץ ועובר כשיש.</li>
+<li>קלטת אחת לפחות לכל כלי, בתוך Git; צילומים לסכמה ולהצהרות; הרצה שנייה „matched”.</li>
+<li>קובץ <code>.github/workflows/tests.yml</code> במאגר <code>ai-course</code>, והמדרגה המהירה ירוקה ב־GitHub.</li>
+<li>חמש הבדיקות של הפרק ושש בדיקות הדוגמה עוברות.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>התיעוד של pytest על markers, <code>conftest.py</code> ו־<code>addoption</code>.</li>
+<li>הספרייה Hypothesis, לבדיקות תכונה שיטתיות: <code>@given(st.text())</code>.</li>
+<li>VCR.py ו־<code>pytest-recording</code>: קלטות ברמת HTTP, לכשתרצי להקליט מתחת ל־SDK.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="17-failure-analysis.html">← פרק 17: ניתוח כשלים ודיבוג של מערכות AI</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

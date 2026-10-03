@@ -76,6 +76,8 @@ def run(
     fault: Fault = "none",
     k: int = 5,
     max_chars: int = 6000,
+    system: str | None = None,
+    prompt_variant: str | None = None,
 ) -> tuple[Answer, Trace]:
     started = time.monotonic()
     documents = load_markdown_dir(notes_dir)
@@ -86,14 +88,16 @@ def run(
     report = index.sync(documents)
 
     retrieved = Retriever(index, mode).retrieve(question, k)
-    answer = answer_question(client, question, retrieved, max_chars=max_chars, ignore_context=(fault == "ignore-context"))
+    answer = answer_question(
+        client, question, retrieved, max_chars=max_chars, ignore_context=(fault == "ignore-context"), system=system
+    )
 
     trace = Trace(
         question=question, mode=mode, chunker=chunk_fn.__name__, fault=fault, documents=len(documents),
         indexed_chunks=index.count(), sync=report.as_dict(),
         retrieved=[{"id": r.chunk.id, "path": r.chunk.path, "heading": r.chunk.heading, "score": round(r.score, 4)} for r in retrieved],
         context_chunks=len(answer.sources), context_chars=sum(len(r.chunk.text) for r in answer.sources),
-        prompt_variant="ignore-context" if fault == "ignore-context" else "grounded",
+        prompt_variant=prompt_variant or ("ignore-context" if fault == "ignore-context" else "grounded"),
         answer=answer.text, citations=answer.citations, invalid_citations=answer.invalid_citations,
         supported=answer.supported, abstained=answer.abstained,
         latency_s=round(time.monotonic() - started, 2),

@@ -1,0 +1,42 @@
+# Chapter 18 solution: three tiers of tests for the learner's ai-course repository.
+# Copy to .github/workflows/tests.yml. The GEMINI_API_KEY secret is set in the repository settings.
+name: tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 3 * * *"      # nightly: judge tier
+    - cron: "41 4 * * 1"      # weekly, Monday: live smoke
+
+jobs:
+  fast:                       # every push: offline only, fails in under a minute if something broke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - run: uv run ruff check .
+      - run: uv run pytest -q -m "not judge"      # live tests skip by themselves without --live
+
+  judge:                      # nightly: paid, slow, measured
+    if: github.event_name == 'schedule' && github.event.schedule == '17 3 * * *'
+    runs-on: ubuntu-latest
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - run: uv run pytest -q -m judge
+
+  live-smoke:                 # weekly: does the real API still answer the way the cassettes say?
+    if: github.event_name == 'schedule' && github.event.schedule == '41 4 * * 1'
+    runs-on: ubuntu-latest
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - run: uv run pytest -q --live -m live

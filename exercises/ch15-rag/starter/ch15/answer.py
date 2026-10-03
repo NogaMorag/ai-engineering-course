@@ -68,14 +68,21 @@ class Answer:
 
 
 def answer_question(
-    client: LLMClient, question: str, retrieved: list[Retrieved], *, max_chars: int = 6000, ignore_context: bool = False
+    client: LLMClient,
+    question: str,
+    retrieved: list[Retrieved],
+    *,
+    max_chars: int = 6000,
+    ignore_context: bool = False,
+    system: str | None = None,
 ) -> Answer:
+    """`system` overrides the built-in prompt (used by the chapter 16 harness to compare prompt versions)."""
     context, included = build_context(retrieved, max_chars)
     if not included:
         return Answer(ABSTAIN_TEXT, [], False, True)
     completion = client.complete(
         build_prompt(question, context),
-        system=SYSTEM_IGNORE_CONTEXT if ignore_context else SYSTEM_GROUNDED,
+        system=system or (SYSTEM_IGNORE_CONTEXT if ignore_context else SYSTEM_GROUNDED),
         max_output_tokens=500,
         temperature=0.0,
         response_format=RESPONSE_FORMAT,
