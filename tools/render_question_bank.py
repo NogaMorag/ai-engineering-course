@@ -40,6 +40,9 @@ def render() -> str:
                 if row.get("tradeoff"):
                     out.append("")
                     out.append(f"*שורת הפשרה:* {row['tradeoff']}")
+                if row.get("follow_up"):
+                    out.append("")
+                    out.append(f"**המשך:** {row['follow_up']}")
                 out.append("")
     return "\n".join(out).rstrip() + "\n"
 

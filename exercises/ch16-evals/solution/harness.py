@@ -83,6 +83,11 @@ def evaluate_case(case: Case, answer_fn: AnswerFn, *, repeats: int = 1, judge: F
     if judge and case.expected.answerable and not record.abstained:
         verdict = judge.judge(case.question, record.sources_text, record.answer, case.expected.reference)
         record.judge = verdict.model_dump()
+        spent = getattr(judge, "last_completion", None)
+        if spent is not None:  # the judge's call is part of what this run cost
+            record.judge["tokens"] = {"input": spent.input_tokens, "output": spent.output_tokens}
+            record.input_tokens += spent.input_tokens
+            record.output_tokens += spent.output_tokens
     return record
 
 

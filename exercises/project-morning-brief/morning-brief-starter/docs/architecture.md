@@ -40,10 +40,15 @@ autoescape. Secrets live in `.env` locally and in Actions secrets in CI. See [se
 
 ## Running it
 
+Exit codes: 0 ok, 2 partial (delivered with a note), 3 failed, 5 `versions.json` disagrees with the environment or names a
+missing prompt file (checked before any model call).
+
 - Locally: `uv run --env-file .env morning-brief run`.
 - GitHub Actions: `.github/workflows/daily.yml`, two cron lines (04:00 and 05:00 UTC) with a local-hour check for DST.
 - Windows Task Scheduler: `schtasks /Create /TN "MorningBrief" /SC DAILY /ST 07:00 /TR "pwsh -File C:\path\to\run_daily.ps1" /F`
   where the script runs the command above from the repo directory.
+- Mac / Linux cron: `0 7 * * * cd $HOME/morning-brief && bash run_daily.sh >> out/cron.log 2>&1` (local time; a
+  launchd agent is the more robust choice because cron does not fire while the laptop sleeps).
 
 ## Known limitations
 

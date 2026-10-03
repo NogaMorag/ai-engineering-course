@@ -4,7 +4,8 @@ r"""Command line.
     morning-brief preview [--date YYYY-MM-DD]
     morning-brief report [--date YYYY-MM-DD]
 
-Exit codes: 0 ok, 2 partial (the issue went out with a note), 3 failed.
+Exit codes: 0 ok, 2 partial (the issue went out with a note), 3 failed,
+5 versions.json disagrees with the environment or a declared prompt file is missing (nothing ran).
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ import sys
 from pathlib import Path
 
 from morning_brief.config import Settings, load_profile
+from morning_brief.llm.prompts import PROMPTS_DIR
 from morning_brief.pipeline import STAGES, Clients, Pipeline
 from morning_brief.store import Store
 
@@ -36,6 +38,20 @@ def real_clients(settings: Settings) -> Clients:
 
 def load_versions(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+def check_versions(versions: dict, settings: Settings, prompts_dir: Path = PROMPTS_DIR) -> list[str]:
+    """Mismatches between versions.json and what this run would actually use. Empty list = consistent."""
+    problems = []
+    for key, actual in (("model_fast", settings.model_fast), ("model_smart", settings.model_smart), ("embedding_model", settings.embedding_model)):
+        declared = versions.get(key)
+        if declared and declared != actual:
+            problems.append(f"{key}: versions.json says {declared}, the environment says {actual}")
+    for key in ("prompt_version", "score_prompt_version"):
+        declared = versions.get(key)
+        if declared and not (prompts_dir / f"{declared}.txt").exists():
+            problems.append(f"{key}: prompt file {declared}.txt not found in {prompts_dir}")
+    return problems
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -64,6 +80,12 @@ def main(argv: list[str] | None = None) -> int:
         settings.out_dir = args.out
 
     if args.command == "run":
+        versions = load_versions(args.versions)
+        problems = check_versions(versions, settings)
+        if problems:  # fail before any model call: a mismatch is a deployment bug, not a strange issue
+            for problem in problems:
+                print(f"version mismatch: {problem}", file=sys.stderr)
+            return 5
         profile = load_profile(args.profile)
         if args.offline:
             from morning_brief.offline import offline_clients
@@ -71,7 +93,7 @@ def main(argv: list[str] | None = None) -> int:
             clients = offline_clients()
         else:
             clients = real_clients(settings)
-        pipeline = Pipeline(settings, profile, clients, versions=load_versions(args.versions) or None)
+        pipeline = Pipeline(settings, profile, clients, versions=versions or None)
         report = pipeline.run(args.date, resume=args.resume, channels=tuple(c.strip() for c in args.channels.split(",") if c.strip()), stop_after=args.stop_after)
         print(f"{report['status']}: cost {report['cost_usd']:.4f} USD, {report['duration_s']} s, {len(report['failures'])} failure(s); report in {settings.data_dir / 'runs' / args.date}")
         return {"ok": 0, "partial": 2}.get(report["status"], 3)

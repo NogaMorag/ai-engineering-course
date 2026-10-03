@@ -26,8 +26,8 @@ from ch11.llm_client import Completion, LLMClient
 # USD per 1M tokens: (input, output, cached-input). Paid tier, from the Stage 1 price table; free tier = 0.
 # Unknown models cost 0.0 and are flagged in the report instead of being guessed.
 PRICES: dict[str, tuple[float, float, float]] = {
-    "gemini-3.5-flash-lite": (0.30, 2.50, 0.075),
-    "gemini-3.8-flash": (0.75, 3.75, 0.1875),
+    "gemini-3.5-flash-lite": (0.30, 2.50, 0.03),
+    "gemini-3.8-flash": (0.75, 3.75, 0.075),
     "gemini-embedding-2": (0.20, 0.0, 0.20),
 }
 

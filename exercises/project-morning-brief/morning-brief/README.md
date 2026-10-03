@@ -53,7 +53,7 @@ uv run morning-brief preview --date 2026-10-03
 </div>
 
 Scheduled with GitHub Actions at 07:00 Asia/Jerusalem ([.github/workflows/daily.yml](.github/workflows/daily.yml));
-the Windows Task Scheduler alternative is in [docs/architecture.md](docs/architecture.md#running-it).
+the local alternatives (Windows Task Scheduler, Mac/Linux cron) are in [docs/architecture.md](docs/architecture.md#running-it).
 
 ## Decisions and alternatives
 

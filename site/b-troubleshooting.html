@@ -14,21 +14,24 @@
 <li><a href="#uv-python">uv ו־Python</a></li>
 <li><a href="#api">המפתח וה־API</a></li>
 <li><a href="#_2">חבילות ספציפיות</a></li>
+<li><a href="#morning-brief">הפרויקט המסכם (Morning Brief)</a></li>
 <li><a href="#obsidian">Obsidian והספר</a></li>
+<li><a href="#mac">ב־Mac</a></li>
 <li><a href="#_3">מה לעשות כשהנספח לא עוזר</a></li>
 </ul>
 </div>
 
 <h1 id="_1">נספח ב: פתרון תקלות התקנה</h1>
-<p>הנספח הזה הוא המקום הראשון שבודקים כשמשהו לא עובד בסביבה. לכל תקלה: איך היא נראית, מה הסיבה, ומה
-עושים. הסדר: Windows ו־PowerShell, uv ו־Python, המפתח וה־API, חבילות, ו־Obsidian. אם התקלה לא כאן, הכלל של
-פרק 0: לקרוא את הודעת השגיאה עד הסוף, ולחפש את השורה האחרונה שלה כלשונה.</p>
+<p>הנספח הזה הוא המקום הראשון שבודקים כשמשהו לא עובד בסביבה. לכל תקלה שלוש עמודות: איך היא נראית, מה
+הסיבה הסבירה, ומה עושים. הסדר: Windows ו־PowerShell, uv ו־Python, המפתח וה־API, חבילות, הפרויקט המסכם,
+Obsidian, ובסוף Mac. אם התקלה לא כאן, הכלל של פרק 0: לקרוא את הודעת השגיאה עד הסוף, ולחפש את השורה
+האחרונה שלה כלשונה.</p>
 <h2 id="powershell-windows">PowerShell ו־Windows</h2>
 <table>
 <thead>
 <tr>
 <th>איך זה נראה</th>
-<th>הסיבה</th>
+<th>הסיבה הסבירה</th>
 <th>מה עושים</th>
 </tr>
 </thead>
@@ -63,6 +66,11 @@
 <td>OneDrive או הרשאות</td>
 <td>לעבוד מחוץ ל־OneDrive, למשל <code>C:\dev\</code></td>
 </tr>
+<tr>
+<td><code>make : The term 'make' is not recognized</code></td>
+<td>אין <code>make</code> ב־Windows כברירת מחדל</td>
+<td>בפרויקט המסכם: <code>scripts/test.ps1</code> ו־<code>scripts/eval.ps1</code> הן אותן פקודות; או <code>winget install GnuWin32.Make</code></td>
+</tr>
 </tbody>
 </table>
 <h2 id="uv-python">uv ו־Python</h2>
@@ -70,7 +78,7 @@
 <thead>
 <tr>
 <th>איך זה נראה</th>
-<th>הסיבה</th>
+<th>הסיבה הסבירה</th>
 <th>מה עושים</th>
 </tr>
 </thead>
@@ -97,8 +105,8 @@
 </tr>
 <tr>
 <td><code>uv add</code> נכשל על <code>chromadb</code></td>
-<td>חסר build tool</td>
-<td><code>uv python pin 3.12</code> (לא 3.13 בשלב זה), ואז שוב; לבדוק שאין רווחים עבריים בנתיב</td>
+<td>חסר build tool לגרסת Python שלך</td>
+<td><code>uv python pin 3.12</code> ואז שוב (נכון לאוקטובר 2026; גלגלים מוכנים ל־3.12 ודאיים); לבדוק שאין רווחים עבריים בנתיב</td>
 </tr>
 <tr>
 <td><code>pip install</code> נראה קל יותר</td>
@@ -112,7 +120,7 @@
 <thead>
 <tr>
 <th>איך זה נראה</th>
-<th>הסיבה</th>
+<th>הסיבה הסבירה</th>
 <th>מה עושים</th>
 </tr>
 </thead>
@@ -159,7 +167,7 @@
 <thead>
 <tr>
 <th>איך זה נראה</th>
-<th>הסיבה</th>
+<th>הסיבה הסבירה</th>
 <th>מה עושים</th>
 </tr>
 </thead>
@@ -191,7 +199,7 @@
 </tr>
 <tr>
 <td><code>mcp</code>: <code>No module named 'mcp.server.fastmcp'</code></td>
-<td>גרסה 2 של ה־SDK</td>
+<td>גרסה 2 של ה־SDK (נכון לאוקטובר 2026)</td>
 <td><code>from mcp.server.mcpserver import MCPServer</code>; שדות ב־snake_case (פרק 21)</td>
 </tr>
 <tr>
@@ -204,10 +212,57 @@
 <td><code>except Exception</code> רחב</td>
 <td>לצמצם, או <code># noqa: BLE001</code> עם הסבר, רק במשגר (פרק 10)</td>
 </tr>
+</tbody>
+</table>
+<h2 id="morning-brief">הפרויקט המסכם (Morning Brief)</h2>
+<table>
+<thead>
 <tr>
-<td>Vitest/Vite לא רלוונטי כאן</td>
-<td></td>
-<td>הקורס הוא Python בלבד</td>
+<th>איך זה נראה</th>
+<th>הסיבה הסבירה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>הפקודה מסתיימת ב־<code>partial</code> וקוד יציאה 2</td>
+<td>פריט אחד או ערוץ אחד נכשל; הגיליון יצא עם הערה</td>
+<td>לקרוא את „Failures” בדוח הריצה (<code>morning-brief report</code>). זה לא כישלון של הריצה; <code>failed</code> וקוד 3 הם הכישלון</td>
+</tr>
+<tr>
+<td><code>email is not configured (SMTP_HOST, SMTP_USER, SMTP_PASSWORD, MAIL_TO)</code></td>
+<td>ערוץ המייל בלי סודות</td>
+<td>למלא את ארבעת המשתנים ב־<code>.env</code> לפי <code>env.example</code> (ב־Actions: Secrets); או להריץ עם <code>--channels file</code></td>
+</tr>
+<tr>
+<td><code>already delivered</code> כשרצית לשלוח שוב</td>
+<td>רשומת המשלוח קיימת: זו האידמפוטנטיות, לא תקלה</td>
+<td>תאריך אחר עם <code>--date</code>; או, בפיתוח בלבד, למחוק את השורה מטבלת <code>deliveries</code></td>
+</tr>
+<tr>
+<td><code>no issue for 2026-10-03</code> מ־<code>preview</code></td>
+<td>אין ריצה לתאריך הזה, או <code>--data-dir</code> אחר מזה של הריצה</td>
+<td>להריץ קודם <code>run</code> לאותו תאריך; לתת ל־<code>preview</code> את אותו <code>--data-dir</code></td>
+</tr>
+<tr>
+<td><code>story memory was built with '...'; rebuild it before using '...'</code></td>
+<td>הוחלף מודל השיכון מול אוסף Chroma קיים</td>
+<td>למחוק את <code>data/chroma</code> (או לבנות מחדש) אחרי שינוי <code>EMBEDDING_MODEL</code>, ולעדכן <code>index_version</code> ב־<code>versions.json</code></td>
+</tr>
+<tr>
+<td><code>BudgetExceeded: spent 0.2600 USD of 0.25 after 12 calls</code></td>
+<td>שומר התקציב עצר את הריצה</td>
+<td>זו התכונה. לבדוק בטבלת העלות לפי שלב מה התנפח (לולאה? פיד ענק?); להעלות <code>BUDGET_USD</code> רק עם סיבה כתובה</td>
+</tr>
+<tr>
+<td><code>collect.json</code> קטן מהצפוי</td>
+<td>התקרה <code>max_articles</code> (ברירת מחדל 40)</td>
+<td>להעלות דרך <code>MAX_ARTICLES</code> ב־<code>.env</code>, או להשאיר: ארבעים כתבות ביום מספיקות לעיתון</td>
+</tr>
+<tr>
+<td>הריצה נעצרת מיד, לפני כל קריאה למודל, עם קוד יציאה 5</td>
+<td>בדיקת הגרסאות: <code>versions.json</code> לא מסכים עם שמות המודלים בסביבה, או שקובץ ההנחיה בגרסה הרשומה חסר</td>
+<td>לעדכן את <code>versions.json</code> או את <code>.env</code> כך שיסכימו (פרק 25); זו עצירה מכוונת, לא תקלה</td>
 </tr>
 </tbody>
 </table>
@@ -216,7 +271,7 @@
 <thead>
 <tr>
 <th>איך זה נראה</th>
-<th>הסיבה</th>
+<th>הסיבה הסבירה</th>
 <th>מה עושים</th>
 </tr>
 </thead>
@@ -243,13 +298,70 @@
 </tr>
 </tbody>
 </table>
+<h2 id="mac">ב־Mac</h2>
+<table>
+<thead>
+<tr>
+<th>איך זה נראה</th>
+<th>הסיבה הסבירה</th>
+<th>מה עושים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>zsh: command not found: uv</code> מיד אחרי ההתקנה</td>
+<td>הטרמינל הפתוח לא קרא את ה־PATH החדש</td>
+<td>לפתוח טרמינל חדש, או להריץ <code>source ~/.zshrc</code></td>
+</tr>
+<tr>
+<td>„cannot be opened because the developer cannot be verified”</td>
+<td>Gatekeeper חוסם קובץ שהורד מהרשת</td>
+<td>System Settings, ואז Privacy &amp; Security, ואז Open Anyway ליד ההודעה</td>
+</tr>
+<tr>
+<td><code>zsh: command not found: code</code></td>
+<td>הפקודה של VS Code לא הותקנה ל־PATH</td>
+<td>בתוך VS Code, בלוח הפקודות (Cmd+Shift+P): „Shell Command: Install 'code' command in PATH”</td>
+</tr>
+<tr>
+<td><code>python: command not found</code></td>
+<td>אין <code>python</code> גלובלי ב־Mac, ולא צריך</td>
+<td>תמיד <code>uv run python</code>; uv מביא את גרסת Python של הפרויקט</td>
+</tr>
+<tr>
+<td>מחפשת איפה להגדיר <code>PYTHONUTF8</code></td>
+<td>הרגל מ־Windows</td>
+<td>לא נדרש: עברית מודפסת נכון ב־Mac כברירת מחדל</td>
+</tr>
+</tbody>
+</table>
 <h2 id="_3">מה לעשות כשהנספח לא עוזר</h2>
-<ol>
-<li>ההודעה עד הסוף; השורה האחרונה כלשונה לחיפוש.</li>
-<li><code>uv run python -c "import X; print(X.__version__)"</code> לכל חבילה מעורבת: הגרסה חשובה.</li>
-<li>סביבה נקייה: <code>Remove-Item -Recurse .venv; uv sync</code>.</li>
-<li>פתק: מה ניסית, מה קרה. ואז לשאול, עם הפתק.</li>
-</ol>
+<table>
+<thead>
+<tr>
+<th>הצעד</th>
+<th>הפקודה או הפעולה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>לקרוא את ההודעה עד הסוף, ולחפש את השורה האחרונה כלשונה</td>
+<td></td>
+</tr>
+<tr>
+<td>לבדוק את הגרסה של כל חבילה מעורבת: הגרסה חשובה</td>
+<td><code>uv run python -c "import X; print(X.__version__)"</code></td>
+</tr>
+<tr>
+<td>סביבה נקייה</td>
+<td><code>Remove-Item -Recurse .venv</code> ואז <code>uv sync</code></td>
+</tr>
+<tr>
+<td>פתק: מה ניסית, מה קרה. ואז לשאול, עם הפתק</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </main>
 <nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="a-glossary.html">← נספח א: מילון מונחים</a> · <a href="c-costs.html">נספח ג: מעקב עלויות ומחירים →</a></nav>
 <script type="module">

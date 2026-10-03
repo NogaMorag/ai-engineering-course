@@ -170,5 +170,5 @@ def resilient_complete(primary: LLMClient, prompt: str, *, fallback: LLMClient |
         try:
             return Outcome(client.complete(prompt, **kwargs), source, errors)
         except LLMError as err:
-            errors.append(f"{source}: {err}")
+            errors.append(f"{source}: {type(err).__name__}: {err}")
     return Outcome(None, "degraded", errors)

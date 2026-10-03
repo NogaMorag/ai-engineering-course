@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from morning_brief.budget import BudgetExceeded, BudgetGuard
 from morning_brief.config import Profile
 from morning_brief.llm import prompts
-from morning_brief.llm.client import LLMClient, LLMError
+from morning_brief.llm.client import LLMClient, resilient_complete
 from morning_brief.llm.schemas import ArticleSummary, Relevance, response_format_for
 from morning_brief.sources.base import Article
 RELEVANCE_FORMAT = response_format_for(Relevance)
@@ -30,5 +30,5 @@ def rule_boosts(article: Article, summary: ArticleSummary, profile: Profile, *, 
 def build_prompt(summary: ArticleSummary, article: Article) -> str:
     raise NotImplementedError
 
-def score_articles(items: list[tuple[Article, ArticleSummary]], profile: Profile, client: LLMClient, *, guard: BudgetGuard | None=None, now: dt.datetime | None=None, prompt_version: int=1) -> tuple[list[Scored], list[str]]:
+def score_articles(items: list[tuple[Article, ArticleSummary]], profile: Profile, client: LLMClient, *, fallback: LLMClient | None=None, guard: BudgetGuard | None=None, now: dt.datetime | None=None, prompt_version: int=1) -> tuple[list[Scored], list[str]]:
     raise NotImplementedError

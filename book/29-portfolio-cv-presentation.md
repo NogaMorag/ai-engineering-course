@@ -38,7 +38,7 @@ part: "חלק ח: קריירה"
 | מה זה עושה? | שורה ראשונה ופסקה | משפט אחד למי ולמה; ציור או צילום מסך של התוצר |
 | איך זה עובד? | ציור הצינור | Mermaid עם K, M, A על הקופסאות; קישור למסמך הארכיטקטורה |
 | איך יודעים שזה עובד? | טבלת הערכה | הדוח האחרון: מונה ומכנה לפי קטגוריה, עלות לגיליון |
-| איך מריצים? | פקודות | שלוש פקודות: התקנה, הרצה יבשה, הרצה אמיתית; ואיך זה מתוזמן |
+| איך מריצים? | פקודות | שלוש פקודות: התקנה, הרצה לא־מקוונת (בלי מפתח ובלי רשת), הרצה אמיתית; ואיך זה מתוזמן |
 
 ואחרי העמוד הראשון, לפי הסדר: החלטות וחלופות (קישור ל־ADR־lite), מה לא עובד (סעיף יושר), מבנה
 המאגר, רישיון. התבנית: `templates/README-template.md`. דבר אחד שאסור: README שמתחיל בהתקנה.
@@ -53,7 +53,7 @@ part: "חלק ח: קריירה"
 2. **איפה המודל ואיפה קוד.** פסקה: „המודל משמש בשלבים 3, 4 (נימוק), 6 ו־7; כל השאר קוד.”
 3. **מודל הנתונים.** הטבלאות והאוסף, במשפט לכל אחד.
 4. **החלטות וחלופות** (ADR־lite): טבלה של החלטות, לכל אחת: ההחלטה, החלופה, למה, ומה ישנה את
-   דעתך. חמש עד שמונה שורות. זה המסמך שראיינת טכנית תפתח.
+   דעתך. חמש עד שמונה שורות. זה המסמך שמראיינת טכנית תפתח.
 5. **מגבלות ידועות.** שלוש שורות כנות.
 
 התבנית: `templates/architecture-template.md`. את החומר כבר כתבת: הסקיצה של יום 42, התזכירים של
@@ -67,8 +67,8 @@ part: "חלק ח: קריירה"
 | --- | --- | --- |
 | 0:00 עד 0:20 | הבעיה והפתרון במשפט | העיתון של הבוקר, פתוח |
 | 0:20 עד 1:00 | הציור | הצינור; אצבע על K, M, A; „רק שלב אחד הוא סוכן, והנה למה” |
-| 1:00 עד 1:50 | הרצה חיה או מוקלטת | `--dry-run` או ריצה אמיתית קצרה; המעקב; הדוח עם העלות |
-| 1:50 עד 2:30 | ההערכה | טבלת הקטגוריות; „4 מתוך 20 נכשלו בנאמנות, התיקון היה…” |
+| 1:00 עד 1:50 | הרצה חיה או מוקלטת | ריצה לא־מקוונת (`--offline`) או ריצה אמיתית קצרה; המעקב; דוח הריצה עם העלות לפי שלב |
+| 1:50 עד 2:30 | ההערכה | טבלת ארבעת החלקים עם הספים; „X מתוך N נכשלו בנאמנות, התיקון היה…”, עם המספרים שלך |
 | 2:30 עד 3:00 | מה לא עובד ומה הלאה | שתי מגבלות, שלב הבא אחד |
 
 כללים: תמיד להציג ריצה שכבר הצליחה כגיבוי (הקלטה או פלט שמור); לא לגלול קוד; המספר של העלות
@@ -87,23 +87,24 @@ part: "חלק ח: קריירה"
 
 </div>
 
-דוגמאות מהפרויקט:
+שש דוגמאות מהפרויקט. המקומות המסומנים (X, N, A, B) מתמלאים רק ממה שמדדת: דוח הריצה ודוח ההערכה
+האחרון. מספר שלא מדדת לא נכנס לשורה.
 
-- Built a scheduled newsletter agent (Python, Gemini API, Chroma) that turns 40 daily articles into a
-  personalized brief; kept the pipeline a plain workflow with a single bounded agent step; runs at
-  $0.08 per issue with a 95% faithfulness score on a 30-case eval.
-- Designed the evaluation harness: 30 labeled cases across six categories, deterministic checks plus a
-  calibrated LLM judge (kappa 0.8 against my labels); used it to pick the cheaper model with no loss in
-  validity, cutting cost 64%.
-- Implemented retrieval with hybrid BM25 + embeddings and reciprocal rank fusion; measured recall@5 from
-  0.78 to 0.85 on 20 labeled queries before adding a reranker.
-- Hardened the pipeline against indirect prompt injection: output policy (links only from sources),
-  allowlisted read-only tools, five injection cases in the eval; documented what the defenses do not
-  guarantee.
+- Built a scheduled newsletter agent (Python, Gemini API, SQLite, Chroma) that turns ~N daily articles
+  from K feeds into a personalized brief; kept the pipeline a plain workflow with a single bounded agent
+  stage; runs at $X per issue with a hard budget stop at $0.25.
+- Designed a four-part evaluation (relevance, faithfulness, grouping, injection) with thresholds as a
+  regression gate; calibrated the faithfulness judge against N of my own labels (agreement A, kappa B)
+  and used the eval to move summaries to a cheaper model with no measured loss.
+- Built cross-day story memory on Chroma with a date filter, and same-day dedupe with a numpy scan;
+  chose the similarity threshold from N labeled pairs (precision A, recall B).
+- Hardened the pipeline against indirect prompt injection: output policy (links only from fetched
+  sources), allowlisted read-only tools, delivery kept outside the agent, five injection cases in the
+  eval at a 1.0 pass threshold; documented what the defenses do not guarantee.
 - Built observability I own: JSONL traces per run with cost and latency per stage, redaction by default;
   a budget guard that stops a run at $0.25.
-- Deployed on GitHub Actions with DST-aware scheduling, secrets, artifacts and a versions file tying
-  prompt, model and index together; one-command rollback.
+- Deployed on GitHub Actions with DST-aware scheduling, secrets, artifacts, idempotent delivery and a
+  versions file tying prompt, model and index together.
 
 שימי לב: כל שורה באנגלית (קורות חיים לתעשייה), עם מספר, ועם החלטה. „עבדתי עם LLM” אינה שורה. על
 הניסיון הקודם שלך (C++, Rust, Python, מערכות) חלה אותה נוסחה, והוא נכס: מהנדסת מערכות שלמדה
@@ -117,8 +118,8 @@ AI שווה יותר ממי שלמדה רק AI.
 
 ```text
 Backend engineer (C++/Rust/Python) moving into applied AI engineering. I build systems around models:
-structured outputs, retrieval, bounded agents, evals and cost control — and I measure them. Latest:
-Morning Brief, a scheduled newsletter agent with a 30-case eval, traces and a budget guard, open on
+structured outputs, retrieval, bounded agents, evals and cost control, and I measure them. Latest:
+Morning Brief, a scheduled newsletter agent with a four-part eval, traces and a budget guard, open on
 GitHub. Looking for an AI engineering role where reliability and measurement matter.
 ```
 
@@ -177,7 +178,7 @@ GitHub. Looking for an AI engineering role where reliability and measurement mat
 - **README שמתחיל בהתקנה.** מה זה עושה ואיך יודעים שזה עובד, קודם.
 - **ציור בלי K, M, A.** אז לא רואים את ההחלטה החשובה: רוב המערכת היא קוד.
 - **הדגמה חיה בלי גיבוי.** הרשת תיפול בדיוק אז.
-- **שורות קורות חיים של משימות.** „עבדתי עם” → „בניתי X, החלטתי Y, מדדתי Z”.
+- **שורות קורות חיים של משימות.** במקום „עבדתי עם”: „בניתי X, החלטתי Y, מדדתי Z”.
 - **להסתיר את מה שלא עובד.** המראיינת תמצא, ואז הכול נראה מוסתר.
 - **לחכות עם החיפוש לסוף הקורס.** הצינור של החיפוש ארוך; מתחילים בשבוע 11.
 
@@ -185,20 +186,26 @@ GitHub. Looking for an AI engineering role where reliability and measurement mat
 
 1. **ספרי לי על הפרויקט שלך בדקה.** (תשובת־המודל בבנק של פרק 28, שאלה q40; תרגלי עם שעון.)
 2. **מה היית עושה אחרת?** שתי מגבלות מסעיף היושר, ומה הלאה. בלי התנצלות: „זה מה שמדדתי, זה
-   הבא”.
-3. **מה בנית ומה השתמשת?** הצינור, ההערכה, המעקב והאבטחה: בניתי. המודל, Chroma, Actions, uv:
-   השתמשתי, ואני יודעת להסביר למה כל אחד.
+   הבא”. התשובה טובה כשיש בה מספר (כמה נכשלו, מתוך כמה) ותוכנית שאפשר לבדוק.
+   **המשך:** „ולמה לא תיקנת את זה כבר?” כי התיקון דורש הרצת הערכה מלאה וגרסה חדשה בקובץ הגרסאות;
+   העדפתי כשל מדוד על תיקון מהיר שלא נמדד.
+3. **מה בנית ומה השתמשת?** הצינור, ההערכה, המעקב והאבטחה: בניתי. המודל ומאגר הווקטורים, ה־CI
+   וכלי החבילות: השתמשתי, ואני יודעת להסביר למה בחרתי בכל אחד.
+   **המשך:** „עוזר AI כתב חלק מהקוד?” כן, וזה מקובל; מה שחשוב הוא שאני יכולה להסביר כל שורה, ושלכל
+   חלק שנכתב כך יש בדיקה.
 
 ## פתק Obsidian
 
 הפתק המוכן נמצא גם כקובץ: `obsidian/29-portfolio-cv-presentation.md`. זה תוכנו:
 
-- **README:** מה / איך (ציור K-M-A) / איך יודעים (טבלת הערכה + עלות) / איך מריצים. התקנה אחרונה.
+- **README, ארבע שאלות:** מה זה עושה; איך זה עובד (ציור עם K, M ו־A); איך יודעים (טבלת הערכה
+  ועלות); איך מריצים. התקנה אחרונה.
 - **ארכיטקטורה:** ציור, איפה המודל, נתונים, החלטות וחלופות (5 עד 8), מגבלות.
-- **הדגמה 3 דקות:** 0:20 בעיה / 1:00 ציור / 1:50 ריצה / 2:30 הערכה / 3:00 מגבלות. גיבוי מוקלט.
-- **שורת קו״ח = מה · החלטה · ראיה.** אנגלית, מספר, החלטה. הניסיון הקודם הוא נכס.
+- **הדגמה של 3 דקות:** בעיה עד 0:20, ציור עד 1:00, ריצה עד 1:50, הערכה עד 2:30, מגבלות עד 3:00.
+  גיבוי מוקלט.
+- **שורת קורות חיים:** מה, החלטה, ראיה. אנגלית, מספר שמדדת, החלטה. הניסיון הקודם הוא נכס.
 - **יושר:** בניתי מול השתמשתי; הדגמה אינה ייצור; מכנה; „לא עובד” בקול; נתונים ציבוריים.
-- **חיפוש:** משבוע 11; שעתיים ביום אחרי הקורס; לוח אחד; דחייה = נתון.
+- **חיפוש:** משבוע 11; שעתיים ביום אחרי הקורס; לוח אחד; דחייה היא נתון.
 - **שאלה פתוחה:** ___
 
 <div dir="ltr" align="left">

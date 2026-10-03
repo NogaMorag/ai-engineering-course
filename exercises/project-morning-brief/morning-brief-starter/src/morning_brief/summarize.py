@@ -2,10 +2,11 @@
 from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from typing import Any
 from pydantic import ValidationError
 from morning_brief.budget import BudgetExceeded, BudgetGuard
 from morning_brief.llm import prompts
-from morning_brief.llm.client import LLMClient, LLMError
+from morning_brief.llm.client import LLMClient, LLMError, resilient_complete
 from morning_brief.llm.schemas import ArticleSummary, response_format_for
 from morning_brief.sources.base import Article
 from morning_brief.store import Store
@@ -22,9 +23,12 @@ class SummaryResult:
 def build_prompt(article: Article) -> str:
     raise NotImplementedError
 
-def summarize_one(article: Article, client: LLMClient, system: str, *, tracer: Tracer | None=None, guard: BudgetGuard | None=None) -> ArticleSummary:
-    """Ask, validate, repair once. Raises LLMError / ValidationError on a final failure."""
+def summarize_one(article: Article, client: LLMClient, system: str, *, fallback: LLMClient | None=None, tracer: Tracer | None=None, guard: BudgetGuard | None=None) -> tuple[ArticleSummary, dict[str, Any]]:
+    """Ask, validate, repair once. Returns the summary and what it cost (all attempts, whichever model answered).
+
+    Raises LLMError when primary and fallback both failed, ValidationError when two outputs were invalid.
+    """
     raise NotImplementedError
 
-def summarize_articles(articles: list[Article], client: LLMClient, store: Store, *, tracer: Tracer | None=None, guard: BudgetGuard | None=None, prompt_version: int=1, concurrency: int=3) -> SummaryResult:
+def summarize_articles(articles: list[Article], client: LLMClient, store: Store, *, fallback: LLMClient | None=None, tracer: Tracer | None=None, guard: BudgetGuard | None=None, prompt_version: int=1, concurrency: int=3) -> SummaryResult:
     raise NotImplementedError

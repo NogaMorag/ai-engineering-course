@@ -18,14 +18,14 @@ from ch11.llm_client import (
     classify,
     with_retries,
 )
-from ch11.summarize_url import (
-    EXIT_FETCH_FAILURE,
-    EXIT_LLM_FAILURE,
-    EXIT_NOT_ARTICLE,
-    EXIT_OK,
-    main,
-    render_markdown,
-)
+
+
+def cli():
+    """Imported lazily: ch11/summarize_url.py is written on day 19, and the client tests must collect without it."""
+    from ch11 import summarize_url
+
+    return summarize_url
+
 
 VALID = {
     "is_article": True,
@@ -109,29 +109,29 @@ def test_cli_renders_markdown_from_a_file(tmp_path) -> None:
     article = tmp_path / "page.txt"
     article.write_text("Cargo-Lite 2.0 was released today with a shared build cache.", encoding="utf-8")
     fake = FakeClient(script=[json.dumps(VALID)])
-    assert main(["--file", str(article)], client=fake) == EXIT_OK
+    assert cli().main(["--file", str(article)], client=fake) == cli().EXIT_OK
     assert fake.calls[0]["response_format"] is not None and "<article>" in fake.calls[0]["prompt"]
 
 
 def test_cli_json_flag_and_non_article_exit_code(tmp_path, capsys) -> None:
     page = tmp_path / "ad.txt"
     page.write_text("BUY NOW!!! 50% off everything", encoding="utf-8")
-    code = main(["--file", str(page), "--json"], client=FakeClient(script=[json.dumps(NOT_ARTICLE)]))
-    assert code == EXIT_NOT_ARTICLE
+    code = cli().main(["--file", str(page), "--json"], client=FakeClient(script=[json.dumps(NOT_ARTICLE)]))
+    assert code == cli().EXIT_NOT_ARTICLE
     assert json.loads(capsys.readouterr().out)["is_article"] is False
 
 
 def test_cli_exit_codes_for_failures(tmp_path) -> None:
-    assert main(["--file", str(tmp_path / "missing.txt")], client=FakeClient()) == EXIT_FETCH_FAILURE
+    assert cli().main(["--file", str(tmp_path / "missing.txt")], client=FakeClient()) == cli().EXIT_FETCH_FAILURE
     page = tmp_path / "page.txt"
     page.write_text("some text", encoding="utf-8")
-    assert main(["--file", str(page)], client=FakeClient(script=[LLMBadRequest("400")])) == EXIT_LLM_FAILURE
-    assert main(["--file", str(page)], client=FakeClient(script=["{}", "{}"])) == EXIT_LLM_FAILURE
+    assert cli().main(["--file", str(page)], client=FakeClient(script=[LLMBadRequest("400")])) == cli().EXIT_LLM_FAILURE
+    assert cli().main(["--file", str(page)], client=FakeClient(script=["{}", "{}"])) == cli().EXIT_LLM_FAILURE
 
 
 def test_render_markdown_shapes() -> None:
     from ch09.schemas import ArticleSummary
 
-    text = render_markdown(ArticleSummary.model_validate(VALID), "https://example.com/x")
+    text = cli().render_markdown(ArticleSummary.model_validate(VALID), "https://example.com/x")
     assert text.startswith("### Cargo-Lite") and text.count("\n- ") == 3 and "Why it matters:" in text
-    assert "does not look like an article" in render_markdown(ArticleSummary.model_validate(NOT_ARTICLE), "x")
+    assert "does not look like an article" in cli().render_markdown(ArticleSummary.model_validate(NOT_ARTICLE), "x")

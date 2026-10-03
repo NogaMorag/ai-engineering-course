@@ -11,7 +11,7 @@ from pydantic import ValidationError
 from morning_brief.budget import BudgetExceeded, BudgetGuard
 from morning_brief.config import Profile
 from morning_brief.llm import prompts
-from morning_brief.llm.client import LLMClient, LLMError
+from morning_brief.llm.client import LLMClient, resilient_complete
 from morning_brief.llm.schemas import ArticleSummary, Relevance, response_format_for
 from morning_brief.sources.base import Article
 
@@ -53,7 +53,7 @@ def build_prompt(summary: ArticleSummary, article: Article) -> str:
     return f"<item>\ntitle: {article.title}\nheadline: {summary.headline}\n{bullets}\n{summary.why_it_matters}\ntags: {', '.join(summary.tags)}\n</item>"
 
 
-def score_articles(items: list[tuple[Article, ArticleSummary]], profile: Profile, client: LLMClient, *, guard: BudgetGuard | None = None, now: dt.datetime | None = None, prompt_version: int = 1) -> tuple[list[Scored], list[str]]:
+def score_articles(items: list[tuple[Article, ArticleSummary]], profile: Profile, client: LLMClient, *, fallback: LLMClient | None = None, guard: BudgetGuard | None = None, now: dt.datetime | None = None, prompt_version: int = 1) -> tuple[list[Scored], list[str]]:
     now = now or dt.datetime.now(tz=dt.UTC)
     system = prompts.render(prompts.load("score", prompt_version), profile=profile.as_prompt_block())
     scored: list[Scored] = []
@@ -65,17 +65,22 @@ def score_articles(items: list[tuple[Article, ArticleSummary]], profile: Profile
         if boosts.get("skip_topic"):
             scored.append(Scored(article.id, 0, "skip topic", boosts))
             continue
+        outcome = resilient_complete(client, build_prompt(summary, article), fallback=fallback, system=system, max_output_tokens=200, temperature=0.0, response_format=RELEVANCE_FORMAT)
+        if outcome.completion is None:  # primary and fallback both failed: degrade, do not drop
+            failures.append(f"{article.id}: {'; '.join(outcome.errors)}")
+            scored.append(Scored(article.id, 50, "scoring failed: neutral score", boosts))
+            continue
+        model = client.model if outcome.source == "primary" or fallback is None else fallback.model
         try:
-            completion = client.complete(build_prompt(summary, article), system=system, max_output_tokens=200, temperature=0.0, response_format=RELEVANCE_FORMAT)
             if guard:
-                guard.charge(client.model, input_tokens=completion.input_tokens, output_tokens=completion.output_tokens, cached_tokens=completion.cached_tokens, stage="score")
-            relevance = Relevance.model_validate_json(completion.text)
+                guard.charge(model, input_tokens=outcome.completion.input_tokens, output_tokens=outcome.completion.output_tokens, cached_tokens=outcome.completion.cached_tokens, stage="score")
+            relevance = Relevance.model_validate_json(outcome.completion.text)
             scored.append(Scored(article.id, relevance.score, relevance.reason, boosts))
         except BudgetExceeded as exc:
             failures.append(f"{article.id}: budget: {exc}")
             scored.append(Scored(article.id, 50, "budget exhausted: neutral score", boosts))
-        except (LLMError, ValidationError) as exc:
+        except ValidationError as exc:
             failures.append(f"{article.id}: {type(exc).__name__}")
-            scored.append(Scored(article.id, 50, "scoring failed: neutral score", boosts))  # degrade, do not drop
+            scored.append(Scored(article.id, 50, "scoring failed: neutral score", boosts))
     scored.sort(key=lambda s: -s.final)
     return scored, failures

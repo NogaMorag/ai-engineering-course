@@ -12,14 +12,14 @@ chapter: 30
 - **9 שלבים:** איסוף K, חילוץ K, סיכום M, ציון M+K, קיבוץ K (שיכונים), מחקר A, הרכבה M, משלוח K, דוח K.
 - **נתונים:** SQLite (articles, summaries, scores, clusters, issues, runs, deliveries); Chroma `story_memory`
   60 יום; `profile.yaml` בלי זהות.
-- **החלטות:** לא RAG; Chroma רק לזיכרון; סוכן רק למחקר; LangGraph הרחבה; מהיר/חכם; Gmail SMTP; Actions.
+- **החלטות:** לא RAG; Chroma רק לזיכרון; סוכן רק למחקר; LangGraph הרחבה; מהיר וחכם; Gmail SMTP; Actions.
 - **שאלה פתוחה:** ___
 
 <div dir="ltr" align="left">
 
 ```text
 stages    collect -> extract -> summarize -> score -> group(+memory) -> research(top 3) -> compose -> deliver -> report
-ids       article id = sha256(canonical url)[:16]; issue idempotency key = f"{date}:{channel}"
+ids       article id = sha256(canonical url)[:16]; delivery idempotency key = f"run-{date}:{channel}"
 budgets   cost <= 0.25 USD/issue (target 0.10); run <= 10 min; research <= 6 steps / 90 s
 versions  issue metadata: prompt_version, model_fast, model_smart, embedding_model, index_version
 ```

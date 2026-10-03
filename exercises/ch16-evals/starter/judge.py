@@ -8,7 +8,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from ch09.schemas import clean_schema
-from ch11.llm_client import LLMClient
+from ch11.llm_client import Completion, LLMClient
 
 JUDGE_SYSTEM = (
     "You are a strict grader. You receive a question, numbered sources, a candidate answer and a short "
@@ -37,6 +37,8 @@ def judge_prompt(question: str, sources_text: str, answer: str, reference: str) 
 
 
 class FaithfulnessJudge:
+    last_completion: Completion | None = None
+
     def __init__(self, client: LLMClient) -> None:
         self.client = client
 
@@ -44,6 +46,7 @@ class FaithfulnessJudge:
         completion = self.client.complete(
             judge_prompt(question, sources_text, answer, reference), system=JUDGE_SYSTEM, max_output_tokens=300, temperature=0.0, response_format=VERDICT_FORMAT
         )
+        self.last_completion = completion  # the harness adds these tokens to the record: the judge is part of the run's cost
         return Verdict.model_validate_json(completion.text)
 
 
@@ -54,10 +57,20 @@ def agreement(judge_labels: list[bool], human_labels: list[bool]) -> float:
 
 
 def cohens_kappa(a: list[Any], b: list[Any]) -> float:
-    """Agreement corrected for chance. 1 = perfect, 0 = chance level, negative = worse than chance."""
-    # TODO 2: observed = fraction equal; expected = sum over labels of p_a(label) * p_b(label);
-    # kappa = (observed - expected) / (1 - expected); return 1.0 when expected == 1.0. Validate lengths.
-    raise NotImplementedError
+    """Agreement corrected for chance. 1 = perfect, 0 = chance level, negative = worse than chance.
+
+    Provided, not a TODO: read it once. observed = share of equal labels; expected = the agreement two
+    judges would reach by chance given how often each says each label; kappa rescales the gap.
+    """
+    if len(a) != len(b) or not a:
+        raise ValueError("label lists must be non-empty and the same length")
+    n = len(a)
+    observed = sum(1 for x, y in zip(a, b, strict=True) if x == y) / n
+    labels = set(a) | set(b)
+    expected = sum((a.count(label) / n) * (b.count(label) / n) for label in labels)
+    if expected == 1.0:
+        return 1.0
+    return (observed - expected) / (1 - expected)
 
 
 # ---------------------------------------------------------------- pairwise judging and position bias

@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, ValidationError
 from morning_brief.budget import BudgetExceeded, BudgetGuard
 from morning_brief.config import Profile
 from morning_brief.llm import prompts
-from morning_brief.llm.client import LLMClient, LLMError
+from morning_brief.llm.client import LLMClient, LLMError, resilient_complete
 from morning_brief.llm.schemas import ArticleSummary, IssueIntro, ResearchNote, response_format_for
 from morning_brief.memory import FollowUp
 from morning_brief.sources.base import Article
@@ -60,15 +60,18 @@ def build_item(article: Article, summary: ArticleSummary, *, score: float, reaso
     )
 
 
-def write_intro(date: str, profile: Profile, headlines: list[str], client: LLMClient, *, guard: BudgetGuard | None = None, prompt_version: int = 1) -> IssueIntro:
-    """The only model call in composition. A failure degrades to a plain greeting; the issue still goes out."""
+def write_intro(date: str, profile: Profile, headlines: list[str], client: LLMClient, *, fallback: LLMClient | None = None, guard: BudgetGuard | None = None, prompt_version: int = 1) -> IssueIntro:
+    """The only model call in composition: primary, then the fallback model, then a plain greeting. The issue always goes out."""
     system = prompts.render(prompts.load("compose", prompt_version), profile=profile.as_prompt_block(), language=profile.language)
     listed = "\n".join(f"- {h}" for h in headlines) or "- (no top stories today)"
     try:
-        completion = client.complete(f"date: {date}\n<headlines>\n{listed}\n</headlines>", system=system, max_output_tokens=200, temperature=0.4, response_format=response_format_for(IssueIntro))
+        outcome = resilient_complete(client, f"date: {date}\n<headlines>\n{listed}\n</headlines>", fallback=fallback, system=system, max_output_tokens=200, temperature=0.4, response_format=response_format_for(IssueIntro))
+        if outcome.completion is None:
+            raise LLMError("; ".join(outcome.errors))
+        model = client.model if outcome.source == "primary" or fallback is None else fallback.model
         if guard:
-            guard.charge(client.model, input_tokens=completion.input_tokens, output_tokens=completion.output_tokens, cached_tokens=completion.cached_tokens, stage="compose")
-        return IssueIntro.model_validate_json(completion.text)
+            guard.charge(model, input_tokens=outcome.completion.input_tokens, output_tokens=outcome.completion.output_tokens, cached_tokens=outcome.completion.cached_tokens, stage="compose")
+        return IssueIntro.model_validate_json(outcome.completion.text)
     except (LLMError, ValidationError, BudgetExceeded):
         greeting = "בוקר טוב. הנה העיתון של היום." if profile.language == "he" else "Good morning. Here is today's brief."
         return IssueIntro(greeting_line=f"{greeting} ({date})", theme="none")

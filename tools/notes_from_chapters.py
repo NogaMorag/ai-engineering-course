@@ -39,7 +39,10 @@ def make_note(number: int) -> Path:
     start = text.index("## פתק Obsidian")
     end = text.index("## תרגיל", start)
     section = text[start:end]
-    body = section[section.index("\n\n", section.index("זה תוכנו:")) + 2 :].strip() + "\n"
+    # The note section opens with one intro paragraph (where the file lives, how the note is built); the note
+    # proper is everything after it. Do not key on the intro's wording: it varies between chapters.
+    paragraphs = section.split("\n\n")
+    body = "\n\n".join(paragraphs[2:]).strip() + "\n"  # [0] = heading, [1] = intro paragraph
     links = " · ".join(f"[[{s}]]" for s in (prev_slug, next_slug) if s)
     note = f"---\ndirection: rtl\ntags: [ai-course, book]\nchapter: {number}\n---\n# {title_of(text)}\n\n{body}\nקישורים: {links}\n"
     path = NOTES / f"{slug}.md"

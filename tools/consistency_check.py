@@ -4,8 +4,9 @@
 
 Checks: every TOC chapter file exists and is marked done; every chapter has the fixed apparatus; every fenced block
 is wrapped in an LTR div; every relative link resolves; every obsidian note exists and its [[links]] resolve; every
-exercise dir referenced by a chapter has README/solution/tests; chapter cross-references ("פרק N") point at existing
-chapters; day references ("יום N") are within 1..80; schedule day titles vs chapter exercise days; no employer terms.
+exercise dir referenced by a chapter has README/solution/tests and every exercise README has the template sections; appendix F has
+day blocks 0..80; chapter cross-references ("פרק N") point at existing
+chapters; day references ("יום N") are within 0..80; schedule day titles vs chapter exercise days; no employer terms.
 """
 
 from __future__ import annotations
@@ -56,8 +57,8 @@ def check_chapters(findings: list[str]) -> None:
             if ref not in numbers:
                 findings.append(f"{path.name}: refers to chapter {ref} which does not exist")
         for day in {int(x) for x in re.findall(r"יום (\d+)", text)}:
-            if not 1 <= day <= 80:
-                findings.append(f"{path.name}: day {day} outside 1..80")
+            if not 0 <= day <= 80:
+                findings.append(f"{path.name}: day {day} outside 0..80")
         if FORBIDDEN.search(text):
             findings.append(f"{path.name}: forbidden term")
         if n > 0:
@@ -98,11 +99,41 @@ def check_schedule_alignment(findings: list[str]) -> None:
         last_end = max(last_end, end)
 
 
+def check_hebrew_schedule(findings: list[str]) -> None:
+    """Appendix F must carry one '### יום N' block for every day 0..80, in order."""
+    text = (BOOK / "appendices" / "f-daily-schedule.md").read_text(encoding="utf-8")
+    days = [int(d) for d in re.findall(r"^### יום (\d+)", text, flags=re.MULTILINE)]
+    if days != list(range(0, 81)):
+        missing = sorted(set(range(0, 81)) - set(days))
+        extra = sorted(set(days) - set(range(0, 81)))
+        findings.append(f"appendices/f-daily-schedule.md: day blocks {len(days)} (missing {missing[:5]}, extra {extra[:5]}, in order: {days == sorted(days)})")
+
+
+EXERCISE_SECTIONS = ["## רשימת בדיקה", "## טעויות נפוצות ותיקונים", "## רמזים", "## הפתרון", "## מה התרגיל מדגים"]
+NON_CODING = {"ch27-system-design", "ch28-question-bank", "ch29-portfolio"}
+
+
+def check_exercise_readmes(findings: list[str]) -> None:
+    """Every coding exercise README carries the template sections (goal, time, prerequisites, checklist, mistakes, hints, solution, demonstrates)."""
+    for folder in sorted(EXERCISES.glob("ch*/")):
+        text = (folder / "README.md").read_text(encoding="utf-8")
+        required = ["**מטרה:**", "ידע מקדים", "## מה התרגיל מדגים", "## רשימת בדיקה"]
+        if folder.name not in NON_CODING:
+            required += EXERCISE_SECTIONS + ["## פלט צפוי"]
+        if not re.search(r"\*\*זמן(?: משוער)?:\*\*", text):
+            findings.append(f"{folder.name}/README.md: no time estimate")
+        for section in required:
+            if section not in text:
+                findings.append(f"{folder.name}/README.md: missing {section}")
+
+
 def main() -> int:
     findings: list[str] = []
     check_toc(findings)
     check_chapters(findings)
     check_schedule_alignment(findings)
+    check_hebrew_schedule(findings)
+    check_exercise_readmes(findings)
     for appendix in sorted((BOOK / "appendices").glob("*.md")):
         text = appendix.read_text(encoding="utf-8")
         lines = text.splitlines()

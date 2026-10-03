@@ -40,7 +40,9 @@ class ArticleSummary(BaseModel):
 def clean_schema(schema: Any) -> Any:
     """Drop the 'title' keys Pydantic adds; keep 'description', which helps the model."""
     # TODO 2: recursively rebuild dicts without "title" keys and lists item by item; return scalars as is.
-    raise NotImplementedError
+    # Until then this pass-through keeps the module importable (RESPONSE_FORMAT below calls it at import time);
+    # the test for clean_schema fails until you replace it.
+    return schema
 
 
 # What we send to the API: "the output must be JSON that matches this schema".

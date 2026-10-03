@@ -4,7 +4,8 @@ r"""Chapter 25 solution: the job that runs without you. Produces one artifact pe
     uv run python -m ch25.daily_job --out out --dry-run                       # fake model, for CI and tests
     uv run python -m ch25.daily_job --out out --local-hour 7                  # exit 0 without work if it is not 07:00 in Jerusalem
 
-Exit codes: 0 ok, 2 skipped (wrong hour), 3 the model failed, 4 budget exceeded.
+Exit codes: 0 ok, 2 skipped (wrong hour), 3 the model failed, 4 budget exceeded,
+5 versions.json disagrees with the environment or a declared prompt file is missing (nothing ran).
 """
 
 from __future__ import annotations
@@ -24,9 +25,9 @@ from ch19.research_tools import load_feeds
 from ch22.tracing import Tracer, TracingClient
 from ch23.budget import BudgetExceeded, BudgetGuard
 from ch25.schedule_math import is_local_hour
-from ch25.versions import load_versions
+from ch25.versions import check_versions, load_versions
 
-EXIT_OK, EXIT_SKIPPED, EXIT_MODEL_FAILED, EXIT_BUDGET = 0, 2, 3, 4
+EXIT_OK, EXIT_SKIPPED, EXIT_MODEL_FAILED, EXIT_BUDGET, EXIT_VERSIONS = 0, 2, 3, 4, 5
 
 
 def fake_client_for_dry_run(n: int) -> FakeClient:
@@ -78,12 +79,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--local-hour", type=int, help="exit 2 unless it is this hour in Asia/Jerusalem (for double-scheduled cron lines)")
     parser.add_argument("--versions", type=Path, default=Path("versions.json"))
+    parser.add_argument("--prompts-dir", type=Path, default=Path("ch08/prompts"), help="where the declared prompt version must exist")
     args = parser.parse_args(argv)
     now = dt.datetime.now(tz=dt.UTC)
     if args.local_hour is not None and not is_local_hour(now, args.local_hour):
         print(f"not {args.local_hour:02d}:00 in Jerusalem (it is {now.astimezone(dt.UTC).isoformat()}); skipping", file=sys.stderr)
         return EXIT_SKIPPED
     versions = load_versions(args.versions) if args.versions.exists() else None
+    if versions:  # fail early, before any model call: a mismatch is a bug in the deployment, not a strange newsletter
+        problems = check_versions(versions, prompts_dir=args.prompts_dir)
+        if problems:
+            for problem in problems:
+                print(f"version mismatch: {problem}", file=sys.stderr)
+            return EXIT_VERSIONS
     model = versions.model_fast if versions else "gemini-3.5-flash-lite"
     tracer = Tracer(args.out / "traces.jsonl")
     client = fake_client_for_dry_run(args.items) if args.dry_run else GeminiClient(model)

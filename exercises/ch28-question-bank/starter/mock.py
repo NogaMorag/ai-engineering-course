@@ -29,6 +29,7 @@ class Question:
     question: str
     answer: str
     tradeoff: str = ""
+    follow_up: str = ""
 
 
 def load_bank(path: Path = BANK_PATH) -> list[Question]:

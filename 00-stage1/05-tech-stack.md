@@ -31,7 +31,7 @@ professional workflow. Versions were checked on PyPI on 2026-10-03; the book pin
 | **Gemini 3.8 Flash** (`gemini-3.8-flash`) | $0.75 / $3.75 (promotional through 2026-12-31) | **Yes** | Default "smart" model. Stable since Sept 2026. |
 | Gemini 3.1 Flash-Lite | $0.25 / $1.50 | Yes | Cheapest paid fallback available to new accounts. |
 | Gemini 2.5 Flash-Lite | $0.10 / $0.40 | Yes | Cheapest on paper, but since 2026-09-18 restricted to accounts that already used it. |
-| Gemini Embedding 2 (`gemini-embedding-2`) | $0.20 input | **Yes** | Multilingual, 128–3072 dimensions. |
+| Gemini Embedding 2 (`gemini-embedding-2`) | $0.20 input | **Yes** | Multilingual; recommended output dimensions 768, 1536 or 3072 (the course uses 768). |
 | OpenAI GPT-5 nano | $0.05 / $0.40 | No (prepaid) | Cheapest per token among paid-only options. |
 | Claude Haiku 4.5 | $1.00 / $5.00 | No (prepaid) | |
 | Ollama (local open-weights) | $0 | n/a | Slow on a CPU laptop; weaker tool calling. Optional. |

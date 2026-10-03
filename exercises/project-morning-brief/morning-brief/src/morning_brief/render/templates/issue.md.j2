@@ -5,6 +5,9 @@
 _{{ issue.theme }}_
 {% endif %}
 
+{% if not issue.top_stories and not issue.more_stories %}
+_No stories today: every source failed or nothing matched your profile. The run report has the details._
+{% endif %}
 ## Top stories
 
 {% for item in issue.top_stories %}

@@ -34,7 +34,7 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 | פרק | קובץ | מצב |
 | --- | --- | --- |
 | פרק 1: מה בונה מהנדסת AI | [`01-what-an-ai-engineer-builds.md`](01-what-an-ai-engineer-builds.md) | ✅ |
-| פרק 2: סביבת העבודה ב־Windows והקריאה הראשונה למודל | [`02-workbench-windows.md`](02-workbench-windows.md) | ✅ |
+| פרק 2: סביבת העבודה והקריאה הראשונה למודל | [`02-workbench-windows.md`](02-workbench-windows.md) | ✅ |
 
 ## חלק ב: איך מודלים עובדים (בדיוק כמה שצריך)
 
@@ -55,11 +55,11 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 | פרק 10: קריאה לכלים | [`10-tool-calling.md`](10-tool-calling.md) | ✅ |
 | פרק 11: לקוחות עמידים וניידות בין ספקים | [`11-robust-clients.md`](11-robust-clients.md) | ✅ |
 
-## חלק ד: Embeddings, אחזור ו־RAG
+## חלק ד: שיכונים, אחזור ו־RAG
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 12: Embeddings ודמיון סמנטי | [`12-embeddings.md`](12-embeddings.md) | ✅ |
+| פרק 12: שיכונים (Embeddings) ודמיון סמנטי | [`12-embeddings.md`](12-embeddings.md) | ✅ |
 | פרק 13: יסודות החיפוש | [`13-search-fundamentals.md`](13-search-fundamentals.md) | ✅ |
 | פרק 14: מאגרי וקטורים | [`14-vector-databases.md`](14-vector-databases.md) | ✅ |
 | פרק 15: RAG מקצה לקצה | [`15-rag-end-to-end.md`](15-rag-end-to-end.md) | ✅ |

@@ -18,13 +18,13 @@ jobs:
       SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       MAIL_TO: ${{ secrets.MAIL_TO }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: is it 07:00 in Jerusalem? (scheduled runs only)
         if: github.event_name == 'schedule'
         run: |
           hour=$(TZ=Asia/Jerusalem date +%H)
           if [ "$hour" != "07" ]; then echo "local hour is $hour; skipping"; echo "SKIP=1" >> "$GITHUB_ENV"; fi
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v10
         if: env.SKIP != '1'
       - run: uv sync
         if: env.SKIP != '1'
@@ -33,15 +33,18 @@ jobs:
         run: uv run pytest -q -m "not judge"
       - name: restore story memory and store
         if: env.SKIP != '1'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
-          path: data/brief.sqlite data/chroma data/embeddings-cache.sqlite
+          path: |
+            data/brief.sqlite
+            data/chroma
+            data/embeddings-cache.sqlite
           key: morning-brief-data-${{ github.run_id }}
           restore-keys: morning-brief-data-
       - name: run
         if: env.SKIP != '1'
         run: uv run morning-brief run --channels file,email --data-dir data --out out
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always() && env.SKIP != '1'
         with:
           name: brief-${{ github.run_id }}

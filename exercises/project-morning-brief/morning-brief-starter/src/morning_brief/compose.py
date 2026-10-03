@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, ValidationError
 from morning_brief.budget import BudgetExceeded, BudgetGuard
 from morning_brief.config import Profile
 from morning_brief.llm import prompts
-from morning_brief.llm.client import LLMClient, LLMError
+from morning_brief.llm.client import LLMClient, LLMError, resilient_complete
 from morning_brief.llm.schemas import ArticleSummary, IssueIntro, ResearchNote, response_format_for
 from morning_brief.memory import FollowUp
 from morning_brief.sources.base import Article
@@ -40,8 +40,8 @@ class Issue(BaseModel):
 def build_item(article: Article, summary: ArticleSummary, *, score: float, reason: str, members: list[Article], follow_up: FollowUp | None, research: ResearchNote | None) -> IssueItem:
     raise NotImplementedError
 
-def write_intro(date: str, profile: Profile, headlines: list[str], client: LLMClient, *, guard: BudgetGuard | None=None, prompt_version: int=1) -> IssueIntro:
-    """The only model call in composition. A failure degrades to a plain greeting; the issue still goes out."""
+def write_intro(date: str, profile: Profile, headlines: list[str], client: LLMClient, *, fallback: LLMClient | None=None, guard: BudgetGuard | None=None, prompt_version: int=1) -> IssueIntro:
+    """The only model call in composition: primary, then the fallback model, then a plain greeting. The issue always goes out."""
     raise NotImplementedError
 
 def compose_issue(date: str, profile: Profile, top: list[IssueItem], more: list[IssueItem], intro: IssueIntro, *, metadata: dict[str, Any], skipped_note: str='') -> Issue:

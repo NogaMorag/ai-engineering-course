@@ -12,13 +12,33 @@
 - **Chapters** refer to file 02. **Mn** = Morning Brief milestone (file 04). Section numbers are
   provisional until the chapters are written.
 - **Platform**: Windows 11 with PowerShell 7 in Windows Terminal; every command in the book is a
-  PowerShell command.
+  PowerShell command. Mac users follow the same days with the equivalents table in Ch 2 §2.13
+  (install with Homebrew, zsh instead of PowerShell, cron or launchd instead of Task Scheduler).
+- **Day 0**: installations only, done before Week 1 starts (ideally on the weekend before), with no
+  time pressure. Installations are the step most likely to go wrong for someone new to the tools, so
+  they do not share a day with the first model call.
 - Costs: the primary API runs on Google's **free tier**, so every day is $0 as long as you stay
   within its rate limits (shown in AI Studio). Days marked 💲 make many calls and may hit the
   per-minute limit; the exercise then throttles or spreads the calls, which is itself a lesson. If
   you later prepay $5 for Tier 1, those days cost cents.
 
 ---
+
+## Day 0 — Installations (before Week 1)
+
+### D0 — Terminal, tools, Python
+- Objective: a terminal that prints Hebrew correctly and the four tools installed and answering.
+- Read: Ch 2 §2.1–2.4 (Mac: also §2.13).
+- Time: 60–90 min including downloads (20 / 60 / 10). Do it on the weekend before Week 1; if anything
+  fails, appendix B is the first stop and nothing else in the course waits on it.
+- Exercise: install PowerShell 7 and make it the default profile; set `PYTHONUTF8=1` as a user environment
+  variable; install Git, VS Code and uv with `winget`; install Python 3.12 with `uv python install 3.12`;
+  open a new terminal and run the four version commands.
+- Done when: `$PSVersionTable.PSVersion` starts with 7; `git --version`, `code --version`, `uv --version`
+  all answer; `uv python list` shows 3.12; `uv run python -c "import sys; print(sys.flags.utf8_mode)"`
+  prints 1 inside any uv project (or simply after Day 2).
+- You can explain: what uv manages and why the book installs no other Python; why a new terminal is needed
+  after an install or an environment-variable change.
 
 ## Week 1 — Orientation, workbench, ML vocabulary
 
@@ -31,16 +51,19 @@
 - Done when: the note exists with three classified postings.
 - You can explain: what an AI engineer owns that a backend engineer does not; why "it returned valid JSON" is not success.
 
-### D2 — Workbench on Windows and the first real call
-- Objective: a reproducible environment and one working model call with token counts printed.
-- Read: Ch 2.
-- Time: ~120 min (30 / 80 / 10).
-- Exercise: install PowerShell 7, Git, VS Code and uv with `winget`; Python 3.12 via uv; create
-  `ai-course/`; get a free Gemini API key in AI Studio; `.env` loaded with `uv run --env-file`; run
-  `hello_model.py`; print input/output tokens and what they would cost on the paid tier; run a
-  trivial pytest; set `PYTHONUTF8=1` so Hebrew prints correctly.
-- Done when: the script prints an answer and token counts; `uv run pytest` passes; the key is not in git; Hebrew output is readable in the terminal.
-- You can explain: what uv manages; where the key lives and why; what an input token would cost on the paid tier.
+### D2 — The course project and the first real call
+- Objective: a reproducible project and one working model call with token counts printed. (The tools
+  were installed on Day 0.)
+- Read: Ch 2 §2.5–2.12.
+- Time: ~90 min (25 / 55 / 10).
+- Exercise: create `ai-course/` with `uv init --bare`, pin 3.12, add `google-genai` and `pydantic`,
+  `pytest` and `ruff`; `.gitignore` and `pyproject.toml` pytest section; get a free Gemini API key in AI
+  Studio and note your rate limits; `.env` loaded with `uv run --env-file .env`; fill the three TODOs in
+  `hello_model.py` and run it; copy and run the smoke tests; first git commit without the key.
+- Done when: the script prints a Hebrew answer and three token counts; `uv run pytest -q` reports 3 passed;
+  `git check-ignore .env` prints `.env`; the commit exists and does not contain `.env`.
+- You can explain: what `uv run` does on every command; where the key lives and why it is loaded per run;
+  what an input token would cost on the paid tier.
 
 ### D3 — Machine learning vocabulary
 - Objective: model, parameters, training vs. inference, datasets, learning paradigms, generalization.
@@ -117,7 +140,7 @@
 
 ## Week 3 — The Messages API and prompting
 
-### D11 — The Messages API 💲
+### D11 — The Interactions API 💲
 - Objective: request anatomy, roles, statelessness, usage accounting.
 - Read: Ch 7.
 - Time: ~100 min (35 / 55 / 10).
@@ -154,7 +177,7 @@
 
 ### D15 — Tool calling, the loop by hand 💲
 - Objective: the function_call → function_result cycle and a loop you own.
-- Read: Ch 10 §10.1–10.4.
+- Read: Ch 10 §10.1–10.6.
 - Time: ~100 min (30 / 60 / 10).
 - Exercise: tools `fetch_url(url)` (httpx + trafilatura) and `search_notes(query)`; write the loop; run "summarize this URL".
 - Done when: the trace shows function_call → your execution → function_result → final answer.
@@ -164,7 +187,7 @@
 
 ### D16 — Parallel tools, errors, strict schemas, safe dispatch 💲
 - Objective: production-grade tool handling.
-- Read: Ch 10 §10.5–10.8.
+- Read: Ch 10 §10.7–10.8.
 - Time: ~90 min (25 / 55 / 10).
 - Exercise: parallel calls for two URLs; `is_error` results; an allowlist dispatcher that validates
   arguments and rejects `file://` and private IPs; A/B of two tool descriptions.
@@ -226,7 +249,7 @@
 
 ### D23 — Lexical search and BM25
 - Objective: the retrieval method that still wins on identifiers.
-- Read: Ch 13 §13.1–13.3.
+- Read: Ch 13 §13.1–13.4.
 - Time: ~90 min (30 / 50 / 10).
 - Exercise: BM25 over the 200 headlines; ten queries including an error code and a paraphrase; compare top-5 with dense results.
 - Done when: a table shows where lexical wins and where dense wins.
@@ -234,7 +257,7 @@
 
 ### D24 — ANN, hybrid search, reranking
 - Objective: combining retrievers and re-scoring candidates.
-- Read: Ch 13 §13.4–13.6.
+- Read: Ch 13 §13.5–13.6.
 - Time: ~100 min (30 / 60 / 10).
 - Exercise: implement RRF; rerank the top 20 by having the fast model score each query–passage pair (the cross-encoder idea, done with the model you already have); compare orderings; time and count tokens per stage; optional: a local cross-encoder.
 - Done when: RRF tests pass; reranking changes at least one top-3 result for a sensible reason; a latency table exists.
@@ -260,7 +283,7 @@
 
 ### D27 — Ingestion and chunking
 - Objective: turning documents into units of evidence.
-- Read: Ch 15 §15.1–15.5.
+- Read: Ch 15 §15.1–15.4.
 - Time: ~100 min (30 / 60 / 10).
 - Exercise: chunk your Obsidian course notes two ways (fixed size + overlap; heading-based); inspect five chunks each; content-hash IDs; re-run skips unchanged files.
 - Done when: two chunk sets with counts exist and a note says which preserved meaning better.
@@ -268,7 +291,7 @@
 
 ### D28 — Retrieval → context → grounded answer 💲
 - Objective: the query path of RAG with citations and abstention.
-- Read: Ch 15 §15.6–15.9.
+- Read: Ch 15 §15.5–15.8.
 - Time: ~110 min (30 / 70 / 10).
 - Exercise: `ask_notes.py`: index notes in Chroma; retrieve top-k; build context with `[n]` IDs; answer with citations; validate IDs against the retrieved set; abstain when unsupported.
 - Done when: three answerable and two unanswerable questions behave correctly; the invalid-citation path is tested.
@@ -276,9 +299,9 @@
 
 ### D29 — Hybrid, long context vs. RAG, prompt caching 💲
 - Objective: the improvements that are worth measuring.
-- Read: Ch 15 §15.10–15.12.
+- Read: Ch 15 §15.9–15.12.
 - Time: ~100 min (30 / 60 / 10).
-- Exercise: add hybrid retrieval; put the static instructions and documents first in the prompt and verify `total_cached_tokens` > 0 on a repeated call (implicit caching); compare the token cost of "all notes in context" vs. RAG for five questions.
+- Exercise: add hybrid retrieval; put the static instructions and documents first in the prompt and verify `total_cached_tokens` > 0 on a repeated call of the long-context variant (implicit caching needs a prefix of at least 4,096 tokens on the Flash models as of October 2026; the short RAG prompt stays at 0, and that is the lesson); compare the token cost of "all notes in context" vs. RAG for five questions.
 - Done when: cache hits are verified; a cost/latency table compares long context and RAG.
 - You can explain: the prefix-stability rule; when long context beats RAG and when it does not.
 
@@ -295,16 +318,16 @@
 ### D31 — Eval datasets
 - Objective: expectations before results; dev vs. holdout.
 - Read: Ch 16 §16.1–16.4.
-- Time: ~100 min (30 / 60 / 10).
-- Exercise: 30 cases for `ask_notes` (direct, paraphrase, multi-hop, unanswerable, adversarial, Hebrew) as JSONL with expected behavior; split 20 dev / 10 holdout grouping paraphrases together.
-- Done when: the cases file passes a schema test; a note records the leakage you avoided.
+- Time: ~110 min (30 / 70 / 10).
+- Exercise: 30 cases for `ask_notes` (direct, paraphrase, multi-hop, unanswerable, adversarial, Hebrew) as JSONL with expected behavior; split 20 dev / 10 holdout grouping paraphrases together; implement the seven deterministic checks (`run_checks`) and run their tests.
+- Done when: the cases file passes a schema test; the checks' tests pass; a note records the leakage you avoided.
 - You can explain: why expectations are written first; holdout contamination through prompt edits.
 
 ### D32 — Metrics and the LLM judge 💲
 - Objective: deterministic checks, reference-based metrics, a calibrated judge.
 - Read: Ch 16 §16.5–16.8.
 - Time: ~110 min (35 / 65 / 10).
-- Exercise: checks (citations valid, abstention correct), keyword/fuzzy match, a faithfulness judge with a rubric returning structured verdicts; hand-label ten answers; measure agreement; swap answer order in a pairwise test.
+- Exercise: a faithfulness judge with a rubric returning structured verdicts (the checks were built on D31; Cohen's kappa is provided, read it); run v1 on the dev set with the judge; hand-label ten answers; measure agreement and kappa; swap answer order in a pairwise test.
 - Done when: agreement ≥ 8/10 or disagreements are documented; the position-bias observation is written.
 - You can explain: where code beats a judge; judge biases; why two agreeing models are not truth.
 
@@ -368,17 +391,17 @@
 
 ### D40 — LangGraph 💲
 - Objective: see what the framework buys and what it costs.
-- Read: Ch 21 §21.1–21.4.
+- Read: Ch 21 §21.1–21.3.
 - Time: ~120 min (40 / 70 / 10).
-- Exercise: rebuild the D37 agent as a StateGraph with SqliteSaver; add an interrupt before `send`; resume by thread ID; compare lines of code and readability with the hand-written loop.
-- Done when: the graph runs and resumes; a decision note "LangGraph or loop?" lists criteria.
+- Exercise: rebuild the D37 agent as a StateGraph with SqliteSaver; add an interrupt before `send`; resume by thread ID. (The line count and the "LangGraph or loop?" decision note move to D42, which has slack.)
+- Done when: the graph runs, stops at the interrupt, and resumes by thread ID.
 - You can explain: what a checkpointer stores; what an interrupt is; three signs you have outgrown the loop.
 
 ## Week 9 — Frameworks wrap-up; production begins
 
 ### D41 — The landscape and MCP
 - Objective: place every framework name; connect one MCP tool.
-- Read: Ch 21 §21.5–21.7.
+- Read: Ch 21 §21.4–21.7.
 - Time: ~100 min (35 / 55 / 10).
 - Exercise: run a filesystem MCP server (or a 20-line custom one); list tools; call one from your loop; write the security note on untrusted tool descriptions and results.
 - Done when: an MCP tool call appears in your trace; the landscape table is in your notes.
@@ -388,8 +411,8 @@
 - Objective: close Part VI and draft the project pipeline.
 - Read: summaries of Ch 19–21.
 - Time: ~90 min.
-- Exercise: Ch 19–21 interview questions aloud; sketch the Morning Brief pipeline (stages; which are workflow vs. agent; where state lives).
-- Done when: the sketch is saved (refined in Ch 30).
+- Exercise: compare the LangGraph graph with the hand-written loop (line counts, readability) and write the "LangGraph or loop?" decision note; Ch 19–21 interview questions aloud; sketch the Morning Brief pipeline (stages; which are workflow vs. agent; where state lives).
+- Done when: the decision note and the sketch are saved (the sketch is refined in Ch 30).
 - You can explain: your pipeline on a whiteboard in three minutes.
 
 ### D43 — Observability: a tracer you own 💲
@@ -402,7 +425,7 @@
 
 ### D44 — Measuring latency; optional hosted tracing 💲
 - Objective: numbers you can defend.
-- Read: Ch 22 §22.6 (optional); Ch 23 §23.1–23.3.
+- Read: Ch 22 §22.7 (optional); Ch 23 §23.1.
 - Time: ~100 min (30 / 60 / 10).
 - Exercise: benchmark ten runs × two models for the summarizer; p50, p95, TTFT; cost per call; optional: send traces to a free-tier hosted tool.
 - Done when: a benchmark table and a three-line conclusion exist.
@@ -410,9 +433,9 @@
 
 ### D45 — Cost and latency levers 💲
 - Objective: halve the cost with evidence.
-- Read: Ch 23 §23.4–23.7.
+- Read: Ch 23 §23.2–23.4.
 - Time: ~110 min (30 / 70 / 10).
-- Exercise: summarize 50 articles for ≥50% less: cheaper model where the eval holds, prompt caching of instructions, shorter outputs, Batch API for the non-urgent half; a budget guard that stops at a set amount.
+- Exercise: summarize 50 articles (20 on the free tier, `--items 20`) for ≥50% less: cheaper model where the eval holds, a stable prefix for prompt caching (it pays only once the prefix reaches the model's minimum, 4,096 tokens on the Flash models as of October 2026; a 0 in the `cached` column is a measurement, not a bug), shorter outputs, Batch API for the non-urgent half; a budget guard that stops at a set amount.
 - Done when: a before/after table shows cost, latency and eval score.
 - You can explain: the lever order (free wins first); what caching requires; when batch is acceptable.
 
@@ -420,7 +443,7 @@
 
 ### D46 — Reliability patterns
 - Objective: calls that degrade gracefully.
-- Read: Ch 23 §23.8–23.10.
+- Read: Ch 23 §23.5–23.9.
 - Time: ~100 min (30 / 60 / 10).
 - Exercise: `resilient_call()` with a whole-request deadline, retry policy, fallback to a second model, circuit breaker; tests with injected 429 / 529 / timeouts.
 - Done when: tests pass and a fault → outcome table exists.
@@ -538,7 +561,7 @@
 - Objective: from structured inputs to a readable issue.
 - Read: M5 brief (composition).
 - Time: ~110 min (25 / 75 / 10).
-- Exercise: the `Newsletter` model (sections; items with title, summary, why, links, citations); the composer prompt on the stronger model; render Markdown and HTML with Jinja2; `preview` command.
+- Exercise: the `Issue` model (sections; items with title, summary, why, links, citations); the composer prompt on the stronger model; render Markdown and HTML with Jinja2; `preview` command.
 - Done when: a readable issue exists in both formats and every claim is linked.
 - You can explain: why composition takes structured inputs, not raw text; model tiering here.
 
@@ -580,7 +603,7 @@
 - Objective: cents per issue, measured.
 - Read: M7 brief (cost).
 - Time: ~100 min (15 / 75 / 10).
-- Exercise: tiering (cheap model for scoring and summaries, stronger for composition); prompt caching for profile + instructions (verify hits); shorter outputs; Batch API for summaries if latency allows; cost per issue before/after with the eval unchanged.
+- Exercise: tiering (cheap model for scoring and summaries, stronger for composition); prompt caching for profile + instructions where the prefix reaches the 4,096-token minimum (verify hits; record a 0 honestly and drop the lever if it never pays); shorter outputs; Batch API for summaries if latency allows; cost per issue before/after with the eval unchanged.
 - Done when: the cost-per-issue table exists and the eval did not regress.
 - You can explain: your cost budget and how the code enforces it.
 
@@ -630,7 +653,7 @@
 
 ### D71 — System design: framework; cases 1–2
 - Objective: a repeatable way to design under time pressure.
-- Read: Ch 27 §27.1–27.3.
+- Read: Ch 27 §27.1–27.4.
 - Time: ~100 min.
 - Exercise: 25-minute timed design, aloud, for Morning Brief and for document QA with permissions; compare with the worked answers.
 - Done when: both are recorded (notes or audio) and gaps are listed.
@@ -638,7 +661,7 @@
 
 ### D72 — System design: cases 3–5
 - Objective: breadth across system shapes.
-- Read: Ch 27 §27.4–27.6.
+- Read: Ch 27 §27.5–27.7.
 - Time: ~100 min.
 - Exercise: the same drill for a support assistant with actions, a classification pipeline at scale, and batch PDF extraction.
 - Done when: three designs exist and recurring weak spots are noted.

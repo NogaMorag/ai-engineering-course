@@ -4,15 +4,15 @@ jobs:
   fast:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
       - run: uv sync
       - run: uv run ruff check .
       - run: uv run pytest -q -m "not judge"
       - name: offline end-to-end run (fixture feeds, fake models)
         run: uv run morning-brief run --offline --date 2026-10-03 --data-dir data --out out
       - run: uv run python -m evals.run_eval --offline --out docs/eval-offline.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: offline-issue
           path: |

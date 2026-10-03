@@ -12,6 +12,7 @@ from ch25.daily_job import (
     EXIT_BUDGET,
     EXIT_OK,
     EXIT_SKIPPED,
+    EXIT_VERSIONS,
     fake_client_for_dry_run,
     main,
     run_job,
@@ -66,3 +67,17 @@ def test_daily_job_cli_dry_run_and_hour_skip(tmp_path: Path) -> None:
     now_local_hour = dt.datetime.now(tz=ZoneInfo("Asia/Jerusalem")).hour
     wrong_hour = (now_local_hour + 12) % 24
     assert main(["--out", str(tmp_path / "o2"), "--dry-run", "--local-hour", str(wrong_hour), "--versions", str(tmp_path / "none.json")]) == EXIT_SKIPPED
+
+
+def test_daily_job_refuses_a_version_mismatch_before_any_call(tmp_path: Path, monkeypatch) -> None:
+    prompts = tmp_path / "prompts"
+    prompts.mkdir()
+    (prompts / "summarize.v3.txt").write_text("v3", encoding="utf-8")
+    write_default(tmp_path / "versions.json")
+    args = ["--out", str(tmp_path / "o"), "--dry-run", "--items", "1", "--versions", str(tmp_path / "versions.json"), "--prompts-dir", str(prompts)]
+    monkeypatch.setenv("MODEL_FAST", "gemini-9-ultra")
+    assert main(args) == EXIT_VERSIONS
+    assert not (tmp_path / "o" / "run-report.json").exists()  # nothing ran
+    monkeypatch.delenv("MODEL_FAST")
+    monkeypatch.delenv("MODEL_SMART", raising=False)
+    assert main(args) == EXIT_OK

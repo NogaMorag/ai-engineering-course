@@ -30,8 +30,8 @@ def grounded(answer: str, citations: list[int], supported: bool = True) -> str:
 
 def test_cases_file_is_sound() -> None:
     cases = load_cases()
-    assert len(cases) == 30 and validate_cases(cases) == []
-    assert len(load_cases(split="dev")) == 20 and len(load_cases(split="holdout")) == 10
+    assert len(cases) >= 30 and validate_cases(cases) == []  # the shipped file has 30; the reader adds her own
+    assert len(load_cases(split="dev")) >= 20 and len(load_cases(split="holdout")) >= 10
     assert {c.category for c in cases} == {"direct", "paraphrase", "multi-hop", "unanswerable", "adversarial", "hebrew"}
 
 
@@ -123,4 +123,5 @@ def test_repeats_detect_flaky_cases(answer_fn_factory) -> None:
     assert record.runs == 3 and record.passes == 2 and record.flaky and record.passed
     with_judge = answer_fn_factory([grounded("Transient failures only. [1]", [1]), json.dumps({"faithful": True, "correctness": 2, "reasoning": "ok"})])
     judged = evaluate_case(case, with_judge, judge=FaithfulnessJudge(with_judge.__closure__[0].cell_contents))
-    assert judged.judge == {"faithful": True, "correctness": 2, "reasoning": "ok"}
+    assert {k: judged.judge[k] for k in ("faithful", "correctness", "reasoning")} == {"faithful": True, "correctness": 2, "reasoning": "ok"}
+    assert judged.judge["tokens"]["input"] > 0 and judged.input_tokens > 0  # the judge's call is part of the run's cost

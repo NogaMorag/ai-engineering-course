@@ -14,8 +14,8 @@ from typing import Any
 
 # USD per 1M tokens: (input, output, cached input). Paid tier; the free tier bills nothing.
 PRICES: dict[str, tuple[float, float, float]] = {
-    "gemini-3.5-flash-lite": (0.30, 2.50, 0.075),
-    "gemini-3.8-flash": (0.75, 3.75, 0.1875),
+    "gemini-3.5-flash-lite": (0.30, 2.50, 0.03),
+    "gemini-3.8-flash": (0.75, 3.75, 0.075),
     "gemini-embedding-2": (0.20, 0.0, 0.20),
 }
 

@@ -7,6 +7,7 @@
 <h1>Morning Brief · {{ issue.date }}</h1>
 <p>{{ issue.greeting_line }}</p>
 {% if issue.theme and issue.theme != 'none' %}<p><em>{{ issue.theme }}</em></p>{% endif %}
+{% if not issue.top_stories and not issue.more_stories %}<p class="note"><em>No stories today: every source failed or nothing matched your profile. The run report has the details.</em></p>{% endif %}
 <h2>Top stories</h2>
 {% for item in issue.top_stories %}
 <h3>{{ loop.index }}. {{ item.headline }}</h3>

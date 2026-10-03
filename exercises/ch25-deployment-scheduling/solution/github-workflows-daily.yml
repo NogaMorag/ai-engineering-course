@@ -22,8 +22,8 @@ jobs:
       MODEL_FAST: gemini-3.5-flash-lite
       MODEL_SMART: gemini-3.8-flash
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
       - run: uv sync
       - name: offline tests first (never run the paid job on a broken tree)
         run: uv run pytest -q -m "not judge"
@@ -36,7 +36,7 @@ jobs:
           echo "exit=$code" >> "$GITHUB_OUTPUT"
           if [ "$code" = "2" ]; then echo "skipped: not 07:00 in Jerusalem"; exit 0; fi
           exit $code
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always() && steps.job.outputs.exit != '2'
         with:
           name: brief-${{ github.run_id }}

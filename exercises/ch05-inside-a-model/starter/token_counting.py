@@ -5,7 +5,7 @@ Run from the course root:
 
     uv run --env-file .env python -m ch05.token_counting
 
-Uses the free token-counting endpoint (no generation, so no cost even on the paid tier).
+Uses the token-counting endpoint (no generation; not a separate line item on the price list as of Oct 2026; it does count against the rate limit).
 """
 
 from __future__ import annotations

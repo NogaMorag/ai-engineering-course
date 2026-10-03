@@ -39,7 +39,7 @@ Copy-Item path\to\exercises\ch17-failure-analysis\tests\test_ch17.py tests\
 **2. קראי עשרה מעקבים בעיניים** מתוך `results\dev-v1.jsonl` (או הגרסה שזכתה), לפני כל קוד. לכל
 כשל כתבי משפט חופשי בפתק: מה קרה, ואיפה בצינור. זה הקידוד הפתוח.
 
-**3. מלאי את `TODO 1`** (`classify`): הכללים מהטבלה בסעיף 17.4. השוו שמות קבצים (לא נתיבים מלאים)
+**3. מלאי את `TODO 1`** (`classify`): הכללים מהטבלה בסעיף 17.4. השווי שמות קבצים (לא נתיבים מלאים)
 בין המקורות הצפויים, `retrieved_paths` ו־`context_paths`.
 
 **4. מלאי את `TODO 2`** (`prioritize`): ספירה כפול חומרה, מיון יורד, שובר שוויון לפי שם.
@@ -55,12 +55,12 @@ uv run python -m ch17.analyze results\dev-v1.jsonl --out results\analysis-v1.md 
 
 </div>
 
-**6. השוו את התיוג האוטומטי למשפטים שכתבת.** איפה הכללים טעו? איפה שתקו (`unclassified`)? הוסיפי
+**6. השווי את התיוג האוטומטי למשפטים שכתבת.** איפה הכללים טעו? איפה שתקו (`unclassified`)? הוסיפי
 לפחות תג ידני אחד בפתק, ואם הוא חוזר, הוסיפי אותו ל־`TAXONOMY` ולכללים.
 
 **7. תיקון ראשון.** הקטגוריה עם העדיפות הגבוהה. אם זו `retrieval_miss`: `--mode hybrid` או `--k 8`.
-אם `context_truncated`: `k` קטן יותר או תקציב גדול יותר. אם `wrong_language` או `over_refusal`:
-גרסת הנחיה. שינוי **אחד**, ואז:
+אם `context_truncated`: `k` קטן יותר. אם `wrong_language` או `over_refusal`: גרסת הנחיה חדשה, v3,
+שמתווספת למילון `PROMPTS` ב־`run_eval.py` ומשנה משפט אחד. שינוי **אחד**, ואז:
 
 <div dir="ltr" align="left">
 
@@ -75,8 +75,38 @@ uv run python -m ch16.run_eval compare results\dev-v1.jsonl results\dev-fix1.jso
 
 **9. בפתק:** טבלת לפני ואחרי לשני התיקונים בנפרד: מה תוקן, מה נשבר, ולמה בחרת בסדר הזה.
 
-**10. רגרסיה.** הריצי `analyze` שוב עם `--regressions`; הוסיף אפס. הוסיפי את `regressions.jsonl`
-לסט הפיתוח (או טעני אותו ברתמה בנוסף ל־`cases.jsonl`; שינוי של שלוש שורות ב־`run_eval.py`).
+**10. רגרסיה.** הריצי `analyze` שוב עם `--regressions`: הפעם השורה האחרונה היא `added 0 regression
+case(s)`. הכשלים כאן באו מסט הפיתוח, ולכן `regressions.jsonl` חופף לו, ואי אפשר לטעון את שניהם יחד
+(`validate_cases` יתלונן על מזהים כפולים). הקובץ משמש כרשימת מעקב: אחרי כל תיקון, כל מקרה שבו חייב
+לעבור בהרצה החדשה. שמרי את זה כ־`ch17\gate.py`:
+
+<div dir="ltr" align="left">
+
+```python
+import json
+import sys
+from pathlib import Path
+
+from ch16.harness import read_records
+
+watch = {json.loads(line)["id"] for line in Path("regressions.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()}
+passed = {r["case_id"] for r in read_records(Path(sys.argv[1])) if r["passed"]}
+print("regression cases still failing:", ", ".join(sorted(watch - passed)) or "none")
+```
+
+</div>
+
+<div dir="ltr" align="left">
+
+```powershell
+uv run python -m ch17.gate results\dev-fix2.jsonl
+```
+
+</div>
+
+זה שער הרגרסיה מסעיף 16.11 בצורתו הפשוטה ביותר; פרק 18 יראה איפה הוא יושב ב־CI. כשמקרים יגיעו
+ממקום אחר (שאלה של משתמשת שנכשלה), הם ייכנסו ל־`cases.jsonl` עם מזהה חדש, והקובץ הזה יישאר
+רשימת המעקב.
 
 **11. התחייבות.** `git commit -m "Chapter 17: failure taxonomy, two measured fixes, regression set"`.
 
@@ -112,7 +142,24 @@ uv run python -m ch16.run_eval compare results\dev-v1.jsonl results\dev-fix1.jso
 - [ ] דוח הניתוח נכתב, עם ספירה לפי שלב, עדיפויות, ורשימת כשלים עם הנתיבים שאוחזרו.
 - [ ] תג ידני אחד לפחות שהכללים לא נתנו.
 - [ ] שתי השוואות (לפני ואחרי כל תיקון), בנפרד.
-- [ ] `regressions.jsonl` קיים; הרצה שנייה מוסיפה אפס; הבדיקות עוברות.
+- [ ] `regressions.jsonl` קיים; הרצה שנייה מוסיפה אפס; `gate.py` מדפיס `none` אחרי התיקון השני; הבדיקות
+  עוברות.
+
+## טעויות נפוצות ותיקונים
+
+- **לספור לפני שקוראים.** הדוח מסודר, ורוב הכשלים `unclassified`. חוזרים לצעד 2, כותבים משפט לכל
+  כשל, ורק אז מוסיפים כלל.
+- **להשוות נתיבים מלאים במקום שמות קבצים.** כל כשל מתויג `retrieval_miss` גם כשהמקור ברשימה
+  שאוחזרה. משווים את שם הקובץ בלבד, כמו `_names` בפתרון; המקורות הצפויים בקובץ המקרים נכתבו
+  בלי תיקיות.
+- **תג חדש בלי רשומה בטקסונומיה.** `rollup` או `render_analysis` נופלים על `KeyError` אחרי שהוספת
+  תג לכללים. כל תג שהכללים מחזירים צריך `FailureType` עם שלב, סוג תיקון וחומרה.
+- **שני תיקונים בהרצה אחת.** `--mode hybrid` וגם `--k 8` באותה פקודה, וההשוואה לא אומרת מה עזר.
+  תיקון אחד, קובץ תוצאות אחד, השוואה אחת; ואז הבא.
+- **לטעון את `regressions.jsonl` יחד עם `cases.jsonl`.** `validate_cases` מדפיס „duplicate id”. הכשלים
+  כאן באו מסט הפיתוח, אז הקובץ חופף לו; משתמשים בו כרשימת מעקב עם `gate.py` (צעד 10).
+- **להשוות הרצות עם מקרים שונים.** `compare` מדווח על פחות מ־20 מקרים משותפים. אותו `--split`
+  ואותו קובץ מקרים בשתי ההרצות.
 
 ## רמזים
 
@@ -123,8 +170,11 @@ uv run python -m ch16.run_eval compare results\dev-v1.jsonl results\dev-fix1.jso
 
 ## הפתרון
 
-`solution/`. שימי לב ל־`regression_cases`: הוא מחזיר את **המקרים**, לא את הרשומות, כדי שהסט
-ייטען ברתמה בדיוק כמו `cases.jsonl`.
+`solution/` מכיל את שני הקבצים. הפונקציה `classify` משווה שמות קבצים ולא נתיבים, כי קובץ המקרים
+נכתב בלי תיקיות, ומחזירה את התגים בסדר השלבים, כדי שהתג הראשון ברשימה יהיה תמיד השלב המוקדם
+ביותר שבו נעלמה הראיה. הפונקציה `regression_cases` מחזירה את **המקרים**, לא את הרשומות, כדי
+שהקובץ ייטען ברתמה בדיוק כמו `cases.jsonl`. הפונקציה `prioritize` מכפילה ספירה בחומרה ושוברת
+שוויון לפי שם, כדי שאותם נתונים ייתנו תמיד אותו סדר.
 
 ## מה התרגיל מדגים
 

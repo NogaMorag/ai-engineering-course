@@ -12,6 +12,7 @@ from typing import Any
 
 import chromadb
 import numpy as np
+from chromadb.config import Settings
 
 from ch12.embedder import CachedEmbedder, Embedder, GeminiEmbedder
 from ch12.near_duplicates import load_headlines
@@ -42,7 +43,7 @@ class HeadlineStore:
     def __init__(self, path: Path, embedder: Embedder, name: str = "headlines") -> None:
         self.embedder = embedder
         self.name = name
-        self.client = chromadb.PersistentClient(path=str(path))
+        self.client = chromadb.PersistentClient(path=str(path), settings=Settings(anonymized_telemetry=False))
         self.collection = self.client.get_or_create_collection(
             name, metadata={"hnsw:space": "cosine", "embedding_model": embedder.model}
         )

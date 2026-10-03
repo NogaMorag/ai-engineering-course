@@ -8,7 +8,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from ch09.schemas import clean_schema
-from ch11.llm_client import LLMClient
+from ch11.llm_client import Completion, LLMClient
 
 JUDGE_SYSTEM = (
     "You are a strict grader. You receive a question, numbered sources, a candidate answer and a short "
@@ -37,6 +37,8 @@ def judge_prompt(question: str, sources_text: str, answer: str, reference: str) 
 
 
 class FaithfulnessJudge:
+    last_completion: Completion | None = None
+
     def __init__(self, client: LLMClient) -> None:
         self.client = client
 
@@ -44,6 +46,7 @@ class FaithfulnessJudge:
         completion = self.client.complete(
             judge_prompt(question, sources_text, answer, reference), system=JUDGE_SYSTEM, max_output_tokens=300, temperature=0.0, response_format=VERDICT_FORMAT
         )
+        self.last_completion = completion  # the harness adds these tokens to the record: the judge is part of the run's cost
         return Verdict.model_validate_json(completion.text)
 
 

@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-PRICES: dict[str, tuple[float, float, float]] = {'gemini-3.5-flash-lite': (0.3, 2.5, 0.075), 'gemini-3.8-flash': (0.75, 3.75, 0.1875), 'gemini-embedding-2': (0.2, 0.0, 0.2)}
+PRICES: dict[str, tuple[float, float, float]] = {'gemini-3.5-flash-lite': (0.3, 2.5, 0.03), 'gemini-3.8-flash': (0.75, 3.75, 0.075), 'gemini-embedding-2': (0.2, 0.0, 0.2)}
 
 def estimate_cost(model: str, input_tokens: float, output_tokens: float, *, cached_tokens: float=0.0) -> float:
     raise NotImplementedError

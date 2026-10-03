@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>פרק 2: סביבת העבודה ב-Windows והקריאה הראשונה למודל</title>
+<title>פרק 2: סביבת העבודה והקריאה הראשונה למודל</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,6 +24,7 @@
 <li><a href="#210-ollama">2.10 אופציונלי: מודל מקומי עם Ollama</a></li>
 <li><a href="#211">2.11 פתרון תקלות</a></li>
 <li><a href="#212">2.12 עצירה, הפעלה מחדש וניקוי</a></li>
+<li><a href="#213-mac">2.13 אם את עובדת על Mac</a></li>
 <li><a href="#_3">סיכום</a></li>
 <li><a href="#_4">מונחים לזכור</a></li>
 <li><a href="#_5">טעויות נפוצות</a></li>
@@ -34,11 +35,15 @@
 </ul>
 </div>
 
-<h1 id="2-windows">פרק 2: סביבת העבודה ב־Windows והקריאה הראשונה למודל</h1>
+<h1 id="2">פרק 2: סביבת העבודה והקריאה הראשונה למודל</h1>
 <p>בסוף הפרק הזה יהיה לך מחשב מוכן לכל הקורס, ותוכנית Python אחת שמדברת עם מודל שפה אמיתי ומדפיסה
 את התשובה שלו, כמה טוקנים היא עלתה וכמה זמן לקחה. ההתקנות מינימליות ומכוונות: רק מה שמשרת את
-הקורס, כל צעד עם דרך לוודא שהוא הצליח, וטבלת תקלות בסוף. הפקודות כולן ל־PowerShell ב־Windows 11.
-הקציבי לפרק כשעתיים, כולל זמן הורדות.</p>
+הקורס, כל צעד עם דרך לוודא שהוא הצליח, וטבלת תקלות בסוף. הפקודות כולן ל־PowerShell ב־Windows 11;
+אם את עובדת על Mac, סעיף 2.13 נותן את המקבילות, והשאר זהה.</p>
+<p>הפרק מחולק לשני ימי לימוד, בכוונה. <strong>יום 0</strong> (סעיפים 2.1 עד 2.4) הוא ההתקנות בלבד: הטרמינל, הכלים
+ו־Python. עשי אותו בסוף השבוע שלפני תחילת הקורס, בלי שעון, כי התקנות הן הצעד שהכי נוטה להשתבש כשהכלים
+חדשים, ואין סיבה שהן יחלקו יום עם הקריאה הראשונה למודל. <strong>יום 2</strong> (סעיפים 2.5 עד 2.12) הוא הפרויקט,
+המפתח, הקריאה הראשונה והבדיקות. הקציבי ליום 0 בין שעה לשעה וחצי כולל הורדות, וליום 2 כשעה וחצי.</p>
 <h2 id="_1">מה נלמד בפרק</h2>
 <ul>
 <li>מה מתקינים ולמה, ומה במכוון לא מתקינים.</li>
@@ -48,6 +53,7 @@
 <li>להשיג מפתח API חינמי של Gemini, לשמור אותו נכון, ולא להדליף אותו לעולם.</li>
 <li>להריץ קריאה ראשונה למודל ולקרוא את דיווח הטוקנים שלה.</li>
 <li>לעצור, להפעיל מחדש ולנקות את כל מה שהתקנת.</li>
+<li>מה שונה כשעובדים על Mac, בטבלה אחת.</li>
 </ul>
 <h2 id="_2">ידע מקדים</h2>
 <p>פרקים 0 ו־1. היכרות בסיסית עם טרמינל כלשהו.</p>
@@ -256,7 +262,7 @@ uv --version
 <pre><code class="language-text">git version 2.5x.x.windows.1
 1.10x.x
 ...
-uv 0.12.x (...)
+uv 0.x.y (...)
 </code></pre>
 
 
@@ -456,9 +462,10 @@ testpaths = [&quot;tests&quot;]
    בשבילך.</li>
 <li>העתיקי את המפתח. הוא יוצג פעם אחת כמחרוזת ארוכה. אל תדביקי אותו בשום מקום חוץ מהקובץ שבצעד
    הבא.</li>
-<li>באותו אתר, בעמוד השימוש והמגבלות (Usage / Rate limits), תראי את המגבלות של המסלול החינמי לכל
-   מודל: בקשות לדקה ובקשות ליום. רשמי לעצמך את המספרים של <code>gemini-3.5-flash-lite</code>; נזדקק להם בפרק
-   11.</li>
+<li>באותו אתר, בעמוד המגבלות, תראי את המגבלות של המסלול החינמי לכל מודל: בקשות לדקה ובקשות
+   ליום. רשמי לעצמך את המספרים של <code>gemini-3.5-flash-lite</code>; נזדקק להם בפרק 11. כתובת העמוד:
+   <code>https://aistudio.google.com/rate-limit</code>. התיעוד הרשמי לא מפרסם מספרים קבועים, ולכן המספרים שלך
+   הם המקור.</li>
 </ol>
 <p>עכשיו ניצור את קובץ הסודות. בתיקיית <code>ai-course</code>, צרי קובץ בשם <code>.env</code> (עם הנקודה בהתחלה) ובו שלוש
 שורות, כשבמקום <code>PASTE_YOUR_KEY_HERE</code> מודבק המפתח שלך:</p>
@@ -821,6 +828,93 @@ Remove-Item -Recurse -Force &quot;$HOME\ai-course&quot;
 
 </div>
 
+<h2 id="213-mac">2.13 אם את עובדת על Mac</h2>
+<p>הכול בספר עובד על Mac באותו אופן: uv, Python 3.12, VS Code, Git, המפתח, קובץ הסודות והפקודה
+<code>uv run --env-file .env</code>. שלושה דברים שונים: מתקינים עם Homebrew במקום <code>winget</code>, הטרמינל הוא zsh במקום
+PowerShell, והתזמון המקומי בפרק 25 נעשה עם cron או launchd במקום Task Scheduler. אין צורך ב־<code>PYTHONUTF8</code>:
+עברית מודפסת נכון כברירת מחדל. ההתקנות, מתוך אפליקציית Terminal:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-bash">brew install git uv
+brew install --cask visual-studio-code
+uv python install 3.12
+</code></pre>
+
+
+</div>
+
+<p>אם אין לך Homebrew, המתקין הרשמי של uv עובד גם בלעדיו:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-bash">curl -LsSf https://astral.sh/uv/install.sh | sh
+</code></pre>
+
+
+</div>
+
+<p>טבלת המקבילות לפקודות PowerShell שחוזרות בספר. כל השאר (פקודות <code>uv</code>, <code>git</code>, <code>pytest</code>) זהה:</p>
+<table>
+<thead>
+<tr>
+<th>ב־PowerShell (בספר)</th>
+<th>ב־zsh על Mac</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>winget install ...</code></td>
+<td><code>brew install ...</code></td>
+</tr>
+<tr>
+<td><code>$HOME\ai-course</code> ונתיבים עם <code>\</code></td>
+<td><code>~/ai-course</code> ונתיבים עם <code>/</code></td>
+</tr>
+<tr>
+<td><code>New-Item -ItemType Directory ch19\data</code></td>
+<td><code>mkdir -p ch19/data</code></td>
+</tr>
+<tr>
+<td><code>New-Item -ItemType File ch19\__init__.py</code></td>
+<td><code>touch ch19/__init__.py</code></td>
+</tr>
+<tr>
+<td><code>Copy-Item a\*.py b\</code></td>
+<td><code>cp a/*.py b/</code></td>
+</tr>
+<tr>
+<td><code>Remove-Item -Recurse -Force .venv</code></td>
+<td><code>rm -rf .venv</code></td>
+</tr>
+<tr>
+<td><code>@" ... "@ \| Set-Content .gitignore</code></td>
+<td><code>cat &gt; .gitignore &lt;&lt;'EOF'</code> ... <code>EOF</code></td>
+</tr>
+<tr>
+<td><code>Get-ChildItem Env:GOOGLE_API_KEY</code></td>
+<td><code>printenv GOOGLE_API_KEY</code></td>
+</tr>
+<tr>
+<td><code>[Environment]::SetEnvironmentVariable(...)</code></td>
+<td>לא נדרש</td>
+</tr>
+<tr>
+<td><code>\| Out-Null</code> בסוף פקודה</td>
+<td>פשוט להשמיט</td>
+</tr>
+<tr>
+<td><code>pwsh -File run_daily.ps1</code></td>
+<td><code>bash run_daily.sh</code></td>
+</tr>
+<tr>
+<td><code>schtasks ...</code> (פרק 25)</td>
+<td>שורת cron או launchd (פרק 25, סעיף 25.7)</td>
+</tr>
+</tbody>
+</table>
+<p>הפקודה <code>code</code> מהטרמינל מותקנת מתוך VS Code: פתחי את לוח הפקודות (Cmd+Shift+P) והריצי
+„Shell Command: Install 'code' command in PATH”. תקלות שאופייניות ל־Mac מרוכזות בסוף נספח ב.</p>
 <h2 id="_3">סיכום</h2>
 <ul>
 <li>הסביבה: טרמינל חדש, מנהל התקנות, Git, עורך, ו־uv שמנהל גם את Python עצמו.</li>
@@ -830,6 +924,7 @@ Remove-Item -Recurse -Force &quot;$HOME\ai-course&quot;
 <li>המפתח חינמי, נשמר בקובץ הסודות, נטען בזמן ההרצה בלבד, ולעולם לא מופיע בקוד.</li>
 <li>הקריאה הראשונה: יוצרים לקוח, שולחים בקשה אחת, קוראים את טקסט התשובה ואת דיווח הטוקנים.</li>
 <li>שמות המודלים חיים בהגדרות, לא בקוד.</li>
+<li>על Mac: Homebrew, zsh ו־cron במקום winget, PowerShell ו־Task Scheduler; כל השאר זהה.</li>
 </ul>
 <h2 id="_4">מונחים לזכור</h2>
 <table>
@@ -931,7 +1026,8 @@ limits   free tier: ____ requests/min, ____ requests/day   (from AI Studio)
 
 <h2 id="_7">תרגיל</h2>
 <p><strong>מטרה:</strong> סביבה עובדת וקריאה ראשונה למודל, עם בדיקות עשן וקובץ סודות מוגן.
-<strong>זמן:</strong> 90–120 דקות. <strong>ידע מקדים:</strong> הפרק כולו.</p>
+<strong>זמן:</strong> שני ימי לימוד: יום 0 (סעיפים 2.1 עד 2.4, שעה עד שעה וחצי כולל הורדות) ויום 2 (סעיפים 2.5 עד 2.12,
+כשעה וחצי). <strong>ידע מקדים:</strong> הפרק כולו.</p>
 <p>הצעדים המלאים, קוד ההתחלה, רשימת הבדיקה, הרמזים והפתרון נמצאים ב־
 <a href="../exercises/ch02-first-call/README.md"><code>exercises/ch02-first-call/README.md</code></a>.</p>
 <p><strong>קריטריון סיום:</strong></p>

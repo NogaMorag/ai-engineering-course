@@ -176,9 +176,9 @@ class GeminiClient:
             kwargs["system_instruction"] = system
         try:
             for event in self.client.interactions.create(model=self.model, **kwargs):
-                if event.type == "step.delta" and getattr(event.delta, "type", None) == "text":
+                if event.event_type == "step.delta" and getattr(event.delta, "type", None) == "text":
                     yield event.delta.text
-                elif event.type == "error":
+                elif event.event_type == "error":
                     raise LLMError(f"stream error: {getattr(event, 'error', event)}")
         except LLMError:
             raise

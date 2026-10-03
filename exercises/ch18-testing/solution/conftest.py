@@ -2,7 +2,7 @@
 
 Tiers:
     default          offline: fakes, cassettes, snapshots, properties. Runs on every push, < 10 s.
-    -m judge         LLM-as-judge evals. Nightly. Needs a key.
+    --judge          LLM-as-judge evals. Nightly. Needs a key (skipped otherwise, like live).
     --live           live smoke tests against the real API. Weekly, or on demand. Needs a key.
 """
 
@@ -13,33 +13,40 @@ import os
 import pytest
 
 
-def live_enabled(flag: bool, key_present: bool) -> tuple[bool, str]:
-    """Pure decision so it can be unit tested: (run?, reason when skipped)."""
+def tier_enabled(name: str, flag: bool, key_present: bool) -> tuple[bool, str]:
+    """Pure decision so it can be unit tested: (run?, reason when skipped). Used for the live and judge tiers."""
     if not flag:
-        return False, "live tests run only with --live"
+        return False, f"{name} tests run only with --{name}"
     if not key_present:
         return False, "GEMINI_API_KEY (or GOOGLE_API_KEY) is not set"
     return True, ""
 
 
+def live_enabled(flag: bool, key_present: bool) -> tuple[bool, str]:
+    return tier_enabled("live", flag, key_present)
+
+
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--live", action="store_true", default=False, help="run tests marked live against the real API")
+    parser.addoption("--judge", action="store_true", default=False, help="run tests marked judge (LLM-as-judge evals; paid)")
 
 
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "live: calls the real API; needs a key and --live")
-    config.addinivalue_line("markers", "judge: LLM-as-judge evals; slow and paid; run nightly")
+    config.addinivalue_line("markers", "judge: LLM-as-judge evals; slow and paid; needs a key and --judge")
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    """Both paid tiers skip themselves (with a reason, visible with -rs) unless their flag and a key are present."""
     key_present = bool(os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
-    run_live, reason = live_enabled(config.getoption("--live"), key_present)
-    if run_live:
-        return
-    skip_live = pytest.mark.skip(reason=reason)
-    for item in items:
-        if "live" in item.keywords:
-            item.add_marker(skip_live)
+    for name in ("live", "judge"):
+        run, reason = tier_enabled(name, config.getoption(f"--{name}"), key_present)
+        if run:
+            continue
+        marker = pytest.mark.skip(reason=reason)
+        for item in items:
+            if name in item.keywords:
+                item.add_marker(marker)
 
 
 class TokenBudget:

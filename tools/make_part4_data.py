@@ -213,11 +213,14 @@ def main() -> None:
         add(text, "misc")
 
     rng.shuffle(headlines)
-    for n, h in enumerate(headlines, start=1):  # re-number after the shuffle so ids are not topic-ordered
-        old = h["id"]
-        h["id"] = f"h{n:03d}"
-        for ids in key_to_ids.values():
-            ids[:] = [h["id"] if i == old else i for i in ids]
+    # Re-number after the shuffle so ids are not topic-ordered. Build the whole old->new map first and apply it
+    # once: renaming in place while iterating let an already-renamed id collide with a later headline's old id,
+    # which silently mislabelled half of the queries (found in the 2026-10-03 self-review).
+    renumber = {h["id"]: f"h{n:03d}" for n, h in enumerate(headlines, start=1)}
+    for h in headlines:
+        h["id"] = renumber[h["id"]]
+    for ids in key_to_ids.values():
+        ids[:] = [renumber[i] for i in ids]
 
     out12 = ROOT / "exercises/ch12-embeddings/data"
     out13 = ROOT / "exercises/ch13-search/data"

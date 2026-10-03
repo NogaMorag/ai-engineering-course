@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import random
 import re
-from collections import Counter
 
 # (message, is_urgent). Synthetic data written for this exercise.
 MESSAGES: list[tuple[str, bool]] = [
@@ -117,7 +116,7 @@ def main() -> None:
     print(f"accuracy on training data: {accuracy(weights, train_set):.2f}")
     print(f"accuracy on held-out data: {accuracy(weights, held_out):.2f}")
 
-    ranked = sorted(weights.items(), key=lambda item: item[1], reverse=True)
+    ranked = sorted(weights.items(), key=lambda item: (-item[1], item[0]))  # ties broken alphabetically: deterministic output
     print("words that push toward urgent:", [word for word, _ in ranked[:6]])
     print("words that push away:        ", [word for word, _ in ranked[-6:]])
 

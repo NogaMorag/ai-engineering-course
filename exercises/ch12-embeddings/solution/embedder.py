@@ -56,7 +56,7 @@ class GeminiEmbedder:
             rows.extend(list(embedding.values or []) for embedding in response.embeddings or [])
             if start + self.batch_size < len(texts):
                 time.sleep(self.pause_s)
-        # Reduced-dimension vectors are not unit length when they come back; normalize once here.
+        # gemini-embedding-2 returns unit-length vectors even at reduced dimensions (Oct 2026); other models do not, so we normalize once here and the rest of the code may assume unit length; normalize once here.
         return normalize_rows(np.array(rows, dtype=np.float32))
 
 

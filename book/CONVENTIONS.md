@@ -58,6 +58,16 @@ part: "חלק א: התמצאות וסביבת עבודה"
 6. The Obsidian note is given as a blockquote in the chapter *and* as a file in `obsidian/`.
 7. The exercise section states goal, time, prerequisites and completion criteria, and links to
    `exercises/chNN-<slug>/README.md`, which holds the full steps, starter, hints, solution and tests.
+   Every coding-exercise README has, in this order: goal + time + prerequisites, `## מה בתיקייה הזאת`,
+   the steps (`## צעדים` or one `## יום N: …` per study day), `## פלט צפוי`, `## רשימת בדיקה`,
+   `## טעויות נפוצות ותיקונים` (3–6 bullets specific to the exercise: **הטעות.** what you see, what to do),
+   `## רמזים`, `## הפתרון` (a pointer plus 2–4 sentences on why it works), `## מה התרגיל מדגים`.
+   `tools/consistency_check.py` enforces the section set.
+8. Interview questions: numbered, bold question, a model answer that explains the reasoning and the tradeoff
+   (never a single "correct" answer); at most two questions per chapter carry a follow-up line
+   `**המשך:** <question> <1–2 sentence answer>`. The chapter 28 bank is rendered from
+   `exercises/ch28-question-bank/data/questions.jsonl` (fields: id, category, chapter, question, answer,
+   tradeoff, follow_up) by `tools/render_question_bank.py`; edit the data, not the rendered region.
 
 ## Writing rules
 
@@ -76,7 +86,10 @@ part: "חלק א: התמצאות וסביבת עבודה"
 - Commands are PowerShell, written without a prompt prefix so they can be copied as they are.
   Expected output is shown in its own fenced block labelled `text`.
 - Callouts are blockquotes with a bold Hebrew label on the first line:
-  `> **שימי לב:**`, `> **טעות נפוצה:**`, `> **מונח:**`, `> **ב־Windows:**`, `> **העשרה אופציונלית:**`.
+  `> **שימי לב:**`, `> **טעות נפוצה:**`, `> **מונח:**`, `> **ב־Windows:**`, `> **ב־Mac:**`,
+  `> **העשרה אופציונלית:**`. Windows/PowerShell is the primary platform; Mac differences are confined to
+  chapter 2 §2.13 (equivalents table), appendix B (Mac rows) and chapter 25 §25.7 (cron/launchd). Do not add
+  per-command Mac variants elsewhere.
 - Cross-references: "ראי פרק 5, סעיף 5.3". Links to files in the repository use relative paths.
 - Model names, prices and rate limits never appear hard-coded in prose as facts of the world; they
   are quoted "נכון לאוקטובר 2026" and live in `.env` or in appendix C.

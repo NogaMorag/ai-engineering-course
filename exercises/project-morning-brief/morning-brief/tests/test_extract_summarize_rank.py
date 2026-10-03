@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import sqlite3
 from pathlib import Path
 
 import httpx
@@ -87,3 +88,17 @@ def test_rule_boosts_and_scoring(profile) -> None:
     assert scored[-1].reason == "skip topic" and scored[-1].final == 0.0
     assert len(failures) == 1 and any(s.reason.startswith("scoring failed") and s.llm_score == 50 for s in scored)
     assert fake.calls[0]["system"].startswith("<reader_profile>")  # the profile is the stable prefix
+
+
+def test_summarize_falls_back_to_the_second_model_and_stores_real_usage(tmp_path: Path) -> None:
+    store = Store(tmp_path / "brief.sqlite")
+    article = parse_feed((FIXTURES / "devwire.xml").read_bytes(), "devwire")[0]
+    article.text = article.summary
+    primary, fallback = FakeClient(script=[LLMUnavailable("503")], model="fast"), FakeClient(script=[json.dumps(VALID)], model="smart")
+    tracer = Tracer(tmp_path / "t.jsonl")
+    result = summarize_articles([article], primary, store, fallback=fallback, tracer=tracer, concurrency=1)
+    assert not result.failures and result.summaries[article.id].headline.startswith("Cargo-Lite")
+    event = [s for s in read_spans(tracer.path) if s["name"] == "summarize.call"][-1]
+    assert event["source"] == "fallback" and event["model"] == "smart"
+    model, tokens_in, tokens_out = sqlite3.connect(tmp_path / "brief.sqlite").execute("SELECT model, tokens_in, tokens_out FROM summaries").fetchone()
+    assert model == "smart" and tokens_in > 0 and tokens_out > 0  # no more zero columns

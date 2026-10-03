@@ -39,8 +39,10 @@ class Cassette:
     def get(self, key: str) -> dict[str, Any] | None:
         return self.entries.get(key)
 
-    def put(self, key: str, *, prompt_preview: str, completion: Completion) -> None:
-        entry = {"key": key, "prompt_preview": prompt_preview[:120], "completion": asdict(completion)}
+    def put(self, key: str, *, prompt_preview: str, completion: Completion, model: str | None = None) -> None:
+        # The key deliberately ignores the model: a cassette is a fixture, replayed whatever model is configured.
+        # The model is recorded so you can see which one answered and re-record when you switch.
+        entry = {"key": key, "prompt_preview": prompt_preview[:120], "model": model, "completion": asdict(completion)}
         self.entries[key] = entry
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.path.open("a", encoding="utf-8") as handle:
@@ -84,7 +86,7 @@ class RecordingClient:
             self.replayed += 1
             return Completion(**entry["completion"])
         completion = self.inner.complete(prompt, system=system, max_output_tokens=max_output_tokens, temperature=temperature, response_format=response_format)
-        self.cassette.put(key, prompt_preview=prompt, completion=completion)
+        self.cassette.put(key, prompt_preview=prompt, completion=completion, model=getattr(self.inner, "model", None))
         self.recorded += 1
         return completion
 

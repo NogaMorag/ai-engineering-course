@@ -8,4 +8,5 @@
 - [ ] The demo recording shows a real run or says it is a replay.
 - [ ] I can explain every line of code in the repo, including the parts an AI assistant helped me write.
 - [ ] The eval report in the README is the latest one, not the best one.
+- [ ] Every number in a CV bullet, the LinkedIn summary and the pitch comes from my own run report or eval report, not from the course templates or the reference implementation.
 - [ ] Secrets audit is clean; `.env.example` has placeholders only.

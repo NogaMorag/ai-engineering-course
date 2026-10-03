@@ -160,7 +160,7 @@ class Pipeline:
             return
 
         def summarize_stage():
-            result = summarize_articles(articles, c.fast, s, tracer=ctx.tracer, guard=ctx.guard, concurrency=self.settings.summarize_concurrency)
+            result = summarize_articles(articles, c.fast, s, fallback=c.smart, tracer=ctx.tracer, guard=ctx.guard, concurrency=self.settings.summarize_concurrency)
             return {aid: sm.model_dump() for aid, sm in result.summaries.items()}, len(articles), len(result.summaries), result.failures
 
         summaries = {aid: ArticleSummary.model_validate(d) for aid, d in self._run_stage(ctx, "summarize", summarize_stage, resume=resume).items()}
@@ -170,7 +170,7 @@ class Pipeline:
 
         def score_stage():
             items = [(by_id[aid], sm) for aid, sm in summaries.items() if aid in by_id and sm.is_article]
-            scored, failures = score_articles(items, p, c.fast, guard=ctx.guard)
+            scored, failures = score_articles(items, p, c.fast, fallback=c.smart, guard=ctx.guard)
             s.save_scores(ctx.run_id, [(sc.article_id, sc.final, sc.reason, sc.boosts) for sc in scored])
             return [{"article_id": sc.article_id, "final": sc.final, "llm_score": sc.llm_score, "reason": sc.reason, "boosts": sc.boosts} for sc in scored], len(items), len(scored), failures
 
@@ -238,7 +238,7 @@ class Pipeline:
                 items.append(item)
             items = items[: p.issue_size]
             top, more = items[: p.top_stories], items[p.top_stories :]
-            intro = write_intro(ctx.date, p, [i.headline for i in top], c.smart, guard=ctx.guard)
+            intro = write_intro(ctx.date, p, [i.headline for i in top], c.smart, fallback=c.fast, guard=ctx.guard)
             skipped = f"{len(ctx.failures)} item(s) could not be processed today; see the run report." if ctx.failures else ""
             metadata = {**self.versions, "run_id": ctx.run_id, "cost_usd": round(ctx.guard.spent_usd, 6), "generator": f"morning-brief {__version__}"}
             issue = compose_issue(ctx.date, p, top, more, intro, metadata=metadata, skipped_note=skipped)

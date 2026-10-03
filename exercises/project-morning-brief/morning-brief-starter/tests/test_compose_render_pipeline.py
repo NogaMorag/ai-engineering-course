@@ -57,6 +57,11 @@ def test_write_intro_degrades_to_a_plain_greeting(profile) -> None:
     assert fallback.greeting_line.startswith("בוקר טוב") and fallback.theme == "none"
 
 
+def test_write_intro_uses_the_fallback_model_before_degrading(profile) -> None:
+    intro = write_intro("2026-10-03", profile, ["h1"], FakeClient(script=[LLMUnavailable("503")]), fallback=FakeClient(script=[json.dumps({"greeting_line": "שלום!", "theme": "builds"})]))
+    assert intro.greeting_line == "שלום!" and intro.theme == "builds"
+
+
 def test_offline_pipeline_end_to_end_resume_and_idempotent_delivery(settings, profile, clients) -> None:
     pipeline = Pipeline(settings, profile, clients)
     report = pipeline.run("2026-10-03", channels=("file", "email"))
@@ -96,3 +101,12 @@ def test_cli_offline_run_preview_and_report(tmp_path: Path, capsys) -> None:
     assert main(["report", "--date", "2026-10-05", "--data-dir", str(tmp_path / "d")]) == 0
     assert main(["preview", "--date", "1999-01-01", "--data-dir", str(tmp_path / "d")]) == 3
     assert IssueItem.model_fields["also_covered"].default_factory is not None
+
+
+def test_cli_refuses_a_version_mismatch_before_running(tmp_path: Path, capsys) -> None:
+    versions = tmp_path / "versions.json"
+    versions.write_text(json.dumps({"prompt_version": "summarize.v1", "model_fast": "some-other-model"}), encoding="utf-8")
+    profile = str(Path(__file__).resolve().parent.parent / "profile.yaml")
+    code = main(["run", "--offline", "--date", "2026-10-06", "--data-dir", str(tmp_path / "d"), "--out", str(tmp_path / "o"), "--profile", profile, "--versions", str(versions)])
+    assert code == 5 and "model_fast" in capsys.readouterr().err
+    assert not (tmp_path / "d" / "runs").exists()
