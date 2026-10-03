@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="10-tool-calling.html">← פרק 10: קריאה לכלים</a></nav>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="10-tool-calling.html">← פרק 10: קריאה לכלים</a> · <a href="12-embeddings.html">פרק 12: Embeddings ודמיון סמנטי →</a></nav>
 <main class="book">
 <div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
 <li><a href="#_1">מה נלמד בפרק</a></li>
@@ -564,7 +564,7 @@ text = response.choices[0].message.content
 classify  status 429 -&gt; LLMRateLimited | &gt;=500 -&gt; LLMUnavailable | 4xx -&gt; LLMBadRequest | Timeout/Connection -&gt; LLMUnavailable
 retry     wait = uniform(0, min(20, 1 * 2**(attempt-1)));  stop at 4 attempts or when elapsed + wait &gt; 90
 stream    for event in create(..., stream=True): event.type == &quot;step.delta&quot; and event.delta.type == &quot;text&quot; -&gt; event.delta.text
-usage     Completion(text, status, input_tokens, output_tokens, attempts, latency_s)
+usage     Completion(text, status, input_tokens, output_tokens, cached_tokens, attempts, latency_s)
 cli       summarize_url.py &lt;url&gt; | --file page.txt [--json]   exit 0 ok / 2 not article / 3 llm / 4 fetch
 </code></pre>
 
@@ -595,7 +595,7 @@ cli       summarize_url.py &lt;url&gt; | --file page.txt [--json]   exit 0 ok / 
 <li>מימוש <code>OpenAICompatibleClient</code> כמימוש שלישי של <code>LLMClient</code>, והרצת שלוש הכתבות דרכו. מה השתנה?</li>
 </ul>
 </main>
-<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="10-tool-calling.html">← פרק 10: קריאה לכלים</a></nav>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="10-tool-calling.html">← פרק 10: קריאה לכלים</a> · <a href="12-embeddings.html">פרק 12: Embeddings ודמיון סמנטי →</a></nav>
 <script type="module">
   // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
   const blocks = document.querySelectorAll("pre > code.language-mermaid");

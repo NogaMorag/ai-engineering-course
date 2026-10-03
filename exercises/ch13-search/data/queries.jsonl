@@ -1,0 +1,20 @@
+{"id": "q01", "query": "faster rust builds with a shared cache", "relevant": ["h142", "h153"]}
+{"id": "q02", "query": "compile times cut dramatically", "relevant": ["h142", "h151", "h153", "h176"]}
+{"id": "q03", "query": "E0502", "relevant": ["h056"]}
+{"id": "q04", "query": "borrow checker rejects mutable reference", "relevant": ["h056"]}
+{"id": "q05", "query": "Python 3.14 free-threaded", "relevant": ["h154", "h196"]}
+{"id": "q06", "query": "kubernetes upgrade broke pod networking", "relevant": ["h158", "h195"]}
+{"id": "q07", "query": "clusters over-request CPU", "relevant": ["h174", "h181"]}
+{"id": "q08", "query": "database outage caused by a long transaction", "relevant": ["h043", "h160"]}
+{"id": "q09", "query": "CVE-2026-1234", "relevant": ["h117"]}
+{"id": "q10", "query": "password leak millions of users", "relevant": ["h124", "h155"]}
+{"id": "q11", "query": "typosquatting attack on a package registry", "relevant": ["h074", "h154"]}
+{"id": "q12", "query": "LLM judges biased toward long answers", "relevant": ["h163", "h180"]}
+{"id": "q13", "query": "does long context make retrieval obsolete", "relevant": ["h181"]}
+{"id": "q14", "query": "GPU supply improving", "relevant": ["h167", "h178"]}
+{"id": "q15", "query": "when will humans land on the moon again", "relevant": ["h120", "h152"]}
+{"id": "q16", "query": "recovering lithium from old EV batteries", "relevant": ["h151", "h190"]}
+{"id": "q17", "query": "tech company layoffs after missing targets", "relevant": ["h167", "h169"]}
+{"id": "q18", "query": "vector search inside sqlite", "relevant": ["h086"]}
+{"id": "q19", "query": "שדרוג קוברנטיס שבר את הרשת", "relevant": ["h158", "h195"]}
+{"id": "q20", "query": "Helm 4 OCI charts", "relevant": ["h182"]}

@@ -22,7 +22,7 @@ client    genai.Client(http_options=types.HttpOptions(timeout=60_000, retry_opti
 classify  status 429 -> LLMRateLimited | >=500 -> LLMUnavailable | 4xx -> LLMBadRequest | Timeout/Connection -> LLMUnavailable
 retry     wait = uniform(0, min(20, 1 * 2**(attempt-1)));  stop at 4 attempts or when elapsed + wait > 90
 stream    for event in create(..., stream=True): event.type == "step.delta" and event.delta.type == "text" -> event.delta.text
-usage     Completion(text, status, input_tokens, output_tokens, attempts, latency_s)
+usage     Completion(text, status, input_tokens, output_tokens, cached_tokens, attempts, latency_s)
 cli       summarize_url.py <url> | --file page.txt [--json]   exit 0 ok / 2 not article / 3 llm / 4 fetch
 ```
 

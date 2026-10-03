@@ -67,6 +67,7 @@ class Completion:
     status: str
     input_tokens: int = 0
     output_tokens: int = 0
+    cached_tokens: int = 0  # part of input_tokens that hit the provider's prompt cache
     attempts: int = 1
     latency_s: float = 0.0
 

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרק 14: מאגרי וקטורים</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">תוכן העניינים</a> · <a href="13-search-fundamentals.html">← פרק 13: יסודות החיפוש</a> · <a href="15-rag-end-to-end.html">פרק 15: RAG מקצה לקצה →</a></nav>
+<main class="book">
+<div class="toc"><span class="toctitle">תוכן הפרק</span><ul>
+<li><a href="#_1">מה נלמד בפרק</a></li>
+<li><a href="#_2">ידע מקדים</a></li>
+<li><a href="#141-numpy">14.1 מה numpy נותן, ומה חסר</a></li>
+<li><a href="#142">14.2 המבנה</a></li>
+<li><a href="#143-chroma">14.3 Chroma בפועל</a></li>
+<li><a href="#144">14.4 אינדוקס מחדש כשהמודל משתנה</a></li>
+<li><a href="#145">14.5 הנוף</a></li>
+<li><a href="#146-numpy">14.6 מבחן „האם numpy מספיק?”</a></li>
+<li><a href="#147">14.7 תפעול</a></li>
+<li><a href="#148">14.8 בפרויקט</a></li>
+<li><a href="#_3">סיכום</a></li>
+<li><a href="#_4">מונחים לזכור</a></li>
+<li><a href="#_5">טעויות נפוצות</a></li>
+<li><a href="#_6">שאלות ראיון</a></li>
+<li><a href="#obsidian">פתק Obsidian</a></li>
+<li><a href="#_7">תרגיל</a></li>
+<li><a href="#_8">העשרה אופציונלית</a></li>
+</ul>
+</div>
+
+<h1 id="14">פרק 14: מאגרי וקטורים</h1>
+<p>בשני הפרקים הקודמים כל הווקטורים חיו במטריצת numpy בזיכרון, וזה עבד מצוין. הפרק הזה מתחיל בשאלה
+הפוכה מהמקובל: <strong>מה בעצם חסר?</strong> התשובה היא לא „מהירות”, לפחות לא בגדלים שלנו; היא התמדה, סינון
+לפי מטא־נתונים, עדכון לפי מזהה, ועבודה מכמה תהליכים. „מאגר וקטורים” (vector database) הוא
+התוכנה שנותנת את אלה מעל אינדקס של שכנים קרובים. נלמד את Chroma, המאגר המוטמע של הקורס, את
+הנוף סביבו, מתי לא צריך אותו בכלל, ואת ההרגל התפעולי החשוב ביותר: אינדוקס מחדש כשהמודל משתנה.
+בסופו האינדקס של הכותרות יחיה על הדיסק, עם מסנן תאריך, ויסרב לערבב וקטורים משני מודלים.</p>
+<h2 id="_1">מה נלמד בפרק</h2>
+<ul>
+<li>מה numpy כבר נותן, ומה מאגר וקטורים מוסיף.</li>
+<li>המבנה: אוספים, מזהים, וקטורים, מסמכים, מטא־נתונים, מרחקים.</li>
+<li>Chroma בפועל: לקוח מתמיד, upsert, שאילתה עם מסננים, מחיקה.</li>
+<li>אינדוקס מחדש כשהמודל משתנה, ולמה המאגר צריך לסרב לערבב.</li>
+<li>הנוף: numpy, sqlite-vec, pgvector, Qdrant, Weaviate, Pinecone, FAISS.</li>
+<li>מבחן „האם numpy מספיק?”.</li>
+<li>תפעול: גיבוי, גרסאות, הרשאות כמטא־נתונים מול אכיפה בקוד, מחיקה.</li>
+</ul>
+<h2 id="_2">ידע מקדים</h2>
+<p>פרקים 12 ו־13. התרגיל קורא ל־API (שיכונים; המטמון מפרק 12 חוסך את רובן).</p>
+<h2 id="141-numpy">14.1 מה numpy נותן, ומה חסר</h2>
+<p>סריקה מלאה של מטריצה בגודל 100 אלף על 768 היא עשרות אלפיות שנייה. בגדלים של רוב הפרויקטים
+הפנימיים, המהירות לא הסיבה לעבור למאגר. מה כן:</p>
+<table>
+<thead>
+<tr>
+<th>צורך</th>
+<th>numpy</th>
+<th>מאגר וקטורים</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>התמדה</td>
+<td>שומרים קובץ <code>.npy</code> ועוד קובץ של מזהים, ומנהלים את הקשר ביניהם ביד</td>
+<td>חלק מהמאגר</td>
+</tr>
+<tr>
+<td>סינון לפי מטא־נתונים</td>
+<td>מסננים אחרי החיפוש, ומקווים שנשארו תוצאות</td>
+<td>מסנן בתוך השאילתה: „רק מהשבוע האחרון”</td>
+</tr>
+<tr>
+<td>עדכון לפי מזהה</td>
+<td>מוצאים את השורה, מחליפים, שומרים הכול מחדש</td>
+<td><code>upsert</code></td>
+</tr>
+<tr>
+<td>מחיקה</td>
+<td>אותו דבר</td>
+<td><code>delete</code> לפי מזהה או מסנן</td>
+</tr>
+<tr>
+<td>מיליוני וקטורים</td>
+<td>סריקה מלאה נהיית איטית</td>
+<td>אינדקס ANN (פרק 13)</td>
+</tr>
+<tr>
+<td>כמה תהליכים או שירותים</td>
+<td>נעילות ביד</td>
+<td>המאגר מטפל</td>
+</tr>
+<tr>
+<td>כמה אוספים</td>
+<td>כמה מטריצות וכמה רשימות</td>
+<td>אוספים עם שמות</td>
+</tr>
+</tbody>
+</table>
+<p>הטור הימני הוא בדיוק מה שהפרויקט צריך לזיכרון בין ימים: שמירה בין הרצות, „רק סיפורים מ־60 הימים
+האחרונים”, והוספה של כותרות היום בלי לבנות הכול מחדש. לכפילויות <em>באותו יום</em>, לעומת זאת, numpy
+מספיק, והפרויקט ישאיר את זה כך.</p>
+<h2 id="142">14.2 המבנה</h2>
+<p>כל מאגרי הווקטורים חולקים אוצר מילים:</p>
+<ul>
+<li><strong>אוסף</strong> (collection): טבלה. לכל אוסף מודל שיכון אחד ומרחק אחד.</li>
+<li><strong>מזהה</strong> (id): מחרוזת ייחודית לפריט. בחירה טובה היא משהו יציב ומשמעותי: מזהה הכותרת, גיבוב
+  התוכן.</li>
+<li><strong>וקטור</strong> (embedding): המספרים. או שאנחנו מחשבים אותם ושולחים, או שהמאגר קורא למודל בשבילנו.</li>
+<li><strong>מסמך</strong> (document): הטקסט המקורי, כדי שלא נצטרך לשמור אותו במקום אחר.</li>
+<li><strong>מטא־נתונים</strong> (metadata): מילון שטוח של מחרוזות, מספרים ובוליאנים: מקור, תאריך, נושא. זה מה
+  שמסננים לפיו.</li>
+<li><strong>מרחק</strong> (distance): איך משווים. קוסינוס לשיכונים מנורמלים; אוקלידי (L2) או מכפלה פנימית
+  במקרים אחרים. Chroma מחזירה <em>מרחק</em> קוסינוס, שהוא 1 פחות הדמיון, אז 0 הוא זהה ו־1 הוא ניצב.</li>
+</ul>
+<h2 id="143-chroma">14.3 Chroma בפועל</h2>
+<p>Chroma היא מאגר מוטמע: ספריית פייתון שכותבת לתיקייה, בלי שרת, עם גלגלי Windows. התרגיל עוטף
+אותה במחלקה אחת, <code>HeadlineStore</code>; אלה הקריאות שבפנים:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">import chromadb
+from chromadb.config import Settings
+
+client = chromadb.PersistentClient(path=&quot;ch14/chroma&quot;, settings=Settings(anonymized_telemetry=False))
+collection = client.get_or_create_collection(
+    &quot;headlines&quot;,
+    metadata={&quot;hnsw:space&quot;: &quot;cosine&quot;, &quot;embedding_model&quot;: &quot;gemini-embedding-2&quot;},
+)
+
+collection.upsert(
+    ids=[&quot;h042&quot;, &quot;h043&quot;],
+    embeddings=vectors.tolist(),               # we computed and normalized them (chapter 12)
+    documents=[&quot;Kubernetes 1.36 upgrade breaks ...&quot;, &quot;Python 3.14 released ...&quot;],
+    metadatas=[{&quot;source&quot;: &quot;cloudbeat&quot;, &quot;day&quot;: 20260925}, {&quot;source&quot;: &quot;hn&quot;, &quot;day&quot;: 20260912}],
+)
+
+result = collection.query(
+    query_embeddings=embedder.embed([&quot;kubernetes upgrade broke networking&quot;]).tolist(),
+    n_results=5,
+    where={&quot;$and&quot;: [{&quot;day&quot;: {&quot;$gte&quot;: 20260920}}, {&quot;source&quot;: &quot;hn&quot;}]},
+    include=[&quot;documents&quot;, &quot;distances&quot;, &quot;metadatas&quot;],
+)
+ids, distances = result[&quot;ids&quot;][0], result[&quot;distances&quot;][0]   # similarity = 1 - distance
+</code></pre>
+
+
+</div>
+
+<p>הערות שחוסכות שעה כל אחת:</p>
+<ul>
+<li><strong>שם האוסף</strong> חייב להיות באורך 3 עד 512 תווים, אותיות לטיניות, ספרות, נקודה, קו תחתון ומקף.</li>
+<li><strong><code>hnsw:space</code></strong> נקבע ביצירה ולא ניתן לשינוי. ברירת המחדל היא L2; לשיכונים רוצים <code>cosine</code>.</li>
+<li><strong>תאריכים כמספרים.</strong> המסננים <code>$gt</code>, <code>$gte</code>, <code>$lt</code>, <code>$lte</code> עובדים על מספרים בלבד; מחרוזת
+  „2026-09-20” נדחית. לכן <code>day</code> הוא מספר שלם בצורת yyyymmdd, שמסתדר נכון בהשוואה.</li>
+<li><strong>מסננים מרובים</strong> עוטפים ב־<code>$and</code> או <code>$or</code>; מסנן אחד נשלח כמו שהוא.</li>
+<li><strong><code>n_results</code> גדול מהאוסף</strong> זורק שגיאה בחלק מהגרסאות; מצמצמים ל־<code>min(k, count)</code>.</li>
+<li><strong><code>upsert</code> לפי מזהה קיים מחליף</strong> את הווקטור, המסמך והמטא־נתונים. זה מה שהופך הרצה חוזרת
+  לבטוחה.</li>
+<li><strong>פונקציות שיכון מובנות.</strong> Chroma יכולה לקרוא למודל שיכון בעצמה אם לא שולחים וקטורים. ברירת
+  המחדל שלה מורידה מודל מקומי קטן בפעם הראשונה. אנחנו שולחים וקטורים בעצמנו, כדי שהמודל, הנרמול
+  והמטמון יהיו של פרק 12 ולא של המאגר.</li>
+<li><strong>טלמטריה.</strong> ברירת המחדל שולחת נתוני שימוש אנונימיים; <code>anonymized_telemetry=False</code> מכבה.</li>
+</ul>
+<h2 id="144">14.4 אינדוקס מחדש כשהמודל משתנה</h2>
+<p>וקטור מ־<code>gemini-embedding-2</code> ב־768 ממדים ווקטור מאותו מודל ב־256 ממדים, או ממודל אחר, אינם
+ניתנים להשוואה (פרק 12). אוסף שמכיל את שניהם מחזיר תוצאות שנראות סבירות ושגויות. זה הבאג
+הכי שקט במאגרי וקטורים, ולכן <code>HeadlineStore</code> שומר את <strong>שם המודל במטא־נתונים של האוסף</strong> ובודק
+אותו בפתיחה:</p>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-python">store = HeadlineStore(path, embedder)
+if store.needs_reindex():        # collection metadata says another model built it
+    store.reindex(items)         # delete the collection, recreate, upsert everything
+store.upsert(items)              # refuses (RuntimeError) while the models differ
+</code></pre>
+
+
+</div>
+
+<p>אינדוקס מחדש של 200 כותרות הוא שניות; של מיליון מסמכים הוא שעות ועלות API. בפריסה אמיתית
+בונים אוסף <strong>חדש</strong> בשם עם גרסה (<code>headlines_v2</code>), ממלאים אותו ברקע, ומחליפים את השם שהקוד קורא
+לו כשהוא מוכן. אותו עיקרון: וקטורים משני מודלים לא פוגשים זה את זה באותו אוסף, לעולם.</p>
+<h2 id="145">14.5 הנוף</h2>
+<table>
+<thead>
+<tr>
+<th>כלי</th>
+<th>במשפט</th>
+<th>מתי</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>numpy</td>
+<td>מטריצה בזיכרון וסריקה מלאה</td>
+<td>עד מאות אלפי וקטורים, תהליך אחד, בלי מסננים מורכבים</td>
+</tr>
+<tr>
+<td>sqlite-vec</td>
+<td>הרחבה ל־SQLite עם חיפוש וקטורי</td>
+<td>כשהנתונים כבר ב־SQLite ורוצים קובץ אחד</td>
+</tr>
+<tr>
+<td>Chroma</td>
+<td>מאגר מוטמע, אוספים, מסננים, HNSW</td>
+<td>פרויקטים אישיים וקטנים, אב־טיפוס, הקורס הזה</td>
+</tr>
+<tr>
+<td>pgvector</td>
+<td>הרחבה ל־PostgreSQL</td>
+<td>כשיש כבר Postgres: וקטורים ליד הנתונים, טרנזקציות, הרשאות של מסד</td>
+</tr>
+<tr>
+<td>Qdrant, Weaviate</td>
+<td>שרתים ייעודיים, קוד פתוח</td>
+<td>מיליונים ומעלה, מסננים כבדים, כמה שירותים</td>
+</tr>
+<tr>
+<td>Pinecone</td>
+<td>שירות מנוהל</td>
+<td>כשלא רוצים לתפעל כלום ומוכנים לשלם</td>
+</tr>
+<tr>
+<td>FAISS</td>
+<td>ספריית אינדקסים (Meta)</td>
+<td>מחקר, שליטה מלאה באלגוריתם, בלי התמדה ומטא־נתונים</td>
+</tr>
+</tbody>
+</table>
+<p>הטיה שכדאי לדעת עליה: הרבה חומר שיווקי מדבר על מיליארדי וקטורים. רוב המערכות הפנימיות הן
+עשרות אלפים. בחירת כלי צריכה להתחיל מהגודל האמיתי, לא מהגודל שאולי יהיה.</p>
+<h2 id="146-numpy">14.6 מבחן „האם numpy מספיק?”</h2>
+<p>לפני שמוסיפים תלות, חמש שאלות. אם התשובה לכולן היא „לא”, numpy מספיק:</p>
+<table>
+<thead>
+<tr>
+<th>שאלה</th>
+<th>אם „כן”</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>יותר ממאות אלפי וקטורים, או שאילתות רבות לשנייה?</td>
+<td>צריך ANN</td>
+</tr>
+<tr>
+<td>צריך לשמור בין הרצות בלי לנהל קבצים ביד?</td>
+<td>צריך התמדה</td>
+</tr>
+<tr>
+<td>מסננים לפי מטא־נתונים לפני החיפוש (תאריך, מקור, משתמשת)?</td>
+<td>צריך מסננים באינדקס</td>
+</tr>
+<tr>
+<td>כמה תהליכים או שירותים כותבים וקוראים?</td>
+<td>צריך מאגר, ואולי שרת</td>
+</tr>
+<tr>
+<td>מחיקות ועדכונים תכופים לפי מזהה?</td>
+<td>צריך upsert ו־delete</td>
+</tr>
+</tbody>
+</table>
+<p>בפרויקט: כפילויות באותו יום, „לא” לכולן, numpy. זיכרון בין ימים, „כן” להתמדה ולמסננים, Chroma.
+ההערה הזאת נכנסת למסמך ההחלטות של הפרויקט כפי שהיא.</p>
+<h2 id="147">14.7 תפעול</h2>
+<ul>
+<li><strong>גיבוי.</strong> Chroma היא תיקייה; גיבוי הוא העתקה כשהתהליך לא כותב. המטמון של השיכונים (פרק 12)
+  הוא הביטוח האמיתי: אפשר לבנות הכול מחדש בלי קריאות API.</li>
+<li><strong>גרסאות.</strong> שם המודל במטא־נתונים של האוסף (14.4); שם אוסף עם גרסה כשמחליפים.</li>
+<li><strong>הרשאות.</strong> מסנן <code>where={"owner": user}</code> <strong>אינו גבול אבטחה</strong>; הוא מסנן שהקוד <em>בוחר</em> להפעיל. אם
+  שאילתה אחת שוכחת אותו, המשתמשת רואה הכול. הרשאות אמיתיות נאכפות בקוד שעוטף את המאגר, או
+  במאגר שתומך בהן (pgvector יורש את ההרשאות של Postgres). במאגר מוטמע: אוסף נפרד לכל דייר כשזה
+  חשוב.</li>
+<li><strong>נתונים אישיים.</strong> המסמך נשמר כטקסט במאגר; הווקטור ניתן להיפוך (פרק 12). שניהם רגישים כמו
+  המקור, ו„זכות להישכח” פירושה <code>delete</code> לפי מזהה או מסנן, בכל האוספים.</li>
+<li><strong>שימור</strong> (retention). „60 ימים” הוא <code>delete(where={"day": {"$lt": cutoff}})</code> שרץ בסוף כל הרצה.
+  פשוט, אם <code>day</code> הוא מספר.</li>
+</ul>
+<h2 id="148">14.8 בפרויקט</h2>
+<ul>
+<li><strong>אוסף <code>story_memory</code>:</strong> וקטור של כותרת ושורת פתיחה; מטא־נתונים <code>{day, cluster_id, url}</code>;
+  שימור 60 ימים.</li>
+<li><strong>שאילתת ההמשכים:</strong> לכל סיפור של היום, חיפוש באוסף עם <code>day</code> בטווח של השבועיים האחרונים; דמיון
+  מעל סף פירושו „המשך לסיפור מתאריך X”, והעיתון מציין את זה.</li>
+<li><strong>כפילויות באותו יום</strong> נשארות ב־numpy.</li>
+<li><strong>אותו מודל, אותו מטמון</strong>, אותו <code>embedding_model</code> במטא־נתונים; החלפת מודל היא אינדוקס מחדש
+  מתוכנן.</li>
+</ul>
+<h2 id="_3">סיכום</h2>
+<ul>
+<li>מאגר וקטורים מוסיף התמדה, מסננים, upsert, מחיקה ו־ANN מעל מה ש־numpy כבר עושה. בגדלים
+  קטנים המהירות אינה הסיבה.</li>
+<li>אוצר מילים: אוסף, מזהה, וקטור, מסמך, מטא־נתונים, מרחק. Chroma מחזירה מרחק קוסינוס, 1 פחות
+  הדמיון.</li>
+<li>Chroma: לקוח מתמיד, <code>get_or_create_collection</code> עם <code>hnsw:space=cosine</code>, <code>upsert</code>, <code>query</code> עם
+  <code>where</code>, תאריכים כמספרים, <code>n_results</code> לא מעל הגודל, וקטורים שלנו.</li>
+<li>שם המודל במטא־נתונים של האוסף; המאגר מסרב לערבב; החלפת מודל היא אינדוקס מחדש או אוסף חדש
+  עם גרסה.</li>
+<li>מבחן „האם numpy מספיק?” לפני כל תלות. בפרויקט: numpy ליום, Chroma לזיכרון.</li>
+<li>מסנן אינו הרשאה; המסמך והווקטור רגישים כמו המקור; שימור הוא מחיקה לפי תאריך.</li>
+</ul>
+<h2 id="_4">מונחים לזכור</h2>
+<table>
+<thead>
+<tr>
+<th>מונח בעברית</th>
+<th>באנגלית</th>
+<th>במשפט אחד</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>מאגר וקטורים</td>
+<td>vector database</td>
+<td>אינדקס שכנים קרובים עם התמדה, מסננים ועדכונים</td>
+</tr>
+<tr>
+<td>אוסף</td>
+<td>collection</td>
+<td>טבלה של וקטורים עם מודל אחד ומרחק אחד</td>
+</tr>
+<tr>
+<td>מטא־נתונים</td>
+<td>metadata</td>
+<td>מילון שטוח לכל פריט, לסינון</td>
+</tr>
+<tr>
+<td>upsert</td>
+<td>upsert</td>
+<td>הוספה או החלפה לפי מזהה; הרצה חוזרת בטוחה</td>
+</tr>
+<tr>
+<td>מרחק קוסינוס</td>
+<td>cosine distance</td>
+<td>1 פחות דמיון קוסינוס; 0 זהה</td>
+</tr>
+<tr>
+<td>אינדוקס מחדש</td>
+<td>reindex</td>
+<td>חישוב כל הווקטורים מחדש אחרי שינוי מודל</td>
+</tr>
+<tr>
+<td>מאגר מוטמע</td>
+<td>embedded database</td>
+<td>ספרייה שכותבת לתיקייה, בלי שרת</td>
+</tr>
+<tr>
+<td>שימור</td>
+<td>retention</td>
+<td>כמה זמן שומרים; מחיקה לפי תאריך</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">טעויות נפוצות</h2>
+<ul>
+<li><strong>לבחור מאגר לפני לבדוק אם numpy מספיק.</strong> תלות, תפעול וקוד, בשביל 5,000 וקטורים.</li>
+<li><strong>לשכוח <code>hnsw:space=cosine</code>.</strong> ברירת המחדל היא L2, והמרחקים לא מה שציפית.</li>
+<li><strong>תאריכים כמחרוזות במטא־נתונים.</strong> <code>$gte</code> נכשל; מספר yyyymmdd עובד.</li>
+<li><strong>לערבב מודלים באוסף.</strong> תוצאות סבירות למראה ושגויות. שם המודל במטא־נתונים, בדיקה בפתיחה.</li>
+<li><strong>לתת למאגר לשכן בעצמו בלי כוונה.</strong> מודל אחר, בלי מטמון, הורדה בפעם הראשונה.</li>
+<li><strong>לחשוב שמסנן הוא הרשאה.</strong> שאילתה אחת ששכחה אותו חושפת הכול.</li>
+</ul>
+<h2 id="_6">שאלות ראיון</h2>
+<ol>
+<li><strong>מתי צריך מאגר וקטורים ומתי לא?</strong> כשצריך התמדה, מסננים לפני החיפוש, עדכונים לפי מזהה,
+   כמה תהליכים, או יותר ממאות אלפי וקטורים. אחרת מטריצת numpy וסריקה מלאה פשוטות ומהירות
+   יותר. בפרויקט שלי השתמשתי בשניהם, לפי המבחן הזה.</li>
+<li><strong>Chroma מול pgvector מול Qdrant?</strong> Chroma: מוטמע, אפס תפעול, לפרויקטים קטנים. pgvector: כשיש
+   כבר Postgres, וקטורים ליד הנתונים עם טרנזקציות והרשאות. Qdrant ודומיו: שרת ייעודי לגדלים
+   ומסננים כבדים.</li>
+<li><strong>מה קורה כשמחליפים מודל שיכון?</strong> כל הווקטורים חסרי משמעות מול החדשים. שומרים את שם המודל
+   במטא־נתונים של האוסף, מסרבים לכתוב כשהוא שונה, ובונים אוסף חדש (או מאנדקסים מחדש) ומחליפים
+   כשהוא מוכן.</li>
+<li><strong>איך מטפלים בהרשאות במאגר וקטורים?</strong> מסנן מטא־נתונים הוא לא אבטחה; הוא כלי שהקוד חייב
+   להפעיל תמיד. אוכפים בקוד שעוטף את המאגר, או משתמשים במאגר עם הרשאות אמיתיות (Postgres), או
+   מפרידים אוספים לפי דייר.</li>
+</ol>
+<h2 id="obsidian">פתק Obsidian</h2>
+<p>הפתק המוכן נמצא גם כקובץ: <code>obsidian/14-vector-databases.md</code>. זה תוכנו:</p>
+<ul>
+<li><strong>מה חסר ל־numpy:</strong> התמדה, מסננים, upsert, מחיקה, ANN, כמה תהליכים. לא מהירות (בקטן).</li>
+<li><strong>אוצר מילים:</strong> אוסף, id, וקטור, מסמך, מטא־נתונים, מרחק (קוסינוס = 1 פחות דמיון).</li>
+<li><strong>Chroma:</strong> <code>PersistentClient</code>, <code>hnsw:space=cosine</code>, upsert, query עם <code>where</code>, תאריכים כמספרים,
+  וקטורים שלנו, טלמטריה כבויה.</li>
+<li><strong>מודל במטא־נתונים של האוסף.</strong> שונה? מסרבים לכתוב; אינדוקס מחדש או אוסף עם גרסה.</li>
+<li><strong>מבחן numpy מספיק:</strong> גודל, התמדה, מסננים, תהליכים, עדכונים.</li>
+<li><strong>מסנן ≠ הרשאה.</strong> מסמך ווקטור רגישים כמו המקור. שימור = מחיקה לפי תאריך.</li>
+<li><strong>שאלה פתוחה:</strong> ___</li>
+</ul>
+<div dir="ltr" align="left">
+
+
+<pre><code class="language-text">client    chromadb.PersistentClient(path=..., settings=Settings(anonymized_telemetry=False))
+create    get_or_create_collection(name, metadata={&quot;hnsw:space&quot;: &quot;cosine&quot;, &quot;embedding_model&quot;: model})
+upsert    ids, embeddings=vectors.tolist(), documents, metadatas=[{&quot;source&quot;: s, &quot;day&quot;: 20260925}]
+query     query_embeddings=[...], n_results=min(k, count), where={&quot;$and&quot;: [{&quot;day&quot;: {&quot;$gte&quot;: d}}, {&quot;source&quot;: &quot;hn&quot;}]}
+result    result[&quot;ids&quot;][0], result[&quot;distances&quot;][0]  -&gt; similarity = 1 - distance
+reindex   stored_model != embedder.model -&gt; delete_collection + recreate + upsert all
+</code></pre>
+
+
+</div>
+
+<h2 id="_7">תרגיל</h2>
+<p><strong>מטרה:</strong> להעביר את אינדקס הכותרות ל־Chroma: לקוח מתמיד, upsert, שאילתה עם מסנן תאריך ומקור,
+השוואה לסריקת numpy, ואינדוקס מחדש כשהמודל משתנה. <strong>זמן:</strong> יום לימוד אחד (יום 26), כ־60 דקות
+בנייה. <strong>ידע מקדים:</strong> הפרק, התרגיל של פרק 12, ומפתח API.</p>
+<p>הצעדים, קוד ההתחלה, הרמזים והפתרון נמצאים ב־
+<a href="../exercises/ch14-vector-db/README.md"><code>exercises/ch14-vector-db/README.md</code></a>.</p>
+<p><strong>קריטריון סיום:</strong></p>
+<ul>
+<li>חמש התוצאות הראשונות מ־Chroma זהות לאלה של numpy על אותה שאילתה.</li>
+<li>שאילתה עם <code>since_day</code> מחזירה רק כותרות מהתאריך ואילך; עם <code>source</code> רק מהמקור.</li>
+<li>פתיחה עם מודל אחר מדווחת <code>needs_reindex</code> ומסרבת ל־upsert; <code>reindex</code> מתקן.</li>
+<li>ארבע הבדיקות עוברות בלי רשת; בפתק: תשובה כתובה ל„האם numpy היה מספיק כאן?”.</li>
+</ul>
+<h2 id="_8">העשרה אופציונלית</h2>
+<ul>
+<li>התיעוד של Chroma על מסננים (<code>where</code>, <code>where_document</code>) ועל פונקציות שיכון.</li>
+<li>התיעוד של pgvector: אינדקסים HNSW ו־IVFFlat בתוך Postgres.</li>
+<li>המאמר של HNSW (Malkov &amp; Yashunin, 2016), בשביל התמונה המלאה של השכבות.</li>
+</ul>
+</main>
+<nav class="bottom"><a href="index.html">תוכן העניינים</a> · <a href="13-search-fundamentals.html">← פרק 13: יסודות החיפוש</a> · <a href="15-rag-end-to-end.html">פרק 15: RAG מקצה לקצה →</a></nav>
+<script type="module">
+  // Render ```mermaid blocks in the browser (needs internet once; cached afterwards).
+  const blocks = document.querySelectorAll("pre > code.language-mermaid");
+  if (blocks.length) {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+    for (const code of blocks) {
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      code.parentElement.replaceWith(div);
+    }
+    mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+    await mermaid.run();
+  }
+</script>
+</body>
+</html>

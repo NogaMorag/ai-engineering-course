@@ -79,6 +79,7 @@ class Completion:
     status: str
     input_tokens: int = 0
     output_tokens: int = 0
+    cached_tokens: int = 0  # part of input_tokens that hit the provider's prompt cache
     attempts: int = 1
     latency_s: float = 0.0
 
@@ -195,6 +196,7 @@ class GeminiClient:
                 status=status,
                 input_tokens=(usage.total_input_tokens if usage else None) or 0,
                 output_tokens=(usage.total_output_tokens if usage else None) or 0,
+                cached_tokens=(getattr(usage, "total_cached_tokens", None) if usage else None) or 0,
                 latency_s=time.monotonic() - started,
             )
             if status == "incomplete":

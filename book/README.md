@@ -59,10 +59,10 @@ RTL Support. לוח הלימוד היומי נמצא בנספח ו (ובאנגל
 
 | פרק | קובץ | מצב |
 | --- | --- | --- |
-| פרק 12: Embeddings ודמיון סמנטי | `12-embeddings.md` | ⏳ |
-| פרק 13: יסודות החיפוש | `13-search-fundamentals.md` | ⏳ |
-| פרק 14: מאגרי וקטורים | `14-vector-databases.md` | ⏳ |
-| פרק 15: RAG מקצה לקצה | `15-rag-end-to-end.md` | ⏳ |
+| פרק 12: Embeddings ודמיון סמנטי | [`12-embeddings.md`](12-embeddings.md) | ✅ |
+| פרק 13: יסודות החיפוש | [`13-search-fundamentals.md`](13-search-fundamentals.md) | ✅ |
+| פרק 14: מאגרי וקטורים | [`14-vector-databases.md`](14-vector-databases.md) | ✅ |
+| פרק 15: RAG מקצה לקצה | [`15-rag-end-to-end.md`](15-rag-end-to-end.md) | ✅ |
 
 ## חלק ה: הערכה ואיכות
 

@@ -1,0 +1,200 @@
+{"id": "h001", "text": "Postmortem: duplicate invoices at Nimbus traced to DNS caching", "topic": "misc", "source": "cloudbeat", "day": 20260908}
+{"id": "h002", "text": "Postmortem: a 90-minute outage at Tracewise traced to a leap-second bug", "topic": "misc", "source": "hn", "day": 20260911}
+{"id": "h003", "text": "Kotlin 4.0 released with a plugin API and Windows ARM builds", "topic": "misc", "source": "stackdaily", "day": 20260919}
+{"id": "h004", "text": "Ferrous migrates its billing pipeline to ClickHouse and reports zero on-call pages in a quarter", "topic": "misc", "source": "cloudbeat", "day": 20260920}
+{"id": "h005", "text": "Annual Rust survey: compile times remain the top complaint for the fifth year", "topic": "rust", "source": "devwire", "day": 20260919}
+{"id": "h006", "text": "Commercial space station module passes pressure tests ahead of 2028 launch", "topic": "space", "source": "orbitnews", "day": 20260910}
+{"id": "h007", "text": "QCon talk: lessons from running ClickHouse at 500 clusters", "topic": "misc", "source": "cloudbeat", "day": 20260903}
+{"id": "h008", "text": "Ferrous migrates its edge network to Rust and reports 40 percent lower cost", "topic": "misc", "source": "devwire", "day": 20260917}
+{"id": "h009", "text": "New recycling facility reclaims 95 percent of the lithium in spent electric vehicle batteries", "topic": "climate", "source": "devwire", "day": 20260901}
+{"id": "h010", "text": "Study: 60 percent of Kubernetes clusters request twice the CPU they use", "topic": "kubernetes", "source": "orbitnews", "day": 20260928}
+{"id": "h011", "text": "New multilingual embedding model adds Hebrew and Arabic to its top-tier languages", "topic": "ai", "source": "stackdaily", "day": 20260917}
+{"id": "h012", "text": "Typosquatted PyPI package mimicked a popular HTTP client library for 72 hours before removal", "topic": "security", "source": "cloudbeat", "day": 20261002}
+{"id": "h013", "text": "Pandas 4.0 switches the default string dtype to Arrow-backed strings", "topic": "python", "source": "hn", "day": 20260930}
+{"id": "h014", "text": "DuckDB 2.0 can now query Iceberg tables straight from S3-compatible storage", "topic": "databases", "source": "stackdaily", "day": 20260930}
+{"id": "h015", "text": "Why an airline replaced microservices with Postgres: a two-year retrospective", "topic": "misc", "source": "orbitnews", "day": 20260930}
+{"id": "h016", "text": "SpinKube runs WebAssembly workloads next to containers in production clusters", "topic": "kubernetes", "source": "orbitnews", "day": 20261001}
+{"id": "h017", "text": "Open-weights model family released under a permissive license with 1 million token context", "topic": "ai", "source": "stackdaily", "day": 20260910}
+{"id": "h018", "text": "Chipmaker Helion unveils a 2-nanometer process with backside power delivery", "topic": "hardware", "source": "cloudbeat", "day": 20260918}
+{"id": "h019", "text": "QCon talk: lessons from running Postgres at ten thousand nodes", "topic": "misc", "source": "orbitnews", "day": 20260915}
+{"id": "h020", "text": "Lumen migrates its search backend to gRPC and reports a 3x throughput gain", "topic": "misc", "source": "devwire", "day": 20260927}
+{"id": "h021", "text": "SREcon talk: lessons from running Go at the edge", "topic": "misc", "source": "cloudbeat", "day": 20260922}
+{"id": "h022", "text": "Voltaic open-sources Harbor, its internal cost monitoring tool", "topic": "misc", "source": "stackdaily", "day": 20260911}
+{"id": "h023", "text": "Survey: most production AI agents run fewer than five tool calls per task", "topic": "ai", "source": "stackdaily", "day": 20260912}
+{"id": "h024", "text": "Long-context models did not kill RAG: retrieval still wins on cost and freshness, says report", "topic": "ai", "source": "stackdaily", "day": 20260913}
+{"id": "h025", "text": "Battery recycling plant recovers 95 percent of lithium from used EV packs", "topic": "climate", "source": "stackdaily", "day": 20260913}
+{"id": "h026", "text": "PyCon talk: lessons from running Nix at a million users", "topic": "misc", "source": "orbitnews", "day": 20260916}
+{"id": "h027", "text": "Small 3B model reaches 2025 frontier-level coding scores, researchers report", "topic": "ai", "source": "stackdaily", "day": 20260907}
+{"id": "h028", "text": "First RISC-V laptop with a 12-core chip ships to developers", "topic": "hardware", "source": "orbitnews", "day": 20260906}
+{"id": "h029", "text": "Postmortem: lost telemetry at Fairline traced to an expired certificate", "topic": "misc", "source": "devwire", "day": 20260930}
+{"id": "h030", "text": "Fintech Lumen moves 40 TB from MongoDB to Postgres with zero downtime", "topic": "databases", "source": "cloudbeat", "day": 20260926}
+{"id": "h031", "text": "Caddy 0.9 released with native tracing and a stable ABI", "topic": "misc", "source": "hn", "day": 20260909}
+{"id": "h032", "text": "Orbital Labs open-sources Compass, its internal feature flagging tool", "topic": "misc", "source": "cloudbeat", "day": 20260910}
+{"id": "h033", "text": "Why an airline replaced a NoSQL store with a modular monolith: a two-year retrospective", "topic": "misc", "source": "cloudbeat", "day": 20260901}
+{"id": "h034", "text": "Developer tools company Ferrous files for an IPO at a 9 billion dollar valuation", "topic": "business", "source": "stackdaily", "day": 20260914}
+{"id": "h035", "text": "Benchmark: WebAssembly versus Node.js on image resizing", "topic": "misc", "source": "hn", "day": 20260924}
+{"id": "h036", "text": "Zig maintainers deprecate workspace support ahead of the 3.1 release", "topic": "misc", "source": "orbitnews", "day": 20260905}
+{"id": "h037", "text": "Postmortem: a 6-hour login failure at Tracewise traced to an expired certificate", "topic": "misc", "source": "hn", "day": 20260901}
+{"id": "h038", "text": "Postmortem: a 6-hour login failure at Fairline traced to a leap-second bug", "topic": "misc", "source": "stackdaily", "day": 20260929}
+{"id": "h039", "text": "etcd 4.0 cuts snapshot restore time in half for large clusters", "topic": "kubernetes", "source": "orbitnews", "day": 20260902}
+{"id": "h040", "text": "Benchmark: Rust versus REST on time-series ingestion", "topic": "misc", "source": "devwire", "day": 20260915}
+{"id": "h041", "text": "NATS 1.9 released with zero-copy parsing and a stable ABI", "topic": "misc", "source": "orbitnews", "day": 20260911}
+{"id": "h042", "text": "Open-source maintainers fund launches with 20 million from five cloud providers", "topic": "business", "source": "hn", "day": 20260913}
+{"id": "h043", "text": "Postmortem: how a single long-running transaction took a payments database offline for 4 hours", "topic": "databases", "source": "orbitnews", "day": 20260904}
+{"id": "h044", "text": "Strange Loop talk: lessons from running Nix at a million users", "topic": "misc", "source": "cloudbeat", "day": 20260914}
+{"id": "h045", "text": "Why the platform group replaced microservices with a modular monolith: a two-year retrospective", "topic": "misc", "source": "cloudbeat", "day": 20260916}
+{"id": "h046", "text": "Voltaic open-sources Quill, its internal data lineage tool", "topic": "misc", "source": "devwire", "day": 20260926}
+{"id": "h047", "text": "Async Rust working group proposes a standard executor trait for the 2027 edition", "topic": "rust", "source": "orbitnews", "day": 20261002}
+{"id": "h048", "text": "SREcon talk: lessons from running ClickHouse at the edge", "topic": "misc", "source": "stackdaily", "day": 20260916}
+{"id": "h049", "text": "Redis 5.2 released with a plugin API and signed releases", "topic": "misc", "source": "hn", "day": 20260907}
+{"id": "h050", "text": "Postmortem: a stuck deploy at Orbital Labs traced to a misconfigured autoscaler", "topic": "misc", "source": "stackdaily", "day": 20260907}
+{"id": "h051", "text": "Postmortem: a stuck deploy at Stackdaily traced to DNS caching", "topic": "misc", "source": "hn", "day": 20260917}
+{"id": "h052", "text": "Vite maintainers deprecate zero-copy parsing ahead of the 7.0 release", "topic": "misc", "source": "stackdaily", "day": 20260925}
+{"id": "h053", "text": "Cloudbeat migrates its data warehouse to Go and reports half the latency", "topic": "misc", "source": "orbitnews", "day": 20260909}
+{"id": "h054", "text": "A 3-billion-parameter model matches last year's frontier models on coding benchmarks", "topic": "ai", "source": "stackdaily", "day": 20260921}
+{"id": "h055", "text": "Four-day week trial at 60 tech companies ends with 90 percent keeping it", "topic": "business", "source": "stackdaily", "day": 20260922}
+{"id": "h056", "text": "Rust compiler error E0502 explained: why the borrow checker rejects your mutable reference", "topic": "rust", "source": "orbitnews", "day": 20260927}
+{"id": "h057", "text": "Postmortem: a 90-minute outage at Orbital Labs traced to a misconfigured autoscaler", "topic": "misc", "source": "devwire", "day": 20260901}
+{"id": "h058", "text": "Benchmark: ClickHouse versus MySQL on analytics queries", "topic": "misc", "source": "cloudbeat", "day": 20260911}
+{"id": "h059", "text": "Benchmark: Nix versus Node.js on log search", "topic": "misc", "source": "stackdaily", "day": 20260907}
+{"id": "h060", "text": "Clusters on the legacy CNI plugin lose pod networking after upgrading to Kubernetes 1.36", "topic": "kubernetes", "source": "stackdaily", "day": 20260906}
+{"id": "h061", "text": "Quantum computer corrects errors faster than it makes them for the first time", "topic": "hardware", "source": "orbitnews", "day": 20260921}
+{"id": "h062", "text": "Ferrous migrates its event bus to Postgres and reports a 3x throughput gain", "topic": "misc", "source": "stackdaily", "day": 20260923}
+{"id": "h063", "text": "Kotlin 2.0 released with a plugin API and better error messages", "topic": "misc", "source": "devwire", "day": 20260930}
+{"id": "h064", "text": "Why the platform group replaced cron jobs with a real database: a two-year retrospective", "topic": "misc", "source": "devwire", "day": 20260912}
+{"id": "h065", "text": "PostgreSQL 18 ships asynchronous I/O and faster upgrades between major versions", "topic": "databases", "source": "stackdaily", "day": 20260928}
+{"id": "h066", "text": "Postmortem: duplicate invoices at Lumen traced to DNS caching", "topic": "misc", "source": "hn", "day": 20260909}
+{"id": "h067", "text": "Postmortem: a 6-hour login failure at Cloudbeat traced to a schema migration lock", "topic": "misc", "source": "devwire", "day": 20261002}
+{"id": "h068", "text": "Why the platform group replaced microservices with serverless functions: a two-year retrospective", "topic": "misc", "source": "hn", "day": 20260916}
+{"id": "h069", "text": "Open eval suite finds LLM judges prefer longer answers regardless of correctness", "topic": "ai", "source": "devwire", "day": 20261001}
+{"id": "h070", "text": "Tracewise open-sources Beacon, its internal feature flagging tool", "topic": "misc", "source": "hn", "day": 20260929}
+{"id": "h071", "text": "Benchmark: Kafka versus Node.js on analytics queries", "topic": "misc", "source": "orbitnews", "day": 20260921}
+{"id": "h072", "text": "Mars sample return redesigned around two launches to cut costs", "topic": "space", "source": "orbitnews", "day": 20260909}
+{"id": "h073", "text": "Django 6.0 adds native async ORM queries and drops Python 3.11 support", "topic": "python", "source": "orbitnews", "day": 20260906}
+{"id": "h074", "text": "Malicious package on PyPI impersonated a popular HTTP library for three days", "topic": "security", "source": "orbitnews", "day": 20260930}
+{"id": "h075", "text": "Wasm toolchain Ferrous builds Rust to WebAssembly 40 percent faster in new release", "topic": "rust", "source": "devwire", "day": 20260906}
+{"id": "h076", "text": "SREcon talk: lessons from running Rust at ten thousand nodes", "topic": "misc", "source": "orbitnews", "day": 20260919}
+{"id": "h077", "text": "Heat shield review pushes the crewed Moon landing to 2029", "topic": "space", "source": "stackdaily", "day": 20260915}
+{"id": "h078", "text": "Bun maintainers deprecate live reload ahead of the 2.0 release", "topic": "misc", "source": "hn", "day": 20260903}
+{"id": "h079", "text": "Nimbus open-sources Harbor, its internal secrets rotation tool", "topic": "misc", "source": "cloudbeat", "day": 20260910}
+{"id": "h080", "text": "Why a maps startup replaced microservices with serverless functions: a two-year retrospective", "topic": "misc", "source": "devwire", "day": 20260924}
+{"id": "h081", "text": "Tracewise open-sources Compass, its internal release orchestration tool", "topic": "misc", "source": "stackdaily", "day": 20260928}
+{"id": "h082", "text": "Benchmark: Postgres versus Node.js on time-series ingestion", "topic": "misc", "source": "stackdaily", "day": 20260901}
+{"id": "h083", "text": "pytest 9 makes the new assertion rewriting engine the default", "topic": "python", "source": "cloudbeat", "day": 20260924}
+{"id": "h084", "text": "Why a hospital network replaced a NoSQL store with GitHub Actions: a two-year retrospective", "topic": "misc", "source": "cloudbeat", "day": 20260923}
+{"id": "h085", "text": "New fabs in Arizona and Dresden start to relieve the GPU shortage", "topic": "hardware", "source": "stackdaily", "day": 20260901}
+{"id": "h086", "text": "SQLite adds native vector search in version 3.52", "topic": "databases", "source": "stackdaily", "day": 20260910}
+{"id": "h087", "text": "RustConf talk: lessons from running Go at a petabyte a day", "topic": "misc", "source": "devwire", "day": 20260904}
+{"id": "h088", "text": "Cargo-Lite 2.0 released: shared build cache brings 41-minute compiles down to six", "topic": "rust", "source": "hn", "day": 20260907}
+{"id": "h089", "text": "Helm 4 released with OCI-only chart distribution and typed values", "topic": "kubernetes", "source": "hn", "day": 20260915}
+{"id": "h090", "text": "Kotlin 3.1 released with incremental builds and Windows ARM builds", "topic": "misc", "source": "cloudbeat", "day": 20260905}
+{"id": "h091", "text": "Space telescope spots water vapor on a temperate exoplanet", "topic": "space", "source": "orbitnews", "day": 20260920}
+{"id": "h092", "text": "Polars 7.0 released with typed configuration and faster startup", "topic": "misc", "source": "stackdaily", "day": 20260902}
+{"id": "h093", "text": "Postmortem: duplicate invoices at Orbital Labs traced to a leap-second bug", "topic": "misc", "source": "orbitnews", "day": 20260918}
+{"id": "h094", "text": "Outdoor trials show perovskite solar cells hitting 30 percent efficiency", "topic": "climate", "source": "cloudbeat", "day": 20261001}
+{"id": "h095", "text": "QCon talk: lessons from running Nix at 500 clusters", "topic": "misc", "source": "hn", "day": 20260924}
+{"id": "h096", "text": "Postmortem: a 6-hour login failure at Fairline traced to an expired certificate", "topic": "misc", "source": "cloudbeat", "day": 20260925}
+{"id": "h097", "text": "Chip export rules tighten again; hardware startups warn of 12-month delays", "topic": "business", "source": "stackdaily", "day": 20260904}
+{"id": "h098", "text": "Kotlin 7.0 released with a plugin API and a stable ABI", "topic": "misc", "source": "cloudbeat", "day": 20260924}
+{"id": "h099", "text": "RustConf talk: lessons from running gRPC at ten thousand nodes", "topic": "misc", "source": "cloudbeat", "day": 20260921}
+{"id": "h100", "text": "Traefik maintainers deprecate native tracing ahead of the 0.9 release", "topic": "misc", "source": "stackdaily", "day": 20260920}
+{"id": "h101", "text": "Lumen migrates its billing pipeline to Go and reports 40 percent lower cost", "topic": "misc", "source": "cloudbeat", "day": 20260907}
+{"id": "h102", "text": "Postmortem: a 90-minute outage at Helion traced to DNS caching", "topic": "misc", "source": "cloudbeat", "day": 20260929}
+{"id": "h103", "text": "Python 3.14 is out: free-threaded builds become the Linux default", "topic": "python", "source": "cloudbeat", "day": 20260917}
+{"id": "h104", "text": "Mars sample return mission finds a cheaper two-launch architecture", "topic": "space", "source": "hn", "day": 20260927}
+{"id": "h105", "text": "Why a maps startup replaced cron jobs with a workflow engine: a two-year retrospective", "topic": "misc", "source": "cloudbeat", "day": 20260930}
+{"id": "h106", "text": "Gateway API 2.0 graduates and the Ingress resource is formally deprecated", "topic": "kubernetes", "source": "devwire", "day": 20261002}
+{"id": "h107", "text": "Heat pump sales pass gas boilers in Europe for the first year", "topic": "climate", "source": "cloudbeat", "day": 20260904}
+{"id": "h108", "text": "PyCon talk: lessons from running Nix at the edge", "topic": "misc", "source": "cloudbeat", "day": 20260918}
+{"id": "h109", "text": "Argo CD 4 adds progressive rollouts to every application by default", "topic": "kubernetes", "source": "stackdaily", "day": 20260917}
+{"id": "h110", "text": "Data centers now use 4 percent of national electricity, regulator reports", "topic": "climate", "source": "stackdaily", "day": 20260920}
+{"id": "h111", "text": "Tokio 3.1 released with workspace support and signed releases", "topic": "misc", "source": "cloudbeat", "day": 20260912}
+{"id": "h112", "text": "Browsers will stop trusting certificates valid for more than 45 days starting 2028", "topic": "security", "source": "cloudbeat", "day": 20260903}
+{"id": "h113", "text": "Ferrous open-sources Quill, its internal feature flagging tool", "topic": "misc", "source": "orbitnews", "day": 20260912}
+{"id": "h114", "text": "Fairline open-sources Compass, its internal feature flagging tool", "topic": "misc", "source": "devwire", "day": 20261002}
+{"id": "h115", "text": "Tokio 12 released with a new scheduler and a stable ABI", "topic": "misc", "source": "cloudbeat", "day": 20260919}
+{"id": "h116", "text": "KubeCon talk: lessons from running Arrow at ten thousand nodes", "topic": "misc", "source": "orbitnews", "day": 20260923}
+{"id": "h117", "text": "CVE-2026-1234: remote code execution in the OpenSSH agent forwarding path patched", "topic": "security", "source": "orbitnews", "day": 20260910}
+{"id": "h118", "text": "Reusable rocket completes its 30th flight with the same first stage", "topic": "space", "source": "stackdaily", "day": 20260927}
+{"id": "h119", "text": "Vite 5.2 released with zero-copy parsing and signed releases", "topic": "misc", "source": "orbitnews", "day": 20260903}
+{"id": "h120", "text": "Grid-scale storage hits 100 gigawatt-hours installed worldwide", "topic": "climate", "source": "devwire", "day": 20260925}
+{"id": "h121", "text": "Python 3.14 released with the free-threaded build enabled by default on Linux", "topic": "python", "source": "stackdaily", "day": 20260914}
+{"id": "h122", "text": "Prompt injection through a calendar invite tricked an AI assistant into forwarding email", "topic": "security", "source": "stackdaily", "day": 20261002}
+{"id": "h123", "text": "KubeCon talk: lessons from running Postgres at a million users", "topic": "misc", "source": "cloudbeat", "day": 20260914}
+{"id": "h124", "text": "Lumen breach: 12 million customer passwords leaked in credential dump", "topic": "security", "source": "devwire", "day": 20260901}
+{"id": "h125", "text": "Benchmark: pgvector matches dedicated vector databases up to ten million vectors", "topic": "databases", "source": "orbitnews", "day": 20260917}
+{"id": "h126", "text": "Repairable phone maker Fairline sells its one millionth device", "topic": "hardware", "source": "devwire", "day": 20260910}
+{"id": "h127", "text": "Postmortem: a 90-minute outage at Cloudbeat traced to a leap-second bug", "topic": "misc", "source": "orbitnews", "day": 20261002}
+{"id": "h128", "text": "Satellite constellation photographs every hurricane from orbit within ten minutes", "topic": "space", "source": "orbitnews", "day": 20260909}
+{"id": "h129", "text": "Voltaic starts pilot production of solid-state batteries for e-bikes", "topic": "hardware", "source": "orbitnews", "day": 20260903}
+{"id": "h130", "text": "Kotlin maintainers deprecate lazy loading ahead of the 3.1 release", "topic": "misc", "source": "orbitnews", "day": 20260914}
+{"id": "h131", "text": "Why a payments team replaced spreadsheets with a modular monolith: a two-year retrospective", "topic": "misc", "source": "orbitnews", "day": 20260926}
+{"id": "h132", "text": "Why a payments team replaced microservices with a workflow engine: a two-year retrospective", "topic": "misc", "source": "orbitnews", "day": 20260902}
+{"id": "h133", "text": "RustConf talk: lessons from running gRPC at a petabyte a day", "topic": "misc", "source": "stackdaily", "day": 20260907}
+{"id": "h134", "text": "Postmortem: a stuck deploy at Ferrous traced to a misconfigured autoscaler", "topic": "misc", "source": "devwire", "day": 20260909}
+{"id": "h135", "text": "Airflow maintainers deprecate typed configuration ahead of the 1.9 release", "topic": "misc", "source": "cloudbeat", "day": 20260913}
+{"id": "h136", "text": "Backup failures went unnoticed for six months at hosting provider Nimbus, audit finds", "topic": "databases", "source": "stackdaily", "day": 20261001}
+{"id": "h137", "text": "DuckDB 2.0 reads Iceberg tables directly from object storage", "topic": "databases", "source": "devwire", "day": 20260915}
+{"id": "h138", "text": "A payments database was down for four hours because of one long-running transaction, postmortem shows", "topic": "databases", "source": "orbitnews", "day": 20260907}
+{"id": "h139", "text": "SREcon talk: lessons from running gRPC at a million users", "topic": "misc", "source": "cloudbeat", "day": 20260927}
+{"id": "h140", "text": "QCon talk: lessons from running Go at 500 clusters", "topic": "misc", "source": "orbitnews", "day": 20260930}
+{"id": "h141", "text": "Traefik 2.0 released with workspace support and lower memory use", "topic": "misc", "source": "devwire", "day": 20260908}
+{"id": "h142", "text": "Cargo-Lite 2.0 ships a shared build cache that cuts compile times from 41 to 6 minutes", "topic": "rust", "source": "cloudbeat", "day": 20260908}
+{"id": "h143", "text": "Prompt caching cuts inference bills by 60 percent for retrieval-heavy workloads", "topic": "ai", "source": "devwire", "day": 20260924}
+{"id": "h144", "text": "Benchmark: Go versus LevelDB on JSON parsing", "topic": "misc", "source": "orbitnews", "day": 20260927}
+{"id": "h145", "text": "Kafka maintainers deprecate native tracing ahead of the 1.9 release", "topic": "misc", "source": "hn", "day": 20260908}
+{"id": "h146", "text": "Solid-state battery startup Voltaic begins pilot production for electric bikes", "topic": "hardware", "source": "orbitnews", "day": 20260908}
+{"id": "h147", "text": "Airflow 2.0 released with a plugin API and signed releases", "topic": "misc", "source": "devwire", "day": 20260914}
+{"id": "h148", "text": "Benchmark: WebAssembly versus LevelDB on image resizing", "topic": "misc", "source": "hn", "day": 20260909}
+{"id": "h149", "text": "Ferrous migrates its auth service to ClickHouse and reports 40 percent lower cost", "topic": "misc", "source": "stackdaily", "day": 20260907}
+{"id": "h150", "text": "Benchmark: Go versus Docker on message fan-out", "topic": "misc", "source": "stackdaily", "day": 20260915}
+{"id": "h151", "text": "Rust survey results: slow compile times are still developers' number one complaint", "topic": "rust", "source": "devwire", "day": 20260929}
+{"id": "h152", "text": "Crewed lunar landing slips to 2029 after heat shield review", "topic": "space", "source": "hn", "day": 20261002}
+{"id": "h153", "text": "Database vendor Lumen acquires observability startup Tracewise for 400 million", "topic": "business", "source": "devwire", "day": 20260915}
+{"id": "h154", "text": "Elixir 12 released with structured logging and signed releases", "topic": "misc", "source": "orbitnews", "day": 20260920}
+{"id": "h155", "text": "Credential dump exposes 12 million passwords from the Lumen fintech breach", "topic": "security", "source": "cloudbeat", "day": 20260919}
+{"id": "h156", "text": "Polars maintainers deprecate incremental builds ahead of the 12 release", "topic": "misc", "source": "stackdaily", "day": 20260909}
+{"id": "h157", "text": "KubeCon talk: lessons from running Kafka at a petabyte a day", "topic": "misc", "source": "devwire", "day": 20260909}
+{"id": "h158", "text": "HBM4 memory enters mass production with double the bandwidth of HBM3e", "topic": "hardware", "source": "hn", "day": 20260913}
+{"id": "h159", "text": "RustConf talk: lessons from running Kafka at 500 clusters", "topic": "misc", "source": "hn", "day": 20260916}
+{"id": "h160", "text": "Swift maintainers deprecate structured logging ahead of the 7.0 release", "topic": "misc", "source": "hn", "day": 20260923}
+{"id": "h161", "text": "Why an airline replaced Jenkins with GitHub Actions: a two-year retrospective", "topic": "misc", "source": "cloudbeat", "day": 20260913}
+{"id": "h162", "text": "Orbital Labs demonstrates capturing a dead satellite with a robotic arm", "topic": "space", "source": "devwire", "day": 20260919}
+{"id": "h163", "text": "Study: LLM-as-judge systems favor verbose answers even when they are wrong", "topic": "ai", "source": "stackdaily", "day": 20260918}
+{"id": "h164", "text": "Passkeys overtake SMS codes as the most used second factor at major banks", "topic": "security", "source": "cloudbeat", "day": 20260913}
+{"id": "h165", "text": "Fairline migrates its auth service to ClickHouse and reports zero on-call pages in a quarter", "topic": "misc", "source": "hn", "day": 20260906}
+{"id": "h166", "text": "Benchmark: Kafka versus Parquet on message fan-out", "topic": "misc", "source": "cloudbeat", "day": 20260904}
+{"id": "h167", "text": "Nimbus cuts 30 percent of its workforce following a revenue shortfall", "topic": "business", "source": "hn", "day": 20260911}
+{"id": "h168", "text": "Benchmark: gRPC versus LevelDB on log search", "topic": "misc", "source": "cloudbeat", "day": 20260930}
+{"id": "h169", "text": "Cloud startup Nimbus lays off 30 percent of staff after missing revenue targets", "topic": "business", "source": "stackdaily", "day": 20261002}
+{"id": "h170", "text": "Orbital Labs open-sources Compass, its internal load testing tool", "topic": "misc", "source": "stackdaily", "day": 20260923}
+{"id": "h171", "text": "Perovskite solar panels reach 30 percent efficiency in outdoor tests", "topic": "climate", "source": "orbitnews", "day": 20260902}
+{"id": "h172", "text": "Jupyter notebooks gain real-time collaboration in JupyterLab 5", "topic": "python", "source": "devwire", "day": 20260920}
+{"id": "h173", "text": "Cloudbeat open-sources Quill, its internal incident management tool", "topic": "misc", "source": "cloudbeat", "day": 20260909}
+{"id": "h174", "text": "Iced 1.0 brings a stable cross-platform GUI toolkit to Rust", "topic": "rust", "source": "cloudbeat", "day": 20261002}
+{"id": "h175", "text": "Benchmark: Arrow versus Node.js on JSON parsing", "topic": "misc", "source": "hn", "day": 20260906}
+{"id": "h176", "text": "Proposal: a standard executor trait for async Rust lands in the 2027 edition discussion", "topic": "rust", "source": "hn", "day": 20260929}
+{"id": "h177", "text": "PEP 812 proposes inline type syntax for lambda parameters", "topic": "python", "source": "cloudbeat", "day": 20260905}
+{"id": "h178", "text": "GPU shortage eases as two new fabs come online in Arizona and Dresden", "topic": "hardware", "source": "devwire", "day": 20260901}
+{"id": "h179", "text": "Nginx 1.9 released with incremental builds and signed releases", "topic": "misc", "source": "hn", "day": 20260920}
+{"id": "h180", "text": "PyCon talk: lessons from running Nix at 500 clusters", "topic": "misc", "source": "orbitnews", "day": 20260907}
+{"id": "h181", "text": "Report finds most Kubernetes workloads over-request CPU by a factor of two", "topic": "kubernetes", "source": "stackdaily", "day": 20261002}
+{"id": "h182", "text": "Lumen buys observability company Tracewise in a 400 million dollar deal", "topic": "business", "source": "devwire", "day": 20260926}
+{"id": "h183", "text": "New train line connects the airport to downtown in 18 minutes", "topic": "climate", "source": "devwire", "day": 20260921}
+{"id": "h184", "text": "Linux 7.3 merges the first Rust network driver into the mainline kernel", "topic": "rust", "source": "orbitnews", "day": 20260901}
+{"id": "h185", "text": "Voltaic migrates its billing pipeline to WebAssembly and reports 40 percent lower cost", "topic": "misc", "source": "cloudbeat", "day": 20261001}
+{"id": "h186", "text": "Direct air capture plant in Iceland starts storing CO2 at commercial scale", "topic": "climate", "source": "devwire", "day": 20260923}
+{"id": "h187", "text": "Why a maps startup replaced Jenkins with a real database: a two-year retrospective", "topic": "misc", "source": "cloudbeat", "day": 20260915}
+{"id": "h188", "text": "Per-seat software pricing gives way to usage-based billing, survey of 500 vendors finds", "topic": "business", "source": "orbitnews", "day": 20260903}
+{"id": "h189", "text": "Why a games studio replaced cron jobs with a real database: a two-year retrospective", "topic": "misc", "source": "stackdaily", "day": 20260910}
+{"id": "h190", "text": "Why a games studio replaced microservices with a real database: a two-year retrospective", "topic": "misc", "source": "stackdaily", "day": 20260904}
+{"id": "h191", "text": "Audit: Nimbus hosting ran six months with silently failing backups", "topic": "databases", "source": "hn", "day": 20260928}
+{"id": "h192", "text": "Airflow maintainers deprecate incremental builds ahead of the 2.0 release", "topic": "misc", "source": "hn", "day": 20260923}
+{"id": "h193", "text": "Benchmark: Rust versus Node.js on image resizing", "topic": "misc", "source": "orbitnews", "day": 20260930}
+{"id": "h194", "text": "uv 1.0 reaches stable: one tool for Python versions, packages and scripts", "topic": "python", "source": "stackdaily", "day": 20260923}
+{"id": "h195", "text": "Kubernetes 1.36 upgrade breaks pod networking for clusters using the legacy CNI plugin", "topic": "kubernetes", "source": "stackdaily", "day": 20260930}
+{"id": "h196", "text": "Cloudbeat open-sources Compass, its internal load testing tool", "topic": "misc", "source": "cloudbeat", "day": 20260907}
+{"id": "h197", "text": "Ransomware group targets backup servers first, incident reports show", "topic": "security", "source": "stackdaily", "day": 20261002}
+{"id": "h198", "text": "Django 6.0 lands async ORM support; Python 3.11 is no longer supported", "topic": "python", "source": "cloudbeat", "day": 20260919}
+{"id": "h199", "text": "Stackdaily open-sources Prism, its internal feature flagging tool", "topic": "misc", "source": "devwire", "day": 20260926}
+{"id": "h200", "text": "Benchmark: Postgres versus REST on log search", "topic": "misc", "source": "orbitnews", "day": 20260917}
