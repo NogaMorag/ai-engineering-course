@@ -11,7 +11,7 @@ def test_bank_shape() -> None:
     bank = load_bank()
     assert len(bank) >= 40 and len({q.id for q in bank}) == len(bank)
     assert {q.category for q in bank} == set(CATEGORIES)
-    assert all(len(q.answer) > 60 and q.question.endswith("?") or q.question.endswith(".") for q in bank)
+    assert all(len(q.answer) > 60 and (q.question.endswith("?") or q.question.endswith(".")) for q in bank)
     assert sum(1 for q in bank if q.tradeoff) >= 4
 
 
@@ -19,7 +19,7 @@ def test_sample_spreads_categories_and_is_reproducible() -> None:
     bank = load_bank()
     picked = sample(bank, 8, seed=3)
     assert len(picked) == 8 and len({q.id for q in picked}) == 8
-    assert len(set(q.category for q in picked)) == 8  # one per category when n == number of categories
+    assert len({q.category for q in picked}) == 8  # one per category when n == number of categories
     assert [q.id for q in sample(bank, 8, seed=3)] == [q.id for q in picked]
     only = sample(bank, 5, categories=["rag", "evals"], seed=1)
     assert {q.category for q in only} <= {"rag", "evals"} and Counter(q.category for q in only).most_common(1)[0][1] <= 3
